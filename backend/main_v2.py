@@ -24,7 +24,7 @@ from .tool_registry import TOOL_REGISTRY, list_tools_by_category, get_tools_for_
 from .policy_firewall import policy_firewall
 from .tools_impl import tool_executor, TOOL_FUNCTIONS
 from .memory_layer import memory_layer
-from .agent_runtime import agent_runtime
+from .agent_runtime_v2 import agent_runtime_v2 as agent_runtime
 from .llm_client import llm_client
 
 # 新架构
@@ -34,6 +34,10 @@ from .memory.data_flywheel import data_flywheel
 from .learning.evolution_engine import evolution_engine
 from .learning.unsloth_trainer import unsloth_trainer
 from .policy.undo_stack import undo_stack
+from .security.sandbox import file_sandbox, process_sandbox
+from .security.linux_provider import wsl_provider
+from .security.cybersec_tools import cybersec_tools
+from .learning.self_correction import self_correction
 
 app = FastAPI(
     title="本地AI电脑助手 - Zane AGI",
@@ -341,6 +345,35 @@ async def get_policy():
 async def update_policy(req: PolicyUpdateRequest):
     policy_firewall.update_policy(req.tool_name, req.auto_allow)
     return {"success": True, "auto_allow": list(policy_firewall.auto_allow_tools)}
+
+# ========== 安全 - 沙盒 + Linux + 网安 ==========
+@app.get("/api/security/sandbox/check")
+async def security_sandbox_check(path: str):
+    return file_sandbox.check_path(path)
+
+@app.get("/api/security/scan")
+async def security_scan(path: str = None):
+    return cybersec_tools.scan_vulnerability(scan_path=path)
+
+@app.get("/api/security/large-files")
+async def security_large_files(path: str = None, min_gb: float = 1.0):
+    return cybersec_tools.scan_large_files(path=path, min_size_gb=min_gb)
+
+@app.get("/api/security/hardening")
+async def security_hardening():
+    return cybersec_tools.check_system_hardening()
+
+@app.get("/api/security/wsl")
+async def security_wsl():
+    return wsl_provider.wsl_list()
+
+@app.post("/api/security/wsl/exec")
+async def security_wsl_exec(distro: str = "Ubuntu", command: str = "ls -la", workdir: str = "~"):
+    return wsl_provider.wsl_exec(distro=distro, command=command, workdir=workdir)
+
+@app.get("/api/security/correction-stats")
+async def security_correction_stats():
+    return self_correction.get_correction_stats()
 
 @app.get("/api/settings")
 async def get_settings():
