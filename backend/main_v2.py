@@ -18,6 +18,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
+from dataclasses import asdict
 
 # 导入本地模块
 from .tool_registry import TOOL_REGISTRY, list_tools_by_category, get_tools_for_llm
@@ -38,6 +39,10 @@ from .security.sandbox import file_sandbox, process_sandbox
 from .security.linux_provider import wsl_provider
 from .security.cybersec_tools import cybersec_tools
 from .learning.self_correction import self_correction
+from .tool_contract import TOOL_CONTRACTS, list_contracts_by_risk
+from .task_trace import trace_logger
+from .model_registry import model_registry
+from .benchmark.suite import benchmark_suite
 
 app = FastAPI(
     title="本地AI电脑助手 - Zane AGI",
@@ -374,6 +379,88 @@ async def security_wsl_exec(distro: str = "Ubuntu", command: str = "ls -la", wor
 @app.get("/api/security/correction-stats")
 async def security_correction_stats():
     return self_correction.get_correction_stats()
+
+# ========== 工具契约 - 形式化 ==========
+@app.get("/api/contracts")
+async def list_contracts():
+    return {
+        "total": len(TOOL_CONTRACTS),
+        "by_risk": {k: [{"name": c.name, "display_name": c.display_name, "risk": c.risk_level, "side_effect": c.side_effect, "verification": c.verification_method} for c in v] for k, v in list_contracts_by_risk().items()},
+        "all": [{"name": c.name, "display_name": c.display_name, "risk": c.risk_level, "side_effect": c.side_effect, "category": c.category, "is_real": c.is_real, "preconditions": c.preconditions, "postconditions": c.postconditions, "verification": c.verification_method} for c in TOOL_CONTRACTS.values()]
+    }
+
+@app.get("/api/contracts/{tool_name}")
+async def get_contract(tool_name: str):
+    contract = TOOL_CONTRACTS.get(tool_name)
+    if not contract:
+        raise HTTPException(status_code=404, detail=f"工具契约未找到: {tool_name}")
+    return {
+        "name": contract.name,
+        "display_name": contract.display_name,
+        "description": contract.description,
+        "input_schema": contract.input_schema,
+        "output_schema": contract.output_schema,
+        "side_effect": contract.side_effect,
+        "risk_level": contract.risk_level,
+        "timeout": contract.timeout,
+        "required_permissions": contract.required_permissions,
+        "preconditions": contract.preconditions,
+        "postconditions": contract.postconditions,
+        "verification_method": contract.verification_method,
+        "category": contract.category,
+        "is_real": contract.is_real,
+        "examples": contract.examples
+    }
+
+# ========== Task Trace - 统一轨迹 ==========
+@app.get("/api/traces")
+async def list_traces(limit: int = 20):
+    return {
+        "traces": trace_logger.list_traces(limit=limit),
+        "stats": trace_logger.get_stats(),
+        "total": len(trace_logger.current_traces)
+    }
+
+@app.get("/api/traces/{task_id}")
+async def get_trace(task_id: str):
+    trace = trace_logger.get_trace(task_id)
+    if not trace:
+        raise HTTPException(status_code=404, detail=f"轨迹未找到: {task_id}")
+    return trace
+
+# ========== 模型注册表 - 推理与训练分离 ==========
+@app.get("/api/model-registry")
+async def list_model_registry():
+    return {
+        "models": model_registry.list_models(),
+        "active": asdict(model_registry.get_active_model()) if model_registry.get_active_model() else None
+    }
+
+@app.post("/api/model-registry/promote")
+async def promote_model(base_model_id: str, adapter_id: str):
+    return model_registry.promote_adapter(base_model_id, adapter_id)
+
+@app.post("/api/model-registry/rollback")
+async def rollback_model(base_model_id: str):
+    return model_registry.rollback(base_model_id)
+
+# ========== 基准测试 - 可复现评估 ==========
+@app.get("/api/benchmark")
+async def list_benchmark(category: str = None):
+    return {
+        "tasks": benchmark_suite.list_tasks(category=category),
+        "stats": benchmark_suite.get_stats()
+    }
+
+@app.post("/api/benchmark/run/{task_id}")
+async def run_benchmark_task(task_id: str):
+    result = await benchmark_suite.run_task(task_id, agent_runtime)
+    return result
+
+@app.post("/api/benchmark/run-all")
+async def run_benchmark_all(category: str = None):
+    result = await benchmark_suite.run_all(agent_runtime, category=category)
+    return result
 
 @app.get("/api/settings")
 async def get_settings():
