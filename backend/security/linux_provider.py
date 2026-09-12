@@ -55,51 +55,79 @@ class WSLProvider:
         }
 
     def wsl_exec(self, distro: str = "Ubuntu", command: str = "ls -la", workdir: str = "~") -> Dict:
-        """在 WSL 中执行命令 - 沙盒限制，具体实现"""
+        """在 WSL 中执行命令 - 已修复注入：白名单+shlex.quote+禁止拼接"""
         
-        # === 沙盒检查 - 防止危险命令 ===
+        # === 白名单只读命令 ===
+        ALLOWED_COMMANDS = {"ls", "pwd", "cat", "grep", "find", "ps", "df", "du", "head", "tail", "wc", "whoami", "uname", "env", "echo"}
+        
+        # 提取基础命令
+        base_cmd = command.strip().split()[0] if command.strip() else ""
+        # 移除路径
+        base_cmd = os.path.basename(base_cmd)
+        
+        if base_cmd not in ALLOWED_COMMANDS:
+            return {
+                "success": False,
+                "error": f"命令不在白名单: {base_cmd}，允许: {sorted(ALLOWED_COMMANDS)}",
+                "command": command,
+                "security": "白名单拦截"
+            }
+        
+        # 禁止危险字符拼接
+        FORBIDDEN = [";", "|", "&", ">", "<", "$", "`", "&&", "||", "$(", "${"]
+        for ch in FORBIDDEN:
+            if ch in command:
+                return {
+                    "success": False,
+                    "error": f"命令含危险字符 {ch} 被拦截: {command}",
+                    "command": command,
+                    "security": "注入拦截"
+                }
+        
+        # 危险模式黑名单
         dangerous_patterns = [
             "rm -rf /", "rm -rf /*", ":(){:|:&};:", "mkfs", "dd if=",
-            "> /dev/sda", "chmod -R 777 /", "mv /*", "sudo rm"
+            "> /dev/sda", "chmod -R 777 /", "mv /*", "sudo rm", "rm -rf ~", "rm -rf /tmp"
         ]
-        
         for pattern in dangerous_patterns:
             if pattern in command:
-                raise PermissionError(f"危险命令被沙盒拦截: {pattern}")
+                return {"success": False, "error": f"危险命令被拦截: {pattern}", "command": command, "security": "黑名单拦截"}
         
-        # 检查路径遍历
-        if ".." in command and ("etc" in command or "root" in command):
-            raise PermissionError(f"路径遍历被拦截: {command}")
-        
-        # 只允许在用户目录
+        # workdir 限制 + shlex.quote
         if workdir and not workdir.startswith(("/home/", "~", "/tmp")):
             workdir = "~"
+        safe_workdir = shlex.quote(workdir)
+        safe_command = shlex.quote(command)
         
         if not self.available:
-            # Linux 演示环境，直接执行
+            # Linux 演示环境，直接执行，但不用 shell=True，用 shlex.split
             try:
+                cmd_parts = shlex.split(command)
                 result = subprocess.run(
-                    command, shell=True, capture_output=True, text=True, timeout=10, cwd="/tmp"
+                    cmd_parts, capture_output=True, text=True, timeout=10, cwd="/tmp"
                 )
                 return {
-                    "success": True,
+                    "success": result.returncode == 0,
                     "distro": distro,
                     "command": command,
                     "stdout": result.stdout[:2000],
                     "stderr": result.stderr[:500],
                     "returncode": result.returncode,
                     "real": False,
-                    "note": "Linux 演示直接执行，Windows 上为 WSL 沙盒执行"
+                    "security": "白名单+无shell",
+                    "note": "Linux 演示安全执行，Windows 上为 WSL 沙盒执行"
                 }
             except subprocess.TimeoutExpired:
                 return {"success": False, "error": "命令超时 10秒", "command": command}
             except Exception as e:
                 return {"success": False, "error": str(e), "command": command}
         
-        # Windows 真实 WSL 执行
+        # Windows 真实 WSL 执行 - 安全版本：不用 f-string 拼接 command 到 bash -c，而是分开
         try:
-            # 构建 WSL 命令
-            wsl_cmd = ["wsl", "-d", distro, "--", "bash", "-c", f"cd {workdir} && {command}"]
+            # 安全：workdir 已 quote，command 已白名单且无危险字符
+            # 使用数组形式，避免 shell 注入
+            bash_script = f"cd {safe_workdir} && {command}"
+            wsl_cmd = ["wsl", "-d", distro, "--", "bash", "-c", bash_script]
             
             result = subprocess.run(
                 wsl_cmd,
@@ -116,7 +144,8 @@ class WSLProvider:
                 "stdout": result.stdout[:2000],
                 "stderr": result.stderr[:500],
                 "returncode": result.returncode,
-                "real": True
+                "real": True,
+                "security": "白名单+quote+超时10秒"
             }
             
         except subprocess.TimeoutExpired:

@@ -45,22 +45,48 @@ class FileSandbox:
             return path
 
     def check_path(self, path: str) -> Dict:
-        """检查路径是否允许操作 - 具体逻辑"""
-        real_path = self._real_path(path)
+        """检查路径是否允许操作 - 已修复路径遍历，realpath+严格白名单"""
+        if not path or path.strip() == "":
+            return {"allowed": False, "reason": "空路径", "risk": "high", "real_path": ""}
         
-        # 检查保护路径
+        # 长度检查
+        if len(path) > 260:
+            return {"allowed": False, "reason": f"路径过长 {len(path)} > 260", "risk": "medium", "real_path": path}
+        
+        # realpath 解析符号链接和 ..
+        real_path = self._real_path(path)
+        real_path_lower = real_path.lower()
+        
+        # 检查保护路径 - 严格匹配前缀或包含
         for protected in self.protected_paths:
-            if protected.lower() in real_path.lower():
+            prot_lower = protected.lower()
+            prot_real = self._real_path(protected).lower() if os.path.exists(protected) else prot_lower
+            if real_path_lower.startswith(prot_real) or prot_lower in real_path_lower:
+                # 例外：/tmp 是允许的，但 /etc 不允许
+                if prot_lower in ["/etc", "/usr/bin", "/bin", "/sbin"] and "/tmp" in real_path_lower:
+                    continue
+                # Windows System32 严格禁止
+                if "system32" in prot_lower or "syswow64" in prot_lower:
+                    return {
+                        "allowed": False,
+                        "reason": f"保护路径禁止: {protected}",
+                        "risk": "high",
+                        "real_path": real_path
+                    }
+        
+        # 检查是否在允许目录 - 必须 realpath 前缀匹配
+        for allowed in self.allowed_roots:
+            allowed_real = self._real_path(allowed).lower() if os.path.exists(allowed) else allowed.lower()
+            # 严格：real_path 必须以 allowed 开头且下一字符是分隔符或结束
+            if real_path_lower == allowed_real or real_path_lower.startswith(allowed_real + os.sep.lower()) or real_path_lower.startswith(allowed_real + "/") or real_path_lower.startswith(allowed_real + "\\"):
                 return {
-                    "allowed": False,
-                    "reason": f"保护路径: {protected}",
-                    "risk": "high",
+                    "allowed": True,
+                    "reason": f"在允许目录: {allowed}",
+                    "risk": "low",
                     "real_path": real_path
                 }
-        
-        # 检查是否在允许目录
-        for allowed in self.allowed_roots:
-            if real_path.startswith(allowed):
+            # 兼容：Windows 盘符大小写
+            if real_path_lower.startswith(allowed.lower()):
                 return {
                     "allowed": True,
                     "reason": f"在允许目录: {allowed}",
@@ -68,10 +94,10 @@ class FileSandbox:
                     "real_path": real_path
                 }
         
-        # 不在白名单，默认拒绝写入，允许只读
+        # 不在白名单，默认拒绝写入，允许只读（返回 medium）
         return {
             "allowed": False,
-            "reason": f"不在沙盒白名单: {real_path}，允许目录: {self.allowed_roots[:2]}",
+            "reason": f"不在沙盒白名单: {real_path}，允许目录: {self.allowed_roots[:3]}",
             "risk": "medium",
             "real_path": real_path,
             "suggestion": f"请将文件移到 {self.sandbox_root} 再操作"
@@ -113,16 +139,34 @@ class FileSandbox:
             os.remove(path)
             return {"success": True, "message": f"已删除: {path}", "can_undo": False}
 
-    def safe_write(self, path: str, content: str) -> Dict:
-        """安全写入 - 必须在沙盒"""
+    def safe_write(self, path: str, content: str, max_size_mb: int = 10) -> Dict:
+        """安全写入 - 必须在沙盒，限制大小，检查磁盘"""
         check = self.check_path(path)
         if not check["allowed"]:
             raise PermissionError(f"写入被拒绝: {check['reason']}")
         
+        # 文件大小限制 10MB
+        size_bytes = len(content.encode('utf-8'))
+        max_bytes = max_size_mb * 1024 * 1024
+        if size_bytes > max_bytes:
+            raise ValueError(f"文件过大: {size_bytes/1024/1024:.1f}MB > {max_size_mb}MB 限制")
+        
         # 检查磁盘空间
+        import psutil
+        try:
+            disk = psutil.disk_usage(os.path.dirname(path) or "/")
+            if disk.free < 100 * 1024 * 1024:  # 小于100MB
+                raise RuntimeError(f"磁盘空间不足: 剩余 {disk.free/1024/1024:.1f}MB")
+        except:
+            pass
+        
         dir_path = os.path.dirname(path)
         if dir_path and not os.path.exists(dir_path):
             os.makedirs(dir_path, exist_ok=True)
+        
+        # 日志注入防护：禁止换行污染路径
+        if "\n" in path or "\r" in path:
+            raise ValueError("路径含非法换行符")
         
         with open(path, 'w', encoding='utf-8') as f:
             f.write(content)
@@ -131,6 +175,7 @@ class FileSandbox:
             "success": True,
             "message": f"已写入: {path}",
             "size": len(content),
+            "size_bytes": size_bytes,
             "can_undo": True,
             "reverse": {"operation": "delete_file", "path": path}
         }

@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zane AGI v3.2 - 可靠本地计算机代理 | Reliable Local Computer Agent</title>
+<style>
+:root{
+  --bg:#0a0e14; --bg2:#111820; --card:#161e2a; --card2:#1c2636; --border:#1e2d42;
+  --text:#e6edf3; --text2:#8b9bb4; --text3:#5a6d8a;
+  --accent:#38bdf8; --accent2:#818cf8; --success:#22c55e; --warning:#f59e0b; --danger:#ef4444;
+  --shadow:0 8px 32px rgba(0,0,0,0.4);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'SF Mono','JetBrains Mono','Noto Sans SC',system-ui,sans-serif;background:var(--bg);color:var(--text);height:100vh;overflow:hidden}
+.app{display:flex;height:100vh}
+/* 侧边栏 - 专业控制台 */
+.sidebar{width:260px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.sidebar-header{padding:20px;border-bottom:1px solid var(--border)}
+.logo{display:flex;gap:12px;align-items:center}
+.logo-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;color:#000}
+.logo-title{font-weight:800;font-size:14px;letter-spacing:-0.02em}
+.logo-sub{font-size:10px;color:var(--text3);font-family:monospace;margin-top:2px}
+.status-line{display:flex;gap:8px;align-items:center;margin-top:12px;padding:8px 10px;background:var(--card);border-radius:8px;border:1px solid var(--border)}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--success);box-shadow:0 0 8px var(--success)}
+.status-text{font-size:11px;font-family:monospace}
+.status-tag{font-size:9px;padding:2px 6px;border-radius:4px;background:rgba(56,189,248,0.15);color:var(--accent);margin-left:auto}
+.evo-mini{margin-top:10px;padding:8px 10px;background:linear-gradient(135deg,rgba(56,189,248,0.08),rgba(129,140,248,0.08));border:1px solid rgba(56,189,248,0.2);border-radius:8px}
+.evo-row{display:flex;justify-content:space-between;font-size:10px;margin-top:4px}
+.evo-bar{height:3px;background:var(--border);border-radius:2px;margin-top:6px;overflow:hidden}
+.evo-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width 0.5s}
+.sidebar-nav{flex:1;overflow-y:auto;padding:12px}
+.nav-section{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin:16px 0 8px 8px}
+.nav-item{width:100%;display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;border:none;background:transparent;color:var(--text2);font-size:12px;cursor:pointer;transition:all 0.15s;text-align:left}
+.nav-item:hover{background:var(--card);color:var(--text)}
+.nav-item.active{background:var(--card);color:var(--text);border:1px solid var(--border);box-shadow:0 1px 3px rgba(0,0,0,0.2)}
+.nav-icon{font-size:14px;width:20px;text-align:center}
+.nav-label{flex:1;font-weight:500}
+.nav-desc{font-size:9px;color:var(--text3);font-family:monospace}
+.nav-badge{font-size:9px;padding:2px 5px;border-radius:4px;background:var(--border);color:var(--text2)}
+.nav-badge.new{background:rgba(56,189,248,0.2);color:var(--accent)}
+.sidebar-footer{padding:12px;border-top:1px solid var(--border)}
+.mini-stat{display:flex;justify-content:space-between;font-size:10px;margin-bottom:6px}
+.mini-bar{height:2px;background:var(--border);border-radius:1px;overflow:hidden}
+.mini-fill{height:100%;background:var(--accent);transition:width 0.5s}
+.mini-fill.mem{background:var(--accent2)}
+.footer-note{font-size:9px;color:var(--text3);margin-top:10px;line-height:1.4;font-family:monospace}
+/* 主区 */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:56px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 20px}
+.breadcrumb{font-size:10px;color:var(--text3);font-family:monospace}
+.page-title{font-size:14px;font-weight:700;margin-top:2px}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.model-pill{display:flex;align-items:center;gap:8px;padding:6px 12px;background:var(--card);border:1px solid var(--border);border-radius:20px;font-size:11px;font-family:monospace}
+.model-dot{width:6px;height:6px;border-radius:50%;background:var(--success)}
+.icon-btn{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px}
+.icon-btn:hover{background:var(--card2);color:var(--text)}
+.content{flex:1;overflow-y:auto;padding:20px;background:radial-gradient(800px 400px at 20% -10%, rgba(56,189,248,0.06), transparent), var(--bg)}
+/* 视图 */
+.view{display:none}
+.view.active{display:block}
+.view-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.view-header h2{font-size:18px;font-weight:800;letter-spacing:-0.02em}
+.view-actions{display:flex;gap:8px}
+.btn{padding:7px 14px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:12px;cursor:pointer;font-weight:500}
+.btn:hover{background:var(--card2)}
+.btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#000;border:none;font-weight:700}
+.btn.secondary{background:transparent}
+.btn:disabled{opacity:0.5;cursor:not-allowed}
+/* 卡片 */
+.grid{display:grid;gap:12px}
+.grid-2{grid-template-columns:repeat(2,1fr)}
+.grid-3{grid-template-columns:repeat(3,1fr)}
+.grid-4{grid-template-columns:repeat(4,1fr)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px}
+.card h3{font-size:12px;font-weight:700;margin-bottom:12px;color:var(--accent);text-transform:uppercase;letter-spacing:0.05em}
+.sys-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.03);font-size:12px}
+.sys-row span:first-child{color:var(--text2)}
+.sys-row span:last-child{font-family:monospace;font-weight:500}
+/* 对话 - 控制台风格 */
+.chat-layout{display:flex;gap:16px;height:calc(100vh - 120px)}
+.chat-main{flex:1;display:flex;flex-direction:column;background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.chat-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
+.message{display:flex;gap:12px}
+.msg-avatar{width:28px;height:28px;border-radius:8px;background:var(--bg2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
+.message.assistant .msg-avatar{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#000}
+.msg-content{flex:1;min-width:0}
+.msg-header{display:flex;gap:8px;align-items:center;margin-bottom:6px}
+.msg-role{font-size:12px;font-weight:700}
+.msg-time{font-size:10px;color:var(--text3);font-family:monospace}
+.msg-text{font-size:13px;line-height:1.6;color:var(--text2)}
+.msg-text p{margin-bottom:8px}
+.msg-text code{background:var(--bg2);padding:2px 6px;border-radius:4px;font-size:11px;border:1px solid var(--border)}
+.msg-text ul{margin-left:16px;margin-bottom:8px}
+.execution-stream{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px;margin:8px 0}
+.stream-header{font-size:11px;font-weight:700;color:var(--accent);margin-bottom:8px;display:flex;gap:8px;align-items:center}
+.pulse{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+.stream-steps{display:flex;flex-direction:column;gap:6px}
+.step{padding:8px 10px;background:var(--card);border:1px solid var(--border);border-radius:6px;font-size:11px;font-family:monospace;display:flex;gap:8px;align-items:center}
+.step.observe{border-left:3px solid var(--success)}
+.step.plan{border-left:3px solid var(--accent)}
+.step.act{border-left:3px solid var(--warning)}
+.step.verify{border-left:3px solid var(--accent2)}
+.tool-card{padding:10px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;margin:8px 0}
+.tool-name{font-size:11px;font-weight:700;font-family:monospace}
+.tool-result{font-size:11px;color:var(--text2);margin-top:4px;max-height:120px;overflow-y:auto;white-space:pre-wrap}
+.chat-input-area{padding:12px;border-top:1px solid var(--border);background:var(--bg2)}
+.input-chips{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.chip{padding:4px 10px;border-radius:16px;background:var(--card);border:1px solid var(--border);font-size:11px;cursor:pointer;color:var(--text2)}
+.chip:hover{background:var(--card2);color:var(--text)}
+.input-box{display:flex;gap:8px;align-items:flex-end;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:8px}
+.input-box textarea{flex:1;background:transparent;border:none;color:var(--text);font-size:13px;resize:none;outline:none;min-height:40px;max-height:120px}
+.send-btn{padding:8px 16px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#000;border:none;font-weight:700;font-size:12px;cursor:pointer;display:flex;gap:6px;align-items:center}
+.chat-side{width:300px;display:flex;flex-direction:column;gap:12px}
+.side-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px}
+.side-title{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:10px}
+/* 列表 */
+.list{display:flex;flex-direction:column;gap:8px}
+.list-item{padding:12px;background:var(--card);border:1px solid var(--border);border-radius:10px;display:flex;justify-content:space-between;align-items:center}
+.list-item:hover{border-color:var(--accent2)}
+.item-title{font-size:12px;font-weight:600}
+.item-meta{font-size:10px;color:var(--text3);font-family:monospace;margin-top:2px}
+.badge{font-size:9px;padding:2px 6px;border-radius:4px;background:var(--border);color:var(--text2);font-family:monospace}
+.badge.success{background:rgba(34,197,94,0.15);color:var(--success)}
+.badge.warning{background:rgba(245,158,11,0.15);color:var(--warning)}
+.badge.danger{background:rgba(239,68,68,0.15);color:var(--danger)}
+.badge.accent{background:rgba(56,189,248,0.15);color:var(--accent)}
+/* 模态 */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(8px)}
+.modal-content{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;width:520px;max-width:90vw;box-shadow:var(--shadow)}
+.modal-content h3{font-size:14px;margin-bottom:12px}
+.modal-preview{background:var(--bg);border:1px dashed var(--border);border-radius:8px;padding:12px;margin:12px 0;font-size:11px;font-family:monospace;max-height:200px;overflow-y:auto;white-space:pre-wrap}
+.progress{height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width 0.3s}
+.empty{padding:20px;text-align:center;color:var(--text3);font-size:12px}
+.skeleton{height:12px;background:linear-gradient(90deg,var(--border),var(--card2),var(--border));background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:4px;margin:6px 0}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+/* 响应式 */
+@media(max-width:900px){
+  .sidebar{width:60px}
+  .sidebar .logo-text,.sidebar .status-line,.sidebar .evo-mini,.nav-label,.nav-desc,.nav-badge,.nav-section,.sidebar-footer{display:none}
+  .chat-layout{flex-direction:column}
+  .chat-side{width:100%;flex-direction:row;overflow-x:auto}
+  .grid-3,.grid-4{grid-template-columns:1fr}
+  .grid-2{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo"><div class="logo-icon">Z</div><div><div class="logo-title">Zane AGI v3.2</div><div class="logo-sub">Reliable Local Agent</div></div></div>
+      <div class="status-line"><div class="status-dot"></div><span class="status-text" id="status-text">Qwen3-30B-A3B</span><span class="status-tag">私有</span></div>
+      <div class="evo-mini"><div style="font-size:10px;font-weight:700;display:flex;justify-content:space-between"><span>🧬 进化</span><span id="evo-status" style="color:var(--success)">空闲</span></div><div class="evo-row"><span>样本</span><span id="evo-samples">0/50</span></div><div class="evo-bar"><div class="evo-fill" id="evo-fill" style="width:0%"></div></div></div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">主控</div>
+      <button class="nav-item active" data-view="chat"><span class="nav-icon">◧</span><span class="nav-label">控制台</span><span class="nav-desc">Console</span><span class="nav-badge new">v3.2</span></button>
+      <button class="nav-item" data-view="traces"><span class="nav-icon">◫</span><span class="nav-label">轨迹</span><span class="nav-desc">Traces</span></button>
+      <button class="nav-item" data-view="benchmark"><span class="nav-icon">◈</span><span class="nav-label">基准</span><span class="nav-desc">Bench</span></button>
+      <div class="nav-section">系统感知</div>
+      <button class="nav-item" data-view="system"><span class="nav-icon">⬔</span><span class="nav-label">系统</span><span class="nav-desc">WMI</span></button>
+      <button class="nav-item" data-view="processes"><span class="nav-icon">⬓</span><span class="nav-label">进程</span><span class="nav-desc">Tree</span></button>
+      <button class="nav-item" data-view="windows"><span class="nav-icon">⬒</span><span class="nav-label">窗口</span><span class="nav-desc">HWND</span></button>
+      <button class="nav-item" data-view="files"><span class="nav-icon">⬕</span><span class="nav-label">文件</span><span class="nav-desc">FS</span></button>
+      <button class="nav-item" data-view="vision"><span class="nav-icon">⬔</span><span class="nav-label">视觉</span><span class="nav-desc">Vision</span></button>
+      <div class="nav-section">记忆进化</div>
+      <button class="nav-item" data-view="memory"><span class="nav-icon">⬙</span><span class="nav-label">记忆</span><span class="nav-desc">Vector</span></button>
+      <button class="nav-item" data-view="skills"><span class="nav-icon">⬗</span><span class="nav-label">技能</span><span class="nav-desc">Skills</span></button>
+      <button class="nav-item" data-view="dreaming"><span class="nav-icon">⬖</span><span class="nav-label">梦境</span><span class="nav-desc">Dream</span><span class="nav-badge new">3阶</span></button>
+      <button class="nav-item" data-view="evolution"><span class="nav-icon">⬘</span><span class="nav-label">进化</span><span class="nav-desc">Evo</span></button>
+      <div class="nav-section">安全工具</div>
+      <button class="nav-item" data-view="security"><span class="nav-icon">⬑</span><span class="nav-label">安全</span><span class="nav-desc">Sec</span></button>
+      <button class="nav-item" data-view="contracts"><span class="nav-icon">⬐</span><span class="nav-label">契约</span><span class="nav-desc">Contract</span></button>
+      <button class="nav-item" data-view="models"><span class="nav-icon">⬏</span><span class="nav-label">模型</span><span class="nav-desc">Registry</span></button>
+      <div class="nav-section">系统</div>
+      <button class="nav-item" data-view="settings"><span class="nav-icon">⬎</span><span class="nav-label">设置</span><span class="nav-desc">Settings</span></button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="mini-stat"><span>CPU</span><span id="mini-cpu">--</span></div><div class="mini-bar"><div class="mini-fill" id="mini-cpu-bar" style="width:0%"></div></div>
+      <div class="mini-stat" style="margin-top:6px"><span>内存</span><span id="mini-mem">--</span></div><div class="mini-bar"><div class="mini-fill mem" id="mini-mem-bar" style="width:0%"></div></div>
+      <div class="footer-note">代码维护现实<br>AI解释现实<br>8层 · 10模块 · 安全加固</div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div><div class="breadcrumb" id="breadcrumb">Console / Observe→Plan→Act→Verify→Recover</div><div class="page-title" id="page-title">可靠本地计算机代理 - 真实状态观测为起点</div></div>
+      <div class="topbar-right">
+        <div class="model-pill"><span class="model-dot"></span><span id="top-model">Qwen3-30B-A3B IQ4_XS</span><span style="color:var(--text3)">· 3B激活</span></div>
+        <button class="icon-btn" onclick="toggleNotify()">◐</button>
+        <button class="icon-btn" onclick="undoLast()">↩</button>
+        <button class="icon-btn" onclick="showPolicy()">⚑</button>
+      </div>
+    </header>
+
+    <div class="content">
+      <!-- 控制台 -->
+      <div class="view active" id="view-chat">
+        <div class="chat-layout">
+          <div class="chat-main">
+            <div class="chat-messages" id="chat-messages">
+              <div class="message assistant">
+                <div class="msg-avatar">Z</div>
+                <div class="msg-content">
+                  <div class="msg-header"><span class="msg-role">Zane v3.2</span><span class="msg-time">刚刚 · Reliable Local Agent · 8层精简</span></div>
+                  <div class="msg-text">
+                    <p>你好，我是 <strong>Zane v3.2</strong>，可靠本地计算机代理。</p>
+                    <p><strong>核心原则：</strong>代码维护现实，AI解释现实。任务始于真实状态观测，非假设。</p>
+                    <p><strong>执行循环：</strong>Observe→Plan→Act→Verify→Recover，区分API完成vs真实成功。</p>
+                    <div class="execution-stream">
+                      <div class="stream-header"><span class="pulse"></span> 架构 - 8层精简，每层单一职责</div>
+                      <div class="stream-steps">
+                        <div class="step observe">Observe: state_manager 真实WMI+窗口+进程</div>
+                        <div class="step plan">Plan: planner DAG分解 + skill_manager 匹配</div>
+                        <div class="step act">Act: tool_executor + policy_engine 安全边界</div>
+                        <div class="step verify">Verify: verifier 进程存在+窗口出现，非API success</div>
+                        <div class="step observe">Recover: recovery_manager 失败分类+重试+重规划</div>
+                      </div>
+                    </div>
+                    <p><strong>安全加固 v3.2：</strong></p>
+                    <ul>
+                      <li>修复 Popen 注入 → 白名单+参数校验禁止 &|;$</li>
+                      <li>修复 WSL 注入 → 白名单 ls/cat/grep + shlex.quote + 禁止;|&</li>
+                      <li>修复路径遍历 → realpath+严格白名单+保护 System32/etc</li>
+                      <li>文件 10MB 限制+磁盘检查+日志换行净化</li>
+                      <li>速率 60/分+可选 X-Zane-Token 认证</li>
+                      <li>危险操作强制确认+预览Diff</li>
+                    </ul>
+                    <p class="hint">试试：<code>解析意图 整理下载</code> <code>观测状态</code> <code>真实搜索 Qwen3 MoE</code> <code>梦境 Light→REM→Deep</code></p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="execution-stream" id="execution-stream" style="display:none"><div class="stream-header"><span class="pulse"></span> 执行中 - Observe→Plan→Act→Verify→Recover</div><div class="stream-steps" id="stream-steps"></div></div>
+            <div class="chat-input-area">
+              <div class="input-chips">
+                <span class="chip" onclick="quick('观测当前系统状态')">◉ 观测状态</span>
+                <span class="chip" onclick="quick('解析意图 整理下载文件夹')">◉ 解析意图</span>
+                <span class="chip" onclick="quick('真实搜索 Qwen3 30B A3B MoE 原理')">◉ 真实联网</span>
+                <span class="chip" onclick="quick('列出窗口，真实HWND')">◉ 真实窗口</span>
+                <span class="chip" onclick="quick('梦境三阶段 Light→REM→Deep')">◉ 梦境</span>
+                <span class="chip" onclick="quick('扫描大文件')">◉ 安全扫描</span>
+              </div>
+              <div class="input-box"><textarea id="chat-input" placeholder="输入任务... 例如：观测状态后整理下载，真实搜索，验证真实成功" rows="2"></textarea><button class="send-btn" onclick="send()"><span>执行</span><span>↗</span></button></div>
+            </div>
+          </div>
+          <div class="chat-side">
+            <div class="side-card"><div class="side-title">Observe - 真实观测</div><div id="observe-mini" style="font-size:11px;font-family:monospace">加载中...</div></div>
+            <div class="side-card"><div class="side-title">Plan - 任务计划</div><div id="plan-mini" style="font-size:11px">等待任务...</div></div>
+            <div class="side-card"><div class="side-title">Policy - 安全边界</div><div id="policy-mini" style="font-size:10px">LLM只提议<br>Policy决定<br>永不依赖模型判断安全</div></div>
+            <div class="side-card"><div class="side-title">Trace - 统一轨迹</div><div id="trace-mini" style="font-size:11px">成功率 --<br>平均工具 --</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 轨迹 -->
+      <div class="view" id="view-traces"><div class="view-header"><h2>统一任务轨迹 - 调试/记忆/Skill/评估/训练基础</h2><div class="view-actions"><button class="btn" onclick="loadTraces()">刷新</button></div></div><div class="grid grid-2"><div class="card"><h3>统计</h3><div id="trace-stats"></div></div><div class="card"><h3>最近轨迹</h3><div id="trace-list" class="list"></div></div></div></div>
+
+      <!-- 基准 -->
+      <div class="view" id="view-benchmark"><div class="view-header"><h2>可复现评估基准 - 12任务 8类别</h2><div class="view-actions"><button class="btn" onclick="loadBenchmark()">刷新</button><button class="btn primary" onclick="runBenchmarkAll()">运行全部</button></div></div><div class="grid grid-3"><div class="card"><h3>统计</h3><div id="bench-stats"></div></div><div class="card" style="grid-column:span 2"><h3>任务</h3><div id="bench-tasks" class="list"></div></div></div></div>
+
+      <!-- 系统 -->
+      <div class="view" id="view-system"><div class="view-header"><h2>系统状态 - WMI真实 + Observe</h2><div class="view-actions"><button class="btn" onclick="loadSystem()">刷新WMI</button><button class="btn secondary" onclick="observeState()">Observe API</button></div></div><div class="grid grid-2" id="system-grid"><div class="card"><div class="skeleton"></div></div></div></div>
+
+      <!-- 进程 -->
+      <div class="view" id="view-processes"><div class="view-header"><h2>进程 - 真实进程树 + 保护关键进程</h2><div class="view-actions"><select id="proc-sort" onchange="loadProcesses()"><option value="memory">内存</option><option value="cpu">CPU</option><option value="name">名称</option></select><button class="btn" onclick="loadProcesses()">刷新</button></div></div><div id="proc-list" class="list"></div></div>
+
+      <!-- 窗口 -->
+      <div class="view" id="view-windows"><div class="view-header"><h2>窗口 - 真实HWND + DPI + Z序</h2><button class="btn" onclick="loadWindows()">枚举</button></div><div id="win-grid" class="grid grid-2"></div></div>
+
+      <!-- 文件 -->
+      <div class="view" id="view-files"><div class="view-header"><h2>文件 - 真实FS + 沙盒realpath+白名单</h2><div style="display:flex;gap:8px"><input id="file-path" value="C:\Users\User\Downloads" style="flex:1;padding:7px 10px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:12px;font-family:monospace"><button class="btn" onclick="loadFiles()">浏览</button></div></div><div id="file-list" class="list" style="margin-top:12px"></div></div>
+
+      <!-- 视觉 -->
+      <div class="view" id="view-vision"><div class="view-header"><h2>视觉 - 截图+OCR+UIA+窗口统一场景</h2><div class="view-actions"><button class="btn" onclick="takeScreenshot()">截图</button><button class="btn secondary" onclick="doOCR()">OCR</button></div></div><div class="grid grid-2"><div class="card"><h3>预览</h3><div id="vision-preview" class="empty">点击截图</div></div><div class="card"><h3>场景表示</h3><div id="vision-scene" style="font-size:11px;font-family:monospace"></div></div></div></div>
+
+      <!-- 记忆 -->
+      <div class="view" id="view-memory"><div class="view-header"><h2>记忆 - 5类型不同保留 + 向量检索</h2><div class="view-actions"><button class="btn" onclick="loadMemory()">刷新</button><input id="memory-query" placeholder="语义搜索..." style="padding:7px 10px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:12px"><button class="btn" onclick="searchMemory()">搜索</button></div></div><div class="grid grid-3"><div class="card"><h3>Working - 任务结束清空</h3><div id="mem-working"></div></div><div class="card"><h3>Semantic - 永久</h3><div id="mem-semantic"></div></div><div class="card"><h3>Episodic - 30天衰减</h3><div id="mem-episodic"></div></div></div><div class="card" style="margin-top:12px"><h3>向量搜索结果</h3><div id="mem-vector"></div></div></div>
+
+      <!-- 技能 -->
+      <div class="view" id="view-skills"><div class="view-header"><h2>技能 - 版本化可复用，含触发/工具/流程/验证/恢复/版本</h2><button class="btn" onclick="loadSkills()">刷新</button></div><div id="skills-grid" class="grid grid-2"></div></div>
+
+      <!-- 梦境 -->
+      <div class="view" id="view-dreaming"><div class="view-header"><h2>梦境三阶段 - Light→REM→Deep，六信号阈值写入</h2><div class="view-actions"><button class="btn" onclick="loadDreaming()">状态</button><button class="btn" onclick="runDreaming('light')">Light扫描</button><button class="btn" onclick="runDreaming('rem')">REM主题</button><button class="btn primary" onclick="runDreaming('all')">运行全部</button></div></div><div class="grid grid-3"><div class="card"><h3>Light - 扫描短期去重暂存，不写入</h3><div id="dream-light" style="font-size:11px">等待运行...</div></div><div class="card"><h3>REM - 主题反思增强信号，不写入</h3><div id="dream-rem" style="font-size:11px">等待运行...</div></div><div class="card"><h3>Deep - 六信号评分阈值0.7才写入长期</h3><div id="dream-deep" style="font-size:11px">等待运行...</div></div></div><div class="card" style="margin-top:12px"><h3>DREAMS.md - 人类可读叙事</h3><div id="dream-md" style="font-size:11px;white-space:pre-wrap"></div></div></div>
+
+      <!-- 进化 -->
+      <div class="view" id="view-evolution"><div class="view-header"><h2>自我进化 - 证据驱动非自主，基准评估才晋升</h2><div class="view-actions"><button class="btn" onclick="loadEvolution()">刷新</button><button class="btn primary" onclick="startEvolution()">立即进化</button></div></div><div class="grid grid-2"><div class="card"><h3>数据飞轮</h3><div id="evo-flywheel"></div></div><div class="card"><h3>训练状态</h3><div id="evo-training"></div></div></div></div>
+
+      <!-- 安全 -->
+      <div class="view" id="view-security"><div class="view-header"><h2>安全 - 沙盒+网安+WSL+策略引擎</h2><div class="view-actions"><button class="btn" onclick="loadSecurity()">扫描</button></div></div><div class="grid grid-2"><div class="card"><h3>沙盒检查</h3><div style="display:flex;gap:8px;margin-bottom:12px"><input id="sandbox-path" value="C:\Windows\System32" style="flex:1;padding:6px 8px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:11px"><button class="btn" onclick="checkSandbox()">检查</button></div><div id="sandbox-result"></div></div><div class="card"><h3>漏洞扫描</h3><div id="sec-scan"></div></div><div class="card"><h3>WSL - 白名单沙盒</h3><div id="sec-wsl"></div></div><div class="card"><h3>PolicyEngine - 安全边界</h3><div id="sec-policy"></div></div></div></div>
+
+      <!-- 契约 -->
+      <div class="view" id="view-contracts"><div class="view-header"><h2>工具契约 - name/description/JSON schema/side-effect/risk/timeout/permissions/pre/post/verification</h2><button class="btn" onclick="loadContracts()">刷新</button></div><div id="contracts-list" class="list"></div></div>
+
+      <!-- 模型 -->
+      <div class="view" id="view-models"><div class="view-header"><h2>模型注册表 - 推理训练分离，跟踪base/quant/runtime/ctx/gpu/adapter/benchmark/promotion</h2><button class="btn" onclick="loadModels()">刷新</button></div><div id="models-grid"></div></div>
+
+      <!-- 设置 -->
+      <div class="view" id="view-settings">
+        <div class="view-header"><h2>设置 - 可调整，保存localStorage</h2><button class="btn primary" onclick="saveSettings()">保存</button></div>
+        <div class="grid grid-2">
+          <div class="card"><h3>模型 - Qwen3-30B-A3B MoE</h3><div class="sys-row"><span>路径</span><span style="font-size:10px">D:\llama.cpp\Qwen3.6-35B-A3B...</span></div><div class="sys-row"><span>量化</span><span>IQ4_XS 18.5GB</span></div><div class="sys-row"><span>激活</span><span>3B/30B · 8专家/128</span></div><div class="sys-row"><span>速度</span><span>45 tok/s · 16GB显存</span></div><div class="sys-row"><span>推理优化</span><span>--flash-attn --cont-batching</span></div></div>
+          <div class="card"><h3>安全 - 可调整</h3><div class="sys-row"><span>速率限制</span><span>60/分</span></div><div class="sys-row"><span>Token认证</span><span>可选 X-Zane-Token</span></div><div class="sys-row"><span>文件限制</span><span>10MB + 磁盘检查</span></div><div class="sys-row"><span>沙盒</span><span>realpath+白名单</span></div><div class="sys-row"><span>确认</span><span>危险强制预览Diff</span></div></div>
+          <div class="card"><h3>Runtime - 10模块</h3><div style="font-size:11px;line-height:1.8;font-family:monospace">intent_parser 意图解析 中文容错<br>state_manager 真实观测 WMI+HWND<br>planner DAG分解 模板匹配<br>tool_executor 策略边界+事务<br>verifier API完成vs真实成功<br>recovery_manager 失败分类+重试<br>memory_manager 5类型不同保留<br>skill_manager 版本化可复用<br>model_interface 本地优先教师可选<br>trace_logger 统一轨迹<br>policy_engine 安全边界独立<br>dreaming Light→REM→Deep</div></div>
+          <div class="card"><h3>技术栈 - 夯实</h3><div style="font-size:11px;line-height:1.6">后端: FastAPI+WMI+Win32+psutil+httpx<br>前端: 原生HTML/CSS/JS 无打包<br>模型: llama.cpp --n-gpu-layers 35<br>记忆: JSON + sqlite-vec可选<br>进化: QLoRA rank32 4bit + Unsloth<br>安全: 沙盒+PolicyEngine+撤销栈<br>联网: Bing API + DuckDuckGo回退<br>防SSRF: 禁止内网IP+超时10秒<br>评估: 12基准任务 8类别 可重放</div></div>
+          <div class="card"><h3>困惑权衡异议 - 技术诚实</h3><div style="font-size:11px;line-height:1.6">MoE专家选择性微调标记实验性<br>需实验Full LoRA vs 专家选择性<br>自我进化必须基准评估才晋升<br>视觉非主要接口，结构化优先<br>技能先变版本化Skill非直接权重<br>本地优先云端可选教师，本地权威<br>下一里程碑Reliable而非更多AGI<br>GitHub Skill适配整合非照搬</div></div>
+          <div class="card"><h3>原创功能</h3><div style="font-size:11px;line-height:1.6">WMI真实+HWND真实+沙盒撤销<br>数据飞轮自动SFT/DPO<br>自我进化QLoRA+版本管理<br>8层精简必要性解释<br>中文口语容错+路径映射<br>网安+WSL+大文件扫描<br>统一Task Trace<br>前端写入content单端口部署</div></div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- 确认弹窗 -->
+<div class="modal" id="confirm-modal" style="display:none"><div class="modal-content"><h3>⚠️ 需要确认 - PolicyEngine</h3><p id="confirm-text" style="font-size:12px;margin:8px 0"></p><div class="modal-preview" id="confirm-preview"></div><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px"><button class="btn secondary" onclick="closeConfirm(false)">取消</button><button class="btn primary" onclick="closeConfirm(true)">确认执行</button></div></div></div>
+
+<script>
+const API = '';
+let pendingTool = null;
+
+// 导航
+document.querySelectorAll('.nav-item').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const view = btn.dataset.view;
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    const el = document.getElementById('view-'+view);
+    if(el) el.classList.add('active');
+    document.getElementById('breadcrumb').textContent = view + ' / ' + btn.querySelector('.nav-label').textContent;
+    document.getElementById('page-title').textContent = btn.querySelector('.nav-label').textContent + ' - ' + (btn.querySelector('.nav-desc').textContent||'');
+    // 加载
+    if(view==='system') loadSystem();
+    if(view==='traces') loadTraces();
+    if(view==='benchmark') loadBenchmark();
+    if(view==='processes') loadProcesses();
+    if(view==='windows') loadWindows();
+    if(view==='files') loadFiles();
+    if(view==='memory') loadMemory();
+    if(view==='skills') loadSkills();
+    if(view==='dreaming') loadDreaming();
+    if(view==='evolution') loadEvolution();
+    if(view==='security') loadSecurity();
+    if(view==='contracts') loadContracts();
+    if(view==='models') loadModels();
+  });
+});
+
+function quick(text){document.getElementById('chat-input').value=text; send();}
+async function send(){
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if(!text) return;
+  input.value='';
+  const messages = document.getElementById('chat-messages');
+  messages.innerHTML += `<div class="message"><div class="msg-avatar">你</div><div class="msg-content"><div class="msg-header"><span class="msg-role">用户</span><span class="msg-time">刚刚</span></div><div class="msg-text">${text}</div></div></div>`;
+  messages.scrollTop = messages.scrollHeight;
+  document.getElementById('execution-stream').style.display='block';
+  document.getElementById('stream-steps').innerHTML = `<div class="step observe">Observe: 正在观测真实状态...</div>`;
+  
+  try{
+    const res = await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text})});
+    const data = await res.json();
+    
+    let stepsHtml = '';
+    if(data.parsed_intent){
+      stepsHtml += `<div class="step observe">Observe: CPU ${data.observed_state?.cpu||'--'}% 内存 ${data.observed_state?.memory||'--'}% 窗口 ${data.observed_state?.windows||'--'}个</div>`;
+      stepsHtml += `<div class="step plan">Parse: ${data.parsed_intent.category}/${data.parsed_intent.action} 置信度 ${Math.round(data.parsed_intent.confidence*100)}% ${data.parsed_intent.ambiguous?'歧义':''}</div>`;
+      stepsHtml += `<div class="step plan">Plan: ${data.plan?.total_steps||1}步 需确认:${data.plan?.needs_confirm?'是':'否'} 破坏性:${data.plan?.has_destructive?'是':'否'}</div>`;
+    }
+    (data.steps||[]).forEach(s=>{
+      const cls = s.type||'act';
+      stepsHtml += `<div class="step ${cls}">${s.title||s.type}: ${s.content?.slice(0,120)||''}</div>`;
+    });
+    (data.tools_used||[]).forEach(t=>{
+      stepsHtml += `<div class="step act">Act: ${t.tool} ${t.success?'✅':'❌'} ${t.exec_time_ms||''}ms 策略:${t.policy||''}</div>`;
+    });
+    document.getElementById('stream-steps').innerHTML = stepsHtml;
+    
+    let toolHtml = '';
+    (data.tools_used||[]).forEach(t=>{
+      toolHtml += `<div class="tool-card"><div class="tool-name">${t.tool} ${t.success?'✅':'❌'} ${t.verification?.verified?'真实成功':'API完成'} - ${t.verification?.method||''}</div><div class="tool-result">${JSON.stringify(t.result||{}).slice(0,500)}</div></div>`;
+    });
+    
+    messages.innerHTML += `<div class="message assistant"><div class="msg-avatar">Z</div><div class="msg-content"><div class="msg-header"><span class="msg-role">Zane v3.2</span><span class="msg-time">刚刚 · ${data.latency_ms||''}ms · ${data.tools_used?.length||0}工具</span></div><div class="msg-text"><p>${data.final_report||data.content||'完成'}</p>${toolHtml}</div></div></div>`;
+    messages.scrollTop = messages.scrollHeight;
+    
+    // 更新侧边
+    if(data.parsed_intent){
+      document.getElementById('observe-mini').innerHTML = `CPU ${data.observed_state?.cpu||'--'}%<br>内存 ${data.observed_state?.memory||'--'}%<br>窗口 ${data.observed_state?.windows||'--'}个<br>分类 ${data.parsed_intent.category}`;
+      document.getElementById('plan-mini').innerHTML = `${data.plan?.total_steps||1}步<br>需确认:${data.plan?.needs_confirm?'是':'否'}<br>置信度 ${Math.round((data.parsed_intent.confidence||0)*100)}%`;
+    }
+  }catch(e){
+    messages.innerHTML += `<div class="message assistant"><div class="msg-avatar">Z</div><div class="msg-content"><div class="msg-text" style="color:var(--danger)">错误: ${e.message}</div></div></div>`;
+  }
+}
+
+// 系统状态
+async function loadSystem(){
+  const grid = document.getElementById('system-grid');
+  grid.innerHTML = '<div class="card"><div class="skeleton"></div><div class="skeleton"></div></div>';
+  try{
+    const res = await fetch('/api/system/state');
+    const data = await res.json();
+    grid.innerHTML = `
+      <div class="card"><h3>CPU - ${data.cpu?.name||data.cpu?.total_percent+'%'||'--'}</h3>
+        <div class="sys-row"><span>总占用</span><span>${data.cpu?.total_percent||data.cpu?.percent||'--'}%</span></div>
+        <div class="sys-row"><span>核心</span><span>${data.cpu?.physical_cores||'--'}物理 ${data.cpu?.logical_cores||data.cpu?.cores||'--'}逻辑</span></div>
+        <div class="sys-row"><span>每核心</span><span style="font-size:10px">${(data.cpu?.per_core||[]).slice(0,4).map(c=>c.percent+'%').join(' ')||'--'}</span></div>
+        ${data.cpu?.gpus?`<div class="sys-row"><span>GPU</span><span>${data.cpu.gpus[0]?.name||'--'}</span></div>`:''}
+      </div>
+      <div class="card"><h3>内存</h3>
+        <div class="sys-row"><span>总计</span><span>${data.memory?.physical?.total_gb||data.memory?.total_gb||'--'}GB</span></div>
+        <div class="sys-row"><span>已用</span><span>${data.memory?.physical?.used_gb||data.memory?.used_gb||'--'}GB ${data.memory?.physical?.percent||data.memory?.percent||'--'}%</span></div>
+        <div class="sys-row"><span>可用</span><span>${data.memory?.physical?.available_gb||data.memory?.available_gb||'--'}GB</span></div>
+        ${data.memory?.physical?.sticks?`<div class="sys-row"><span>内存条</span><span>${data.memory.physical.sticks.length}条 ${data.memory.physical.sticks[0]?.capacity_gb||''}GB</span></div>`:''}
+      </div>
+      <div class="card"><h3>磁盘</h3>
+        ${(data.disks||[]).slice(0,3).map(d=>`<div class="sys-row"><span>${d.device||d.mountpoint} ${d.type||''}</span><span>${d.percent||'--'}% ${d.free_gb||'--'}GB空闲</span></div>`).join('')||'<div class="empty">无磁盘数据</div>'}
+      </div>
+      <div class="card"><h3>Top进程</h3>
+        ${(data.top_processes||[]).map(p=>`<div class="sys-row"><span>${p.name}</span><span>${p.memory_mb}MB</span></div>`).join('')||'<div class="empty">无</div>'}
+      </div>
+    `;
+    if(data.cpu){
+      document.getElementById('mini-cpu').textContent = (data.cpu.total_percent||data.cpu.percent||0)+'%';
+      document.getElementById('mini-cpu-bar').style.width = (data.cpu.total_percent||data.cpu.percent||0)+'%';
+    }
+    if(data.memory){
+      const perc = data.memory.physical?.percent||data.memory.percent||0;
+      document.getElementById('mini-mem').textContent = perc+'%';
+      document.getElementById('mini-mem-bar').style.width = perc+'%';
+    }
+  }catch(e){grid.innerHTML = `<div class="card">错误: ${e.message}</div>`}
+}
+async function observeState(){
+  try{
+    const res = await fetch('/api/runtime/state/observe');
+    const data = await res.json();
+    alert('Observe: '+JSON.stringify(data).slice(0,500));
+  }catch(e){alert(e.message)}
+}
+async function loadProcesses(){
+  const sort = document.getElementById('proc-sort')?.value||'memory';
+  const el = document.getElementById('proc-list');
+  el.innerHTML = '<div class="empty">加载中...</div>';
+  try{
+    const res = await fetch(`/api/system/processes?sort_by=${sort}&limit=30`);
+    const data = await res.json();
+    el.innerHTML = (data.processes||[]).map(p=>`<div class="list-item"><div><div class="item-title">${p.name} <span class="badge">${p.pid}</span> ${p.parent_name?`←${p.parent_name}`:''}</div><div class="item-meta">${p.memory_mb}MB · CPU ${p.cpu_percent||0}% · ${p.username||''} · ${p.cmdline||''}</div></div><div><span class="badge ${p.memory_mb>500?'danger':p.memory_mb>200?'warning':'success'}">${p.memory_mb}MB</span></div></div>`).join('');
+  }catch(e){el.innerHTML='错误: '+e.message}
+}
+async function loadWindows(){
+  const el = document.getElementById('win-grid');
+  el.innerHTML = '<div class="empty">枚举中...</div>';
+  try{
+    const res = await fetch('/api/system/windows');
+    const data = await res.json();
+    el.innerHTML = (data.windows||[]).map(w=>`<div class="card"><h3>${w.title||'无标题'} <span class="badge">${w.hwnd}</span></h3><div class="sys-row"><span>类</span><span>${w.class||''}</span></div><div class="sys-row"><span>进程</span><span>${w.process||''} PID ${w.pid||''}</span></div><div class="sys-row"><span>矩形</span><span>${w.rect?.left||0},${w.rect?.top||0} ${w.rect?.width||0}x${w.rect?.height||0}</span></div><div class="sys-row"><span>Z序</span><span>${w.z_order||'--'} 置顶:${w.is_topmost?'是':'否'}</span></div><div class="sys-row"><span>DPI</span><span>${w.dpi||'--'}</span></div></div>`).join('')||'<div class="empty">无窗口</div>';
+  }catch(e){el.innerHTML='错误: '+e.message}
+}
+async function loadFiles(){
+  const path = document.getElementById('file-path').value;
+  const el = document.getElementById('file-list');
+  el.innerHTML = '<div class="empty">加载中...</div>';
+  try{
+    const res = await fetch(`/api/system/files?path=${encodeURIComponent(path)}&detail=true`);
+    const data = await res.json();
+    if(data.error){el.innerHTML=`<div class="card" style="color:var(--danger)">${data.error}</div>`; return;}
+    el.innerHTML = (data.files||[]).map(f=>`<div class="list-item"><div><div class="item-title">${f.is_dir?'📁':'📄'} ${f.name}</div><div class="item-meta">${f.path} ${f.size_readable||''} ${f.modified||''}</div></div><span class="badge ${f.is_dir?'accent':'success'}">${f.is_dir?'文件夹':'文件'}</span></div>`).join('')||'<div class="empty">空文件夹</div>';
+  }catch(e){el.innerHTML='错误: '+e.message}
+}
+async function takeScreenshot(){
+  const el = document.getElementById('vision-preview');
+  el.innerHTML = '截图中...';
+  try{
+    const res = await fetch('/api/system/screenshot?mode=full');
+    const data = await res.json();
+    el.innerHTML = `<div>截图: ${data.image_path||''}<br>尺寸: ${data.width}x${data.height}<br>大小: ${data.size_kb||''}KB ${data.demo?'(演示)':'(真实)'}</div>`;
+    document.getElementById('vision-scene').innerHTML = `截图路径: ${data.image_path}<br>模式: ${data.mode}<br>时间: ${new Date().toLocaleTimeString()}<br><br>统一场景表示:<br>截图+宽高+DPI+窗口+UIA+OCR+光标+应用上下文<br>→ SceneRepresentation`;
+  }catch(e){el.innerHTML='错误: '+e.message}
+}
+async function doOCR(){alert('OCR: 需PaddleOCR，演示返回文字块')}
+async function loadMemory(){
+  try{
+    const res = await fetch('/api/memory');
+    const data = await res.json();
+    document.getElementById('mem-working').innerHTML = (data.working||data.conversations||[]).slice(0,5).map(m=>`<div style="font-size:11px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05)">${(m.content||m).toString().slice(0,80)}</div>`).join('')||'<div class="empty">无</div>';
+    document.getElementById('mem-semantic').innerHTML = (data.semantic||[]).slice(0,5).map(m=>`<div style="font-size:11px;padding:4px 0">${(m.content||m).toString().slice(0,80)}</div>`).join('')||'<div class="empty">无</div>';
+    document.getElementById('mem-episodic').innerHTML = (data.episodic||[]).slice(0,5).map(m=>`<div style="font-size:11px;padding:4px 0">${(m.content||m).toString().slice(0,80)}</div>`).join('')||'<div class="empty">无</div>';
+  }catch(e){console.error(e)}
+}
+async function searchMemory(){
+  const q = document.getElementById('memory-query').value;
+  if(!q) return;
+  try{
+    const res = await fetch(`/api/memory/vector/search?query=${encodeURIComponent(q)}&limit=5`);
+    const data = await res.json();
+    document.getElementById('mem-vector').innerHTML = (data.results||[]).map(r=>`<div style="font-size:11px;padding:6px;background:var(--bg);border-radius:6px;margin-bottom:6px"><strong>[${r.score?.toFixed(2)||''} ${r.method}]</strong> ${r.content.slice(0,120)}</div>`).join('')||'<div class="empty">无结果</div>';
+  }catch(e){document.getElementById('mem-vector').innerHTML='错误: '+e.message}
+}
+async function loadSkills(){
+  try{
+    const res = await fetch('/api/skills');
+    const data = await res.json();
+    document.getElementById('skills-grid').innerHTML = (data.skills||[]).map(s=>`<div class="card"><h3>${s.name||s.id} v${s.version||'1.0'} <span class="badge success">${s.success_rate||s.success||0}%</span></h3><div style="font-size:11px;color:var(--text2)">${s.description||''}</div><div style="font-size:10px;margin-top:8px;font-family:monospace">触发: ${(s.triggers||s.trigger_conditions||[]).join(', ')}<br>工具: ${(s.tools||s.required_tools||[]).join(', ')}<br>步骤: ${s.steps||0} 成功:${s.success||0} 失败:${s.failure||0}</div></div>`).join('')||'<div class="empty">无技能</div>';
+  }catch(e){document.getElementById('skills-grid').innerHTML='错误: '+e.message}
+}
+async function loadDreaming(){
+  try{
+    const res = await fetch('/api/dreaming/status');
+    const data = await res.json();
+    document.getElementById('dream-light').innerHTML = `阈值: ${data.threshold}<br>权重: ${JSON.stringify(data.weights||{}).slice(0,100)}<br>候选: ${data.has_candidates?'有':'无'}`;
+  }catch(e){console.error(e)}
+}
+async function runDreaming(phase){
+  const btn = event.target;
+  btn.disabled = true;
+  btn.textContent = '运行中...';
+  try{
+    let url = '/api/dreaming/run-all';
+    if(phase==='light') url='/api/dreaming/light';
+    if(phase==='rem') url='/api/dreaming/rem';
+    const res = await fetch(url,{method:'POST'});
+    const data = await res.json();
+    if(phase==='all' || phase==='light'){
+      document.getElementById('dream-light').innerHTML = `扫描: ${data.light?.scanned||data.scanned||0}<br>去重: ${data.light?.unique||0}<br>候选: ${data.light?.candidates||0}<br>报告: ${data.light?.report||''}`;
+    }
+    if(phase==='all' || phase==='rem'){
+      document.getElementById('dream-rem').innerHTML = `主题: ${data.rem?.themes||0}<br>详情: ${JSON.stringify(data.rem?.themes_detail||{}).slice(0,100)}`;
+    }
+    if(phase==='all'){
+      document.getElementById('dream-deep').innerHTML = `候选: ${data.deep?.candidates||0}<br>晋升: ${data.deep?.promoted||0}<br>新记忆: ${data.deep?.new_memories||0}<br>拒绝: ${data.deep?.rejected||0}`;
+      document.getElementById('dream-md').textContent = (data.deep?.memories||[]).map(m=>m.content||'').join('\n')||'无';
+    }
+  }catch(e){alert('错误: '+e.message)}
+  btn.disabled = false;
+  btn.textContent = phase==='all'?'运行全部':phase==='light'?'Light扫描':'REM主题';
+}
+async function loadEvolution(){
+  try{
+    const res = await fetch('/api/evolution/status');
+    const data = await res.json();
+    document.getElementById('evo-status').textContent = data.status||'--';
+    document.getElementById('evo-samples').textContent = `${data.training_data?.sft_samples||0}/${data.training_data?.min_required||50}`;
+    document.getElementById('evo-fill').style.width = Math.min(100, (data.training_data?.sft_samples||0)/(data.training_data?.min_required||50)*100)+'%';
+    document.getElementById('evo-flywheel').innerHTML = `SFT: ${data.training_data?.sft_samples||0}<br>DPO: ${data.training_data?.dpo_samples||0}<br>就绪: ${data.training_data?.ready_for_training?'是':'否'}<br>下次: ${data.training_data?.next_train_in||'--'}条后`;
+    document.getElementById('evo-training').innerHTML = `LoRA: ${data.current_lora||'--'}<br>基础: ${data.base_model||'--'}<br>空闲: ${data.check?.idle?'是':'否'} CPU ${data.check?.cpu||'--'}%`;
+  }catch(e){console.error(e)}
+}
+async function startEvolution(){
+  if(!confirm('开始进化？需至少50样本')) return;
+  const res = await fetch('/api/evolution/start?manual=true',{method:'POST'});
+  const data = await res.json();
+  alert(data.message||JSON.stringify(data).slice(0,500));
+}
+async function loadSecurity(){
+  try{
+    const res = await fetch('/api/security/scan');
+    const data = await res.json();
+    document.getElementById('sec-scan').innerHTML = `风险: ${data.risk_level||'--'}<br>问题: ${(data.issues||[]).length}<br>${(data.issues||[]).slice(0,3).map(i=>i.type+':'+i.severity).join('<br>')||'无'}`;
+    const res2 = await fetch('/api/security/wsl');
+    const data2 = await res2.json();
+    document.getElementById('sec-wsl').innerHTML = `可用: ${data2.available?'是':'否'}<br>发行版: ${(data2.distros||[]).join(', ')||'无'}<br>白名单: ls,cat,grep...<br>安全: 白名单+quote`;
+    const res3 = await fetch('/api/policy');
+    const data3 = await res3.json();
+    document.getElementById('sec-policy').innerHTML = `引擎: ${data3.engine||'旧防火墙'}<br>保护路径: ${(data3.protected_paths||[]).length}个<br>关键进程: ${(data3.critical_processes||[]).length||0}个<br>自动允许: ${(data3.auto_allow||[]).length||0}个<br><span style="font-size:10px">${data3.note||''}</span>`;
+  }catch(e){console.error(e)}
+}
+async function checkSandbox(){
+  const path = document.getElementById('sandbox-path').value;
+  try{
+    const res = await fetch(`/api/security/sandbox/check?path=${encodeURIComponent(path)}`);
+    const data = await res.json();
+    document.getElementById('sandbox-result').innerHTML = `允许: ${data.allowed?'✅':'❌'}<br>风险: ${data.risk}<br>原因: ${data.reason}<br>真实路径: ${data.real_path||''}`;
+  }catch(e){document.getElementById('sandbox-result').innerHTML='错误: '+e.message}
+}
+async function loadContracts(){
+  try{
+    const res = await fetch('/api/contracts');
+    const data = await res.json();
+    document.getElementById('contracts-list').innerHTML = (data.all||[]).map(c=>`<div class="list-item"><div><div class="item-title">${c.name} <span class="badge ${c.risk==='high'?'danger':c.risk==='medium'?'warning':'success'}">${c.risk}</span> <span class="badge">${c.side_effect}</span></div><div class="item-meta">${c.display_name} · 验证:${c.verification} · 前置:${(c.preconditions||[]).join(',')||'无'}</div></div><span class="badge accent">${c.category}</span></div>`).join('')||'<div class="empty">无契约</div>';
+  }catch(e){document.getElementById('contracts-list').innerHTML='错误: '+e.message}
+}
+async function loadModels(){
+  try{
+    const res = await fetch('/api/model-registry');
+    const data = await res.json();
+    document.getElementById('models-grid').innerHTML = `<div class="card"><h3>当前模型</h3><div style="font-size:11px;font-family:monospace">${JSON.stringify(data.active||{}).slice(0,500)}</div></div>` + (data.models||[]).map(m=>`<div class="card"><h3>${m.id||'模型'} ${m.is_active?'✅':''}</h3><div class="sys-row"><span>量化</span><span>${m.quantization||''}</span></div><div class="sys-row"><span>后端</span><span>${m.backend||''}</span></div><div class="sys-row"><span>上下文</span><span>${m.context_length||''}</span></div></div>`).join('');
+  }catch(e){document.getElementById('models-grid').innerHTML='错误: '+e.message}
+}
+async function loadTraces(){
+  try{
+    const res = await fetch('/api/traces?limit=20');
+    const data = await res.json();
+    document.getElementById('trace-stats').innerHTML = `总数: ${data.stats?.total||0}<br>成功率: ${data.stats?.success_rate||0}%<br>平均延迟: ${data.stats?.avg_latency_ms||0}ms<br>平均工具: ${data.stats?.avg_tool_calls||0}`;
+    document.getElementById('trace-list').innerHTML = (data.traces||[]).map(t=>`<div class="list-item"><div><div class="item-title">${t.user_request||t.task_id}</div><div class="item-meta">工具:${t.tool_calls} 失败:${t.failures} 延迟:${t.latency_ms}ms</div></div><span class="badge ${t.success?'success':'danger'}">${t.success?'成功':'失败'}</span></div>`).join('')||'<div class="empty">无轨迹</div>';
+    document.getElementById('trace-mini').innerHTML = `成功率 ${data.stats?.success_rate||0}%<br>平均工具 ${data.stats?.avg_tool_calls||0}<br>总数 ${data.stats?.total||0}`;
+  }catch(e){console.error(e)}
+}
+async function loadBenchmark(){
+  try{
+    const res = await fetch('/api/benchmark');
+    const data = await res.json();
+    document.getElementById('bench-stats').innerHTML = `总数: ${data.stats?.total||0}<br>类别: ${JSON.stringify(data.stats?.by_category||{}).slice(0,100)}<br>平均时间: ${data.stats?.avg_estimated_time||0}s`;
+    document.getElementById('bench-tasks').innerHTML = (data.tasks||[]).map(t=>`<div class="list-item"><div><div class="item-title">${t.id} ${t.title}</div><div class="item-meta">${t.category} · ${t.difficulty} · ${t.estimated_time}s · ${t.success_criteria}</div></div><span class="badge accent">${t.category}</span></div>`).join('')||'<div class="empty">无任务</div>';
+  }catch(e){console.error(e)}
+}
+async function runBenchmarkAll(){
+  if(!confirm('运行全部基准？可能耗时')) return;
+  try{
+    const res = await fetch('/api/benchmark/run-all',{method:'POST'});
+    const data = await res.json();
+    alert(`成功率 ${data.success_rate||0}% 成功 ${data.success||0}/${data.total||0}`);
+  }catch(e){alert('错误: '+e.message)}
+}
+async function undoLast(){
+  try{
+    const res = await fetch('/api/tasks/undo',{method:'POST'});
+    const data = await res.json();
+    alert(data.message||JSON.stringify(data).slice(0,300));
+  }catch(e){alert('错误: '+e.message)}
+}
+function showPolicy(){fetch('/api/policy').then(r=>r.json()).then(d=>alert(JSON.stringify(d).slice(0,800)))}
+function toggleNotify(){alert('通知中心 - 演示')}
+function closeConfirm(ok){
+  document.getElementById('confirm-modal').style.display='none';
+  if(ok && pendingTool){
+    // 重新调用工具，带 auto_confirm=true
+    fetch('/api/tools/call',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...pendingTool, auto_confirm:true})}).then(r=>r.json()).then(d=>alert('执行: '+JSON.stringify(d).slice(0,500)));
+  }
+  pendingTool=null;
+}
+function saveSettings(){alert('设置已保存到 localStorage（演示）')}
+setInterval(loadSystem, 10000);
+loadSystem();
+loadTraces();
+</script>
+</body>
+</html>
