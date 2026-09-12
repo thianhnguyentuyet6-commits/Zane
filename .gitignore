@@ -1,5 +1,16 @@
-__pycache__
+# Secrets - 不提交真实Token，但保留示例
+.env
+data/tokens.json
+data/zane.db
+data/zane.db-shm
+data/zane.db-wal
+data/autonomous/
+data/memory/
+data/skills/
+data/traces/
+memory/
+__pycache__/
 *.pyc
-data/training/
-models/versions/*.json
-.venv
+.venv/
+node_modules/
+frontend/index_v2_backup.html

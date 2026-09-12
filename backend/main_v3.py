@@ -102,6 +102,9 @@ try:
     from .memory.vector_memory import vector_memory
     from .middleware.security import rate_limiter, auth_manager, sanitize_log
     from .tools.network.web_search_real import web_search_real
+    from .autonomous_optimizer import autonomous_optimizer
+    from .token_manager import token_manager
+    from .database import database
     NEW_ARCH_AVAILABLE = True
 except ImportError as e:
     print(f"新架构导入失败: {e}")
@@ -122,6 +125,9 @@ except ImportError as e:
     rate_limiter = None
     auth_manager = None
     web_search_real = None
+    autonomous_optimizer = None
+    token_manager = None
+    database = None
 
 app = FastAPI(
     title="Zane AGI v3.2 - 可靠本地计算机代理",
@@ -936,6 +942,96 @@ async def runtime_match_skill(intent: str):
             return {"matched": True, "skill": {"name": skill.name, "description": skill.description, "version": skill.version, "steps": len(skill.procedure), "success_rate": f"{skill.success_count}/{skill.success_count+skill.failure_count}"}}
         return {"matched": False, "reason": "无匹配技能"}
     return {"error": "技能管理器不可用"}
+
+# ========== Token管理 - 可替换Tokens栏 - 新增 ==========
+@app.get("/api/tokens")
+async def list_tokens(mask: bool = True):
+    if 'token_manager' in globals() and token_manager:
+        return {
+            "tokens": token_manager.list_tokens(mask=mask),
+            "real_search_config": token_manager.get_real_search_config(),
+            "count": len(token_manager.token_definitions)
+        }
+    return {"tokens": {}, "count": 0}
+
+@app.get("/api/tokens/{token_id}")
+async def get_token(token_id: str, mask: bool = True):
+    if 'token_manager' in globals() and token_manager:
+        return token_manager.get_token(token_id, mask=mask)
+    return {"error": "Token管理器不可用"}
+
+@app.post("/api/tokens/{token_id}")
+async def set_token(token_id: str, value: str):
+    if 'token_manager' in globals() and token_manager:
+        result = token_manager.set_token(token_id, value)
+        return result
+    return {"error": "Token管理器不可用"}
+
+@app.get("/api/tokens/real-search/config")
+async def real_search_config():
+    if 'token_manager' in globals() and token_manager:
+        return token_manager.get_real_search_config()
+    return {"error": "不可用"}
+
+# ========== 数据库 - 技术栈 - 新增 ==========
+@app.get("/api/database/stats")
+async def database_stats():
+    if 'database' in globals() and database:
+        return {
+            "memory_stats": database.get_memory_stats(),
+            "trace_stats": database.get_trace_stats(),
+            "tech_stack": database.get_tech_stack(),
+            "file": database.db_path,
+            "vec_available": database.vec_available
+        }
+    return {"error": "数据库不可用"}
+
+@app.get("/api/database/tech-stack")
+async def tech_stack():
+    if 'database' in globals() and database:
+        return database.get_tech_stack()
+    return {
+        "database": {"primary": "JSON文件", "note": "database模块不可用时回退"},
+        "backend": {"framework": "FastAPI"},
+        "frontend": {"framework": "原生HTML/CSS/JS"}
+    }
+
+@app.get("/api/database/memories/search")
+async def database_search_memories(query: str, limit: int = 5):
+    if 'database' in globals() and database:
+        results = database.search_memories(query, limit=limit)
+        return {"query": query, "results": results, "count": len(results), "database": "SQLite"}
+    return {"query": query, "results": [], "count": 0}
+
+# ========== 自主优化 - 闲暇时间任务 - 新增 ==========
+@app.get("/api/autonomous/status")
+async def autonomous_status():
+    if 'autonomous_optimizer' in globals() and autonomous_optimizer:
+        return autonomous_optimizer.get_status()
+    return {"error": "自主优化器不可用"}
+
+@app.post("/api/autonomous/run")
+async def autonomous_run():
+    if 'autonomous_optimizer' in globals() and autonomous_optimizer:
+        result = await autonomous_optimizer.run_idle_task()
+        return result
+    return {"error": "不可用"}
+
+@app.post("/api/autonomous/query-open-source")
+async def autonomous_query():
+    if 'autonomous_optimizer' in globals() and autonomous_optimizer:
+        result = await autonomous_optimizer.query_open_source()
+        return result
+    return {"error": "不可用"}
+
+@app.get("/api/autonomous/candidate-skills")
+async def autonomous_candidate_skills():
+    if 'autonomous_optimizer' in globals() and autonomous_optimizer:
+        return {
+            "candidates": autonomous_optimizer.candidate_skills,
+            "count": len(autonomous_optimizer.candidate_skills)
+        }
+    return {"candidates": [], "count": 0}
 
 # ========== 设置 ==========
 @app.get("/api/settings")

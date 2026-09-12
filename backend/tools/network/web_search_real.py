@@ -16,6 +16,7 @@ class WebSearchReal:
     def __init__(self):
         self.bing_key = os.getenv("BING_API_KEY")
         self.tavily_key = os.getenv("TAVILY_API_KEY")
+        self.github_pat = os.getenv("GITHUB_PAT") or os.getenv("GITHUB_TOKEN")
         self.timeout = 10
         self.max_content = 5000
     
@@ -45,6 +46,53 @@ class WebSearchReal:
             return True
         except:
             return False
+
+    async def search_github(self, query: str, count: int = 5) -> Dict:
+        """GitHub API真实搜索 - 使用PAT"""
+        if not self.github_pat:
+            return {"results": [], "source": "GitHub未配置"}
+        
+        try:
+            async with httpx.AsyncClient(timeout=self.timeout) as client:
+                # 搜索仓库
+                resp = await client.get(
+                    "https://api.github.com/search/repositories",
+                    headers={
+                        "Authorization": f"Bearer {self.github_pat}",
+                        "Accept": "application/vnd.github.v3+json",
+                        "User-Agent": "Zane-AGI/1.0"
+                    },
+                    params={"q": query, "per_page": count, "sort": "stars", "order": "desc"}
+                )
+                
+                if resp.status_code == 200:
+                    data = resp.json()
+                    results = []
+                    for item in data.get("items", [])[:count]:
+                        results.append({
+                            "title": item.get("full_name", ""),
+                            "url": item.get("html_url", ""),
+                            "snippet": item.get("description", "")[:300] + f" ⭐{item.get('stargazers_count',0)}",
+                            "source": "GitHub",
+                            "stars": item.get("stargazers_count", 0),
+                            "language": item.get("language", ""),
+                            "real": True
+                        })
+                    
+                    if results:
+                        return {
+                            "query": query,
+                            "results": results,
+                            "count": len(results),
+                            "source": "GitHub API",
+                            "real": True
+                        }
+                else:
+                    print(f"GitHub搜索失败: {resp.status_code} {resp.text[:200]}")
+        except Exception as e:
+            print(f"GitHub搜索异常: {e}")
+        
+        return {"results": [], "source": "GitHub失败"}
 
     async def search(self, query: str, count: int = 5, fetch_content: bool = False) -> Dict:
         """真实搜索 - 具体实现"""
@@ -81,6 +129,44 @@ class WebSearchReal:
                         }
             except Exception as e:
                 print(f"Bing搜索失败: {e}")
+        
+        # 其次 Tavily
+        if self.tavily_key:
+            try:
+                async with httpx.AsyncClient(timeout=self.timeout) as client:
+                    resp = await client.post(
+                        "https://api.tavily.com/search",
+                        json={"api_key": self.tavily_key, "query": query, "max_results": count, "include_answer": False},
+                        headers={"Content-Type": "application/json"}
+                    )
+                    if resp.status_code == 200:
+                        data = resp.json()
+                        results = []
+                        for item in data.get("results", [])[:count]:
+                            url = item.get("url", "")
+                            if self._is_safe_url(url):
+                                results.append({
+                                    "title": item.get("title", ""),
+                                    "url": url,
+                                    "snippet": item.get("content", "")[:300],
+                                    "source": "Tavily"
+                                })
+                        if results:
+                            return {
+                                "query": query,
+                                "results": results,
+                                "count": len(results),
+                                "source": "Tavily API",
+                                "real": True
+                            }
+            except Exception as e:
+                print(f"Tavily搜索失败: {e}")
+        
+        # 其次 GitHub API - 使用PAT真实搜索
+        if self.github_pat:
+            github_result = await self.search_github(query, count)
+            if github_result.get("results"):
+                return github_result
         
         # 回退 DuckDuckGo HTML（无需Key）
         try:
