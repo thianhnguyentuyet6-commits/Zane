@@ -1,33 +1,32 @@
-fastapi==0.115.0
-uvicorn==0.32.0
-psutil==6.1.0
-pillow==11.0.0
-pydantic==2.9.2
-python-multipart==0.0.12
-aiofiles==24.1.0
-httpx==0.27.2
+fastapi==0.115.0  # Web框架 异步 自动文档 单端口8000
+uvicorn==0.32.0  # ASGI服务器
+psutil==6.1.0  # 系统信息跨平台 CPU/内存/进程
+pillow==11.0.0  # 截图 ImageGrab
+pydantic==2.9.2  # 数据校验
+python-multipart==0.0.12  # 表单解析 FastAPI必需
+aiofiles==24.1.0  # 异步文件 StaticFiles可选
+httpx==0.27.2  # 异步HTTP 调LLM OpenAI兼容
 
-# A夯实 - 基础加固 v2.3集成版
-filelock==3.15.0
-slowapi==0.1.9
-APScheduler==3.10.4
-python-jose[cryptography]==3.3.0
-loguru==0.7.2  # 商业级日志，文件轮转10MB保留7天，已集成lifespan
+# 基础加固 - A夯实 商业级必备
+filelock==3.15.0  # 并发安全 SQLite多进程写
+slowapi==0.1.9  # 限流 60/分 商业级
+APScheduler==3.10.4  # 定时 凌晨2点+每30分钟+每天3点清理
+python-jose[cryptography]==3.3.0  # JWT HS256 7天 商业级认证
+loguru==0.7.2  # 日志 文件轮转10MB保留7天 商业级
 
-# Windows深度控制
-# wmi==1.5.1  # Windows only, 安装脚本处理
-# pywin32==308  # Windows only
+# Windows深度控制 - Windows only 安装脚本处理
+# wmi==1.5.1  # WMI真实CPU每核心+内存条+磁盘+服务
+# pywin32==308  # Win32真实HWND+Z序+DPI
 
-# C自主 - 向量+OCR 轻量优先，重型可选
-# 轻量已安装 - 补全
-sqlite-vec==0.1.6
-rapidocr_onnxruntime==1.3.12  # 轻量OCR 50MB，替代PaddleOCR 500MB，已安装
-# 重型可选 - 用户选择时安装
-# sentence-transformers==3.3.1  # 80MB语义，安装后自动启用
-# torch==2.5.0  # 由sentence-transformers依赖
-# paddlepaddle==3.0.0  # 重型
-# paddleocr==2.9.1  # 重型 500MB
+# 向量+OCR 轻量优先 重型可选
+sqlite-vec==0.1.6  # 向量数据库轻量 384维
+rapidocr_onnxruntime==1.3.12  # OCR 50MB轻量 替代PaddleOCR 500MB 已安装真实可用
+# 重型可选 - 用户按需安装
+# sentence-transformers==3.3.1  # 80MB语义 all-MiniLM-L6-v2 384维 真实嵌入
+# torch==2.5.0  # sentence-transformers依赖
+# paddleocr==2.9.1  # 重型500MB
+# paddlepaddle==3.0.0
 
 # 自我进化
-datasets==3.0.0
-# 可选训练：unsloth, torch, transformers, trl, peft
+datasets==3.0.0  # 训练数据 SFT/DPO
+# 可选训练重型：unsloth, torch, transformers, trl, peft 按需

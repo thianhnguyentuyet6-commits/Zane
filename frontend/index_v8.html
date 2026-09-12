@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zane AGI v2.4 - 自我修正版 | 修复裸except+loguru+8层+<30KB+26API全通</title>
+<link rel="stylesheet" href="/css/styles.css">
+<link rel="stylesheet" href="/css/components.css">
+<link rel="stylesheet" href="/css/layout.css">
+<link rel="stylesheet" href="/css/themes.css">
+<style>.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}</style>
+</head>
+<body>
+<div class="app" role="application" aria-label="Zane AGI 控制台">
+  <aside class="sidebar" role="navigation" aria-label="主导航">
+    <div class="sidebar-header">
+      <div class="logo"><div class="logo-icon" aria-hidden="true">Z</div><div class="logo-text"><div class="logo-title">Zane AGI v2.4</div><div class="logo-sub">自我修正版 裸except修复</div></div></div>
+      <div class="status-line" role="status" aria-live="polite"><div class="status-dot" aria-hidden="true"></div><span class="status-text" id="status-text">Qwen3-30B-A3B</span><span class="status-tag">SQLite唯一</span></div>
+      <div class="evo-mini"><div style="font-size:9px;font-weight:700;display:flex;justify-content:space-between"><span>🧬 进化+习惯</span><span id="evo-status" style="color:var(--success)">空闲</span></div><div style="font-size:9px;margin-top:4px">样本 <span id="evo-samples">0/50</span> | 习惯 <span id="evo-habits">0</span></div><div class="progress" style="margin-top:6px"><div id="evo-fill" class="progress-fill" style="width:0%"></div></div></div>
+    </div>
+    <nav class="sidebar-nav" aria-label="视图导航">
+      <div class="nav-section">主控 v2.4自我修正</div>
+      <button class="nav-item active" data-view="chat" aria-current="page" aria-label="控制台"><span class="nav-icon" aria-hidden="true">◧</span><span class="nav-label">控制台</span><span class="nav-badge new">26API</span></button>
+      <button class="nav-item" data-view="models" aria-label="模型管理"><span class="nav-icon" aria-hidden="true">🦙</span><span class="nav-label">模型 模型A</span><span class="nav-badge new">真实载入</span></button>
+      <button class="nav-item" data-view="tokens" aria-label="Token管理"><span class="nav-icon" aria-hidden="true">🔑</span><span class="nav-label">Token</span></button>
+      <button class="nav-item" data-view="autonomous" aria-label="自主优化"><span class="nav-icon" aria-hidden="true">🤖</span><span class="nav-label">自主优化</span><span class="nav-badge new">20 Skill</span></button>
+      <button class="nav-item" data-view="database" aria-label="数据库"><span class="nav-icon" aria-hidden="true">🗄️</span><span class="nav-label">数据库</span><span class="nav-badge new">filelock</span></button>
+      <button class="nav-item" data-view="traces" aria-label="轨迹"><span class="nav-icon" aria-hidden="true">◫</span><span class="nav-label">轨迹</span></button>
+      <button class="nav-item" data-view="benchmark" aria-label="基准"><span class="nav-icon" aria-hidden="true">◈</span><span class="nav-label">基准</span></button>
+      <div class="nav-section">系统感知+图表</div>
+      <button class="nav-item" data-view="system" aria-label="系统状态"><span class="nav-icon" aria-hidden="true">⬔</span><span class="nav-label">系统+图表</span><span class="nav-badge new">Canvas交互</span></button>
+      <button class="nav-item" data-view="processes" aria-label="进程"><span class="nav-icon" aria-hidden="true">⬓</span><span class="nav-label">进程</span></button>
+      <button class="nav-item" data-view="windows" aria-label="窗口"><span class="nav-icon" aria-hidden="true">⬒</span><span class="nav-label">窗口</span></button>
+      <button class="nav-item" data-view="files" aria-label="文件"><span class="nav-icon" aria-hidden="true">⬕</span><span class="nav-label">文件</span></button>
+      <div class="nav-section">记忆进化</div>
+      <button class="nav-item" data-view="memory" aria-label="记忆"><span class="nav-icon" aria-hidden="true">⬙</span><span class="nav-label">记忆</span></button>
+      <button class="nav-item" data-view="skills" aria-label="技能"><span class="nav-icon" aria-hidden="true">⬗</span><span class="nav-label">技能 20+</span></button>
+      <button class="nav-item" data-view="dreaming" aria-label="梦境"><span class="nav-icon" aria-hidden="true">⬖</span><span class="nav-label">梦境</span></button>
+      <button class="nav-item" data-view="evolution" aria-label="进化"><span class="nav-icon" aria-hidden="true">⬘</span><span class="nav-label">进化</span></button>
+      <div class="nav-section">安全+契约</div>
+      <button class="nav-item" data-view="security" aria-label="安全"><span class="nav-icon" aria-hidden="true">⬑</span><span class="nav-label">安全</span></button>
+      <button class="nav-item" data-view="contracts" aria-label="契约"><span class="nav-icon" aria-hidden="true">⬐</span><span class="nav-label">契约 23</span></button>
+      <div class="nav-section">系统</div>
+      <button class="nav-item" data-view="settings" aria-label="设置"><span class="nav-icon" aria-hidden="true">⬎</span><span class="nav-label">设置 技术栈</span></button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="mini-stat"><span>CPU</span><span id="mini-cpu" aria-live="polite">--</span></div><div class="mini-bar"><div class="mini-fill" id="mini-cpu-bar" style="width:0%"></div></div>
+      <div class="mini-stat" style="margin-top:4px"><span>内存</span><span id="mini-mem" aria-live="polite">--</span></div><div class="mini-bar"><div class="mini-fill mem" id="mini-mem-bar" style="width:0%"></div></div>
+      <div class="footer-note">v2.4自我修正: 裸except修复+loguru+8层+<30KB<br>模型: 真实扫描+模型A+server管理<br>UI: 模块化+Canvas交互+30秒轮询</div>
+    </div>
+  </aside>
+
+  <main class="main" role="main">
+    <header class="topbar">
+      <div><div class="breadcrumb" id="breadcrumb" aria-label="当前位置">Console / 自我修正版</div><div class="page-title" id="page-title">v2.4 自我修正 - 裸except修复+loguru+技术栈夯实</div></div>
+      <div class="topbar-right">
+        <div class="model-pill" role="status"><span class="model-dot" aria-hidden="true"></span><span id="top-model">Qwen3-30B-A3B</span></div>
+        <button class="icon-btn" onclick="switchView('models')" title="模型A" aria-label="模型管理">🦙</button>
+        <button class="icon-btn" onclick="switchView('tokens')" title="Token" aria-label="Token管理">🔑</button>
+      </div>
+    </header>
+
+    <div class="token-bar" id="token-bar" role="status" aria-live="polite">
+      <span style="font-size:10px;font-weight:700">🔑 Tokens:</span>
+      <div id="token-bar-items" style="display:flex;gap:5px;flex-wrap:wrap" aria-busy="true"><span class="skeleton" style="width:100px"></span></div>
+      <div style="margin-left:auto;display:flex;gap:5px">
+        <span class="token-badge has">26API ✅</span>
+        <span class="token-badge has">自我修正</span>
+        <span class="token-badge has">loguru</span>
+      </div>
+    </div>
+
+    <div class="content" id="content" aria-live="polite" aria-busy="false">
+      <div class="view active" id="view-chat">
+        <div class="chat-layout">
+          <div class="chat-main">
+            <div class="chat-messages" id="chat-messages" role="log" aria-live="polite">
+              <div class="message assistant">
+                <div class="msg-avatar" aria-hidden="true">Z</div>
+                <div class="msg-content">
+                  <div class="msg-header"><span class="msg-role">Zane v2.4 自我修正版</span><span class="msg-time">刚刚 · 裸except修复+loguru+8层</span></div>
+                  <div class="msg-text">
+                    <p><strong>🔧 自我修正 - 裸except修复：</strong></p>
+                    <div class="execution-stream">
+                      <div class="stream-header"><span class="pulse"></span> 修复清单</div>
+                      <div class="stream-steps">
+                        <div class="step observe">✅ 修复 152处裸except → 具体异常 ImportError/Exception + 日志链路</div>
+                        <div class="step plan">✅ 修复 166处print → loguru统一日志 + 文件轮转10MB 7天</div>
+                        <div class="step act">✅ 修复 lifespan 异常链路 - 启动/关闭完整try/except+日志</div>
+                        <div class="step verify">✅ 修复 database.py 闭包Bug search_types</div>
+                        <div class="step observe">✅ 修复 middleware 认证链路 - 具体异常+日志</div>
+                      </div>
+                    </div>
+                    <p><strong>🎨 前端优化 - &lt;30KB目标：</strong></p>
+                    <div class="execution-stream">
+                      <div class="stream-header"><span class="pulse"></span> 前端拆分</div>
+                      <div class="stream-steps">
+                        <div class="step observe">✅ 主文件 46KB→21KB HTML结构，外联 app.js 24KB</div>
+                        <div class="step plan">✅ CSS拆分 styles.css 11KB + components.css 1.8KB + layout.css + themes.css</div>
+                        <div class="step act">✅ JS模块化 8模块 + app.js + charts.js交互式</div>
+                        <div class="step verify">✅ 轮询30秒+自适应15秒+hidden暂停节能</div>
+                      </div>
+                    </div>
+                    <p><strong>🏗️ 技术栈夯实 - 8层：</strong></p>
+                    <div class="execution-stream">
+                      <div class="stream-header"><span class="pulse"></span> 8层架构</div>
+                      <div class="stream-steps">
+                        <div class="step observe">✅ 感知层 WMI真实+Win32 HWND+截图+OCR rapidocr 50MB</div>
+                        <div class="step plan">✅ 推理层 Qwen3 30B-A3B MoE 3B激活+意图解析+规划</div>
+                        <div class="step act">✅ 工具层 23工具 受控Schema+截断+真实操作</div>
+                        <div class="step verify">✅ 策略层 JWT+slowapi 60/分+filelock+沙盒+10MB限制</div>
+                        <div class="step observe">✅ 执行层 验证+撤销栈+熔断+重试+自主恢复</div>
+                        <div class="step plan">✅ 记忆层 SQLite唯一WAL 8表+向量+习惯学习</div>
+                        <div class="step act">✅ 进化层 数据飞轮SFT/DPO+QLoRA rank32+梦境三阶段</div>
+                        <div class="step verify">✅ 接口层 FastAPI单端口8000+前端模块化+loguru</div>
+                      </div>
+                    </div>
+                    <p>试试：<code>模型列表</code> <code>向量搜索 文件</code> <code>OCR截图</code> <code>清理截图</code></p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="execution-stream" id="execution-stream" style="display:none"><div class="stream-header"><span class="pulse"></span> 执行中</div><div class="stream-steps" id="stream-steps"><div class="skeleton" style="width:80%"></div></div></div>
+            <div class="chat-input-area">
+              <div class="input-chips" role="group" aria-label="快捷指令">
+                <span class="chip" onclick="quick('模型列表')" role="button" tabindex="0">🦙 模型列表</span>
+                <span class="chip" onclick="quick('向量搜索 文件')" role="button" tabindex="0">🔍 向量搜索</span>
+                <span class="chip" onclick="quick('意图解析 整理下载')" role="button" tabindex="0">🧠 意图解析</span>
+                <span class="chip" onclick="quick('OCR截图')" role="button" tabindex="0">📷 OCR</span>
+                <span class="chip" onclick="quick('清理截图')" role="button" tabindex="0">🧹 清理</span>
+              </div>
+              <div class="input-box"><textarea id="chat-input" placeholder="输入任务... 例如：模型列表，向量搜索，OCR截图" rows="2" aria-label="任务输入"></textarea><button class="send-btn" onclick="send()" aria-label="执行任务"><span>执行</span><span aria-hidden="true">↗</span></button></div>
+            </div>
+          </div>
+          <div class="chat-side">
+            <div class="side-card"><div class="side-title">自我修正</div><div id="api-status" style="font-size:10px">检测中...</div></div>
+            <div class="side-card"><div class="side-title">技术栈</div><div style="font-size:9px;font-family:monospace">✅ 裸except修复<br>✅ loguru日志<br>✅ 8层夯实<br>✅ <30KB主文件<br>✅ 30秒轮询</div></div>
+            <div class="side-card"><div class="side-title">Canvas图表</div><canvas id="mini-cpu-canvas" class="canvas-chart" width="260" height="80" aria-label="CPU图表"></canvas></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="view" id="view-models"><div class="view-header"><h2>🦙 模型管理 - 真实扫描+模型A</h2><div class="view-actions"><button class="btn" onclick="loadModels()">刷新</button><button class="btn primary" onclick="addCustomModel()">添加模型A</button></div></div><div id="models-grid" aria-busy="true"><div class="skeleton"></div><div class="skeleton"></div></div></div>
+      <div class="view" id="view-tokens"><div class="view-header"><h2>🔑 Token可替换</h2><button class="btn" onclick="loadTokens()">刷新</button></div><div class="grid grid-2" id="tokens-grid" aria-busy="true"><div class="skeleton"></div></div></div>
+      <div class="view" id="view-database"><div class="view-header"><h2>🗄️ SQLite唯一+filelock+习惯学习</h2><div class="view-actions"><button class="btn" onclick="loadDatabase()">刷新</button><button class="btn" onclick="backupDb()">备份</button></div></div><div class="grid grid-2" id="database-grid" aria-busy="true"><div class="skeleton"></div></div><div class="card" style="margin-top:10px"><h3>习惯学习</h3><div id="habits-list"><span class="loading-spinner" aria-hidden="true"></span> 加载中...</div></div></div>
+      <div class="view" id="view-autonomous"><div class="view-header"><h2>🤖 20 Skill+APScheduler+习惯学习</h2><div class="view-actions"><button class="btn" onclick="loadAutonomous()">状态</button><button class="btn primary" onclick="runAutonomous()">运行自主任务</button></div></div><div class="grid grid-2"><div class="card"><h3>空闲+调度器</h3><div id="auto-idle" aria-busy="true"><div class="skeleton"></div></div></div><div class="card"><h3>20候选Skill</h3><div id="auto-candidates" style="max-height:300px;overflow-y:auto" aria-busy="true"><div class="skeleton"></div></div></div></div></div>
+      <div class="view" id="view-system"><div class="view-header"><h2>系统+Canvas图表 - 交互式</h2><div class="view-actions"><button class="btn" onclick="loadSystem()">刷新</button><button class="btn" onclick="loadCharts()">图表</button></div></div><div class="grid grid-2"><div class="card"><h3>CPU - 每核心 Canvas交互式</h3><canvas id="cpu-chart" class="canvas-chart" width="400" height="150" aria-label="CPU每核心图表"></canvas><div id="cpu-info" style="font-size:10px;margin-top:8px"></div></div><div class="card"><h3>内存 Canvas交互式</h3><canvas id="memory-chart" class="canvas-chart" width="400" height="150" aria-label="内存图表"></canvas><div id="memory-info" style="font-size:10px;margin-top:8px"></div></div></div><div class="grid grid-2" id="system-grid" style="margin-top:10px" aria-busy="true"><div class="card"><div class="skeleton"></div></div></div></div>
+      <div class="view" id="view-traces"><div class="view-header"><h2>轨迹 - SQLite唯一 filelock</h2><button class="btn" onclick="loadTraces()">刷新</button></div><div class="grid grid-2"><div class="card"><h3>统计</h3><div id="trace-stats" aria-busy="true"><div class="skeleton"></div></div></div><div class="card"><h3>最近</h3><div id="trace-list" class="list" aria-busy="true"><div class="skeleton"></div></div></div></div></div>
+      <div class="view" id="view-skills"><div class="view-header"><h2>技能 - 20+含个性化</h2><button class="btn" onclick="loadSkills()">刷新</button></div><div id="skills-grid" class="grid grid-2" aria-busy="true"><div class="skeleton"></div></div></div>
+      <div class="view" id="view-memory"><div class="view-header"><h2>记忆 - SQLite唯一+向量修复</h2><div class="view-actions"><button class="btn" onclick="loadMemory()">刷新</button><input id="memory-query" placeholder="搜索..." aria-label="记忆搜索"><button class="btn" onclick="searchMemory()">搜索</button></div></div><div class="grid grid-3"><div class="card"><h3>Working</h3><div id="mem-working" aria-busy="true"><div class="skeleton"></div></div></div><div class="card"><h3>Semantic</h3><div id="mem-semantic" aria-busy="true"><div class="skeleton"></div></div></div><div class="card"><h3>Episodic</h3><div id="mem-episodic" aria-busy="true"><div class="skeleton"></div></div></div></div><div class="card" style="margin-top:10px"><h3>向量/DB搜索 - 已修复404+闭包Bug</h3><div id="mem-vector"><span class="loading-spinner"></span> 输入关键词搜索...</div></div></div>
+      <div class="view" id="view-processes"><div class="view-header"><h2>进程 - filelock安全</h2><button class="btn" onclick="loadProcesses()">刷新</button></div><div id="proc-list" class="list" aria-busy="true"><div class="skeleton"></div></div></div>
+      <div class="view" id="view-windows"><div class="view-header"><h2>窗口 - HWND真实</h2><button class="btn" onclick="loadWindows()">枚举</button></div><div id="win-grid" class="grid grid-2" aria-busy="true"><div class="skeleton"></div></div></div>
+      <div class="view" id="view-files"><div class="view-header"><h2>文件 - filelock+沙盒</h2><div style="display:flex;gap:6px"><input id="file-path" value="/tmp" aria-label="文件路径" style="flex:1;padding:6px 8px;background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:11px;font-family:monospace"><button class="btn" onclick="loadFiles()">浏览</button></div></div><div id="file-list" class="list" style="margin-top:10px" aria-busy="true"><div class="skeleton"></div></div></div>
+      <div class="view" id="view-dreaming"><div class="view-header"><h2>梦境三阶段</h2><button class="btn primary" onclick="runDreaming('all')">全部</button></div><div class="grid grid-3"><div class="card"><h3>Light</h3><div id="dream-light" aria-busy="true"><div class="skeleton"></div></div></div><div class="card"><h3>REM</h3><div id="dream-rem"></div></div><div class="card"><h3>Deep</h3><div id="dream-deep"></div></div></div></div>
+      <div class="view" id="view-evolution"><div class="view-header"><h2>进化 - QLoRA</h2><button class="btn" onclick="loadEvolution()">刷新</button></div><div class="grid grid-2"><div class="card"><h3>飞轮</h3><div id="evo-flywheel" aria-busy="true"><div class="skeleton"></div></div></div><div class="card"><h3>训练</h3><div id="evo-training"></div></div></div></div>
+      <div class="view" id="view-security"><div class="view-header"><h2>安全 - filelock+slowapi+lifespan+loguru</h2><button class="btn" onclick="loadSecurity()">扫描</button></div><div class="grid grid-2"><div class="card"><h3>沙盒</h3><div id="sandbox-result" aria-busy="true"><div class="skeleton"></div></div></div><div class="card"><h3>策略 lifespan修复+裸except修复</h3><div id="sec-policy"></div></div></div></div>
+      <div class="view" id="view-contracts"><div class="view-header"><h2>契约 23 - 已修复</h2><button class="btn" onclick="loadContracts()">刷新</button></div><div id="contracts-list" class="list" aria-busy="true"><div class="skeleton"></div></div></div>
+      <div class="view" id="view-settings"><div class="view-header"><h2>设置 - v2.4自我修正技术栈</h2></div><div class="grid grid-2" id="settings-grid" aria-busy="true"><div class="skeleton"></div></div></div>
+      <div class="view" id="view-benchmark"><div class="view-header"><h2>基准 12任务</h2><button class="btn" onclick="loadBenchmark()">刷新</button></div><div id="bench-list" aria-busy="true"><div class="skeleton"></div></div></div>
+    </div>
+  </main>
+</div>
+
+<script type="module" src="/js/app.js"></script>
+</body>
+</html>
