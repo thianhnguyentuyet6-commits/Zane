@@ -38,17 +38,18 @@ class ToolExecutor:
     async def execute(self, tool_name: str, params: Dict, task_id: str = "", auto_confirm: bool = True) -> ExecutionResult:
         start = time.time()
         
-        # 1. Policy 检查
+        # 1. Policy 检查 - 兼容 action/decision
         if self.policy_engine:
             decision = self.policy_engine.decide(tool_name, params)
-            if decision["decision"] == "deny":
+            dec_action = decision.get("decision") or decision.get("action", "allow")
+            if dec_action == "deny":
                 return ExecutionResult(
                     tool=tool_name, params=params, success=False,
                     result=None, exec_time_ms=0,
                     policy_decision="deny",
                     error=f"被策略拒绝: {decision['reason']}"
                 )
-            if decision["decision"] == "need_confirm" and not auto_confirm:
+            if dec_action == "need_confirm" and not auto_confirm:
                 return ExecutionResult(
                     tool=tool_name, params=params, success=False,
                     result={"need_confirm": True, "preview": decision.get("preview")},
@@ -58,6 +59,7 @@ class ToolExecutor:
                 )
         else:
             decision = {"decision": "allow"}
+            dec_action = "allow"
         
         # 2. 记录 pre-state（事务）
         pre_state = self._capture_pre_state(tool_name, params)
@@ -81,7 +83,8 @@ class ToolExecutor:
             
             # 5. 记录 Trace
             if self.trace_logger and task_id:
-                self.trace_logger.log_tool_call(task_id, tool_name, params, result, exec_time, decision["decision"])
+                dec_action_log = decision.get("decision") or decision.get("action", "allow")
+                self.trace_logger.log_tool_call(task_id, tool_name, params, result, exec_time, dec_action_log)
             
             # 6. 加入撤销栈（如果是写操作）
             can_undo = False
@@ -96,10 +99,11 @@ class ToolExecutor:
                     )
                     can_undo = True
             
+            dec_action_final = decision.get("decision") or decision.get("action", "allow")
             return ExecutionResult(
                 tool=tool_name, params=params, success=True,
                 result=result, exec_time_ms=exec_time,
-                policy_decision=decision["decision"],
+                policy_decision=dec_action_final,
                 pre_state=pre_state, post_state=post_state,
                 can_undo=can_undo
             )
@@ -109,10 +113,11 @@ class ToolExecutor:
             if self.trace_logger and task_id:
                 self.trace_logger.log_failure(task_id, tool_name, str(e), {"params": params})
             
+            dec_err = decision.get("decision") or decision.get("action", "allow") if 'decision' in locals() else "allow"
             return ExecutionResult(
                 tool=tool_name, params=params, success=False,
                 result=None, exec_time_ms=exec_time,
-                policy_decision=decision.get("decision", "allow") if 'decision' in locals() else "allow",
+                policy_decision=dec_err,
                 error=str(e)
             )
     

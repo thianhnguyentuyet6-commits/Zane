@@ -46,7 +46,7 @@ class WebSearchReal:
         except:
             return False
 
-    async def search(self, query: str, count: int = 5) -> Dict:
+    async def search(self, query: str, count: int = 5, fetch_content: bool = False) -> Dict:
         """真实搜索 - 具体实现"""
         # 清理查询，防注入
         query = re.sub(r'[^\w\s\u4e00-\u9fa5\-_.,!?]', ' ', query)[:200]
@@ -93,7 +93,6 @@ class WebSearchReal:
                 )
                 if resp.status_code == 200:
                     # 简单解析，避免 bs4 依赖
-                    import re
                     results = []
                     # 提取标题和链接
                     pattern = r'<a[^>]+class="result__url"[^>]+href="([^"]+)"[^>]*>([^<]+)</a>.*?class="result__snippet"[^>]*>([^<]+)</'

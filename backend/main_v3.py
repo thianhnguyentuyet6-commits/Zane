@@ -49,6 +49,7 @@ try:
     from .tools_impl import tool_executor, TOOL_FUNCTIONS
     from .memory_layer import memory_layer
     from .agent_runtime_v2 import agent_runtime_v2 as agent_runtime
+    from .agent_runtime_v3 import agent_runtime_v3
     from .llm_client import llm_client
     from .platform.base import get_platform_provider
     from .llm.model_manager import model_manager
@@ -61,6 +62,15 @@ try:
     from .security.cybersec_tools import cybersec_tools
     from .learning.self_correction import self_correction
     from .tool_contract import TOOL_CONTRACTS, list_contracts_by_risk
+    # 补全契约 - 必须在 TOOL_CONTRACTS 导入后
+    try:
+        import backend.tool_contract_complete  # noqa: F401 补充21工具契约
+        from backend.tools_impl_complete import patch_tool_functions
+        patch_tool_functions()
+    except Exception as e:
+        print(f"补全契约/工具失败: {e}")
+        import traceback
+        traceback.print_exc()
     from .task_trace import trace_logger as old_trace_logger
     from .model_registry import model_registry
     from .benchmark.suite import benchmark_suite
@@ -72,6 +82,7 @@ except ImportError as e:
     TOOL_FUNCTIONS = {}
     memory_layer = None
     agent_runtime = None
+    agent_runtime_v3 = None
     llm_client = None
 
 # 新架构 - Runtime模块化
@@ -209,7 +220,29 @@ async def health():
 @app.post("/api/chat")
 async def chat(request: ChatRequest, x_zane_token: str = Header(None)):
     try:
-        # 使用新架构的 intent_parser + state_manager + planner
+        # 优先使用 v3 完整运行时 - Observe→Plan→Act→Verify→Recover
+        if 'agent_runtime_v3' in globals() and agent_runtime_v3:
+            try:
+                result = await agent_runtime_v3.execute_task(request.message, request.history)
+                # 自动收集训练数据
+                if result.get("tools_used") and data_flywheel:
+                    try:
+                        data_flywheel.collect_from_success(
+                            task=request.message,
+                            tools_used=result["tools_used"],
+                            reasoning=result["steps"][1]["content"] if len(result.get("steps", [])) > 1 else "",
+                            final_report=result["final_report"],
+                            system_state=result.get("observed_state", {})
+                        )
+                    except Exception as e:
+                        print(f"数据飞轮收集失败: {e}")
+                return result
+            except Exception as e:
+                print(f"v3 runtime失败，回退v2: {e}")
+                import traceback
+                traceback.print_exc()
+        
+        # 使用新架构的 intent_parser + state_manager + planner + 旧执行
         if NEW_ARCH_AVAILABLE and intent_parser and state_manager and planner:
             # 1. Observe
             state = state_manager.observe(include_screenshot=False)
@@ -505,18 +538,22 @@ async def list_tools():
 @app.post("/api/tools/call")
 async def call_tool(request: ToolCallRequest, x_zane_token: str = Header(None)):
     # PolicyEngine 安全边界 - LLM只提议，Policy决定
+    decision = None
     if policy_engine:
         decision = policy_engine.decide(request.tool_name, request.parameters)
-        if decision["decision"] == "deny":
+        # 兼容 action/decision 两种字段
+        dec_action = decision.get("decision") or decision.get("action", "allow")
+        if dec_action == "deny":
             raise HTTPException(status_code=403, detail=f"被策略拒绝: {decision['reason']}")
-        if decision["decision"] == "need_confirm" and not request.auto_confirm:
+        if dec_action == "need_confirm" and not request.auto_confirm:
             return {
                 "status": "need_confirm",
                 "reason": decision["reason"],
                 "tool": request.tool_name,
                 "parameters": request.parameters,
                 "preview": decision.get("preview"),
-                "policy": "PolicyEngine"
+                "policy": "PolicyEngine",
+                "risk": decision.get("risk", "medium")
             }
     
     # 旧防火墙兼容
@@ -550,12 +587,13 @@ async def call_tool(request: ToolCallRequest, x_zane_token: str = Header(None)):
         if verifier:
             verification = verifier.verify(request.tool_name, request.parameters, result)
         
+        dec_action_final = (decision.get("decision") or decision.get("action")) if decision else None
         return {
             "status": "success",
             "tool": request.tool_name,
             "result": result,
             "exec_time_ms": exec_time,
-            "policy": decision["decision"] if 'decision' in locals() and decision else (policy.action.value if 'policy' in locals() else "allow"),
+            "policy": dec_action_final or (policy.action.value if 'policy' in locals() and 'policy' in globals() and policy else "allow"),
             "verification": verification
         }
     except Exception as e:
@@ -571,9 +609,8 @@ async def get_policy():
             "engine": "PolicyEngine v3.2",
             "protected_paths": policy_engine.protected_paths,
             "critical_processes": policy_engine.critical_processes,
-            "auto_allow": policy_engine.auto_allow,
-            "need_confirm": policy_engine.need_confirm,
-            "denied": policy_engine.denied,
+            "auto_allow": list(policy_engine.auto_allow),
+            "denied": list(policy_engine.denied),
             "note": "LLM只提议，PolicyEngine决定，永不依赖模型判断安全"
         }
     if policy_firewall:
@@ -752,8 +789,22 @@ async def run_benchmark_all(category: str = None):
 @app.post("/api/search/real")
 async def search_real(request: SearchRequest):
     if web_search_real:
-        result = await web_search_real.search(request.query, count=request.count, fetch_content=request.fetch_content)
-        return result
+        try:
+            # 兼容 fetch_content 参数
+            try:
+                result = await web_search_real.search(request.query, count=request.count)
+            except TypeError:
+                result = await web_search_real.search(request.query, count=request.count, fetch_content=request.fetch_content)
+            # 如果需要抓取内容
+            if request.fetch_content and result.get("results"):
+                # 抓取第一条
+                first_url = result["results"][0].get("url")
+                if first_url:
+                    page = await web_search_real.fetch_page(first_url)
+                    result["fetched_page"] = page
+            return result
+        except Exception as e:
+            return {"error": str(e), "query": request.query, "results": []}
     # 回退演示
     if tool_executor:
         return tool_executor.web_search(query=request.query, count=request.count)
@@ -762,8 +813,11 @@ async def search_real(request: SearchRequest):
 @app.get("/api/search/real")
 async def search_real_get(query: str, count: int = 5):
     if web_search_real:
-        result = await web_search_real.search(query, count=count)
-        return result
+        try:
+            result = await web_search_real.search(query, count=count)
+            return result
+        except Exception as e:
+            return {"error": str(e), "query": query, "results": []}
     if tool_executor:
         return tool_executor.web_search(query=query, count=count)
     return {"query": query, "results": []}

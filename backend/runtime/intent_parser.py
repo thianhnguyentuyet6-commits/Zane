@@ -31,7 +31,7 @@ class IntentParser:
         "security": ["安全", "扫描", "漏洞", "密码", "明文", "启动项", "大文件", "沙盒", "风险"],
         "linux": ["Linux", "WSL", "Ubuntu", "执行", "bash", "ls", "cat", "grep", "终端"],
         "network": ["搜索", "联网", "查一下", "百度", "谷歌", "信息", "验证", "网页", "Bing"],
-        "system": ["系统", "状态", "性能", "硬件", "CPU", "内存", "显卡", "磁盘", "温度", "电量"],
+        "system": ["系统", "状态", "性能", "硬件", "CPU", "内存", "显卡", "磁盘", "温度", "电量", "观测", "观察", "查看系统"],
     }
     
     ACTION_KEYWORDS = {
@@ -63,8 +63,15 @@ class IntentParser:
         # 3. 实体提取
         entities = self._extract_entities(raw)
         
-        # 4. 歧义检测
-        ambiguous = cat_conf < 0.6 or act_conf < 0.5
+        # 4. 歧义检测 - 系统/文件等高置信度分类不算歧义，即使动作一般
+        ambiguous = False
+        if category == "general" and cat_conf < 0.6:
+            ambiguous = True
+        elif cat_conf < 0.4 and act_conf < 0.4:
+            ambiguous = True
+        elif not entities and category in ["file", "process", "window"] and act_conf < 0.3:
+            ambiguous = True
+        
         clarification = ""
         if ambiguous:
             clarification = self._generate_clarification(category, action, entities)

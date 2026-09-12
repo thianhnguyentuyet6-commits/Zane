@@ -1,52 +1,62 @@
 # -*- coding: utf-8 -*-
 """
-启动脚本 - 一键启动本地AI电脑助手
+Zane AGI v1.0 - 一键启动
+可靠本地计算机代理
 """
 import os
 import sys
-import subprocess
+import time
+
+if sys.platform == "win32":
+    os.environ['PYTHONIOENCODING'] = 'utf-8'
 
 def main():
     print("""
     ╔══════════════════════════════════════════════════╗
-    ║   本地AI电脑助手 - Local AI Computer Agent      ║
-    ║   私有 · 自主 · 运行在你的PC上                  ║
-    ║   代码维护现实 · AI解释现实                     ║
+    ║   Zane AGI v1.0 - 可靠本地计算机代理             ║
+    ║   Reliable Local Computer Agent                  ║
+    ║   代码维护现实，AI解释现实                       ║
+    ║   8层精简 + 10模块Runtime + 安全加固             ║
+    ║   Qwen3-30B-A3B MoE + 自我进化                   ║
     ╚══════════════════════════════════════════════════╝
+    
+    启动中...
     """)
     
     # 检查依赖
     try:
-        import fastapi, uvicorn, psutil, PIL
-        print("✅ 依赖检查通过")
+        import fastapi, uvicorn, psutil
+        print("✅ 核心依赖已安装")
     except ImportError as e:
         print(f"❌ 缺少依赖: {e}")
-        print("正在安装依赖...")
-        subprocess.run([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"])
+        print("请运行: pip install -r requirements.txt")
+        return
     
-    # 确保数据目录
-    os.makedirs("data/screenshots", exist_ok=True)
-    print("✅ 数据目录就绪")
+    # 检查前端
+    frontend_path = os.path.join(os.path.dirname(__file__), "frontend", "index.html")
+    if os.path.exists(frontend_path):
+        print(f"✅ 前端已就绪: {frontend_path}")
+    else:
+        print(f"⚠️ 前端未找到: {frontend_path}")
     
-    # 启动服务
+    # 启动
+    import uvicorn
     print("""
-    启动服务...
-    - 后端API: http://127.0.0.1:8000
-    - 前端控制台: http://127.0.0.1:8000/
-    - API文档: http://127.0.0.1:8000/docs
-    - 本地LLM: http://127.0.0.1:8080/v1 (若已启动llama.cpp)
+    🚀 启动 Zane AGI v1.0
+    📍 前端: http://localhost:8000
+    📚 API文档: http://localhost:8000/docs
+    🔧 健康检查: http://localhost:8000/api/health
     
-    提示：
-    - 若无本地模型，系统自动进入离线演示模式，仍可体验完整流程
-    - 支持中文口语指令：帮我打开微信、看看什么程序占内存最多等
+    按 Ctrl+C 停止
     """)
     
-    # 切换到backend目录并启动
-    backend_path = os.path.join(os.path.dirname(__file__), "backend")
-    sys.path.insert(0, os.path.dirname(__file__))
-    
-    import uvicorn
-    uvicorn.run("backend.main:app", host="0.0.0.0", port=8000, reload=False)
+    uvicorn.run(
+        "backend.main_v3:app",
+        host="0.0.0.0",
+        port=8000,
+        reload=False,
+        log_level="info"
+    )
 
 if __name__ == "__main__":
     main()
