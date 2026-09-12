@@ -168,7 +168,7 @@ class DreamingSystem:
             try:
                 with open(semantic_path, 'r', encoding='utf-8') as f:
                     semantic = json.load(f)
-            except:
+            except Exception:
                 semantic = []
         
         new_memories = []
@@ -238,7 +238,7 @@ class DreamingSystem:
                         else:
                             content = str(item)
                         items.append({"content": content, "source": "episodic"})
-            except:
+            except Exception:
                 pass
         
         # conversations
@@ -249,7 +249,7 @@ class DreamingSystem:
                     data = json.load(f)
                     for item in data[-50:]:
                         items.append({"content": str(item), "source": "conversation"})
-            except:
+            except Exception:
                 pass
         
         # 模拟一些短期

@@ -38,13 +38,13 @@ class WebSearchReal:
                 # 禁止私有IP
                 if ip.is_private or ip.is_loopback or ip.is_link_local:
                     return False
-            except:
+            except Exception:
                 # 不是IP，是域名，检查常见内网域名
                 if hostname.lower() in ["localhost", "127.0.0.1", "0.0.0.0"]:
                     return False
             
             return True
-        except:
+        except Exception:
             return False
 
     async def search_github(self, query: str, count: int = 5) -> Dict:

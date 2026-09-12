@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "system": "你使用SimpleMem压缩记忆。你了解用户的习惯：微信在 C:\\Program Files\\Tencent\\WeChat，常用文件夹是 Downloads/Documents，喜欢先截图再操作",
+  "tool_desc": "工具需严格按Schema调用，参数错误返回InvalidParam",
+  "verification": "每次写后重新感知，验证是否成功",
+  "score": 0.7343904289195201,
+  "created_at": 1789242391.809467,
+  "parent": 0,
+  "mutation": "随机改写一句"
+}

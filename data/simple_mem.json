@@ -1,0 +1,18 @@
+[
+  {
+    "id": "sm_semantic_1789240771596367",
+    "type": "semantic",
+    "content": "从梦境 counterfactual 提炼原则：假设任务失败是因为工具选择错误，改用其他工具是否成功",
+    "compressed": "从梦境 counterfactual 提炼原则：假设任务失败是因为工具选择错误，改用其他工具是否成功",
+    "importance": 0.8382045875519559,
+    "access_count": 0,
+    "created_at": 1789240771.596368,
+    "last_accessed": 1789240771.596368,
+    "tags": [
+      "dream",
+      "evolved",
+      "evolved_principle"
+    ],
+    "embedding": null
+  }
+]

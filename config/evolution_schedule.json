@@ -1,0 +1,14 @@
+{
+  "enabled": true,
+  "train_time": "02:00",
+  "check_interval_minutes": 30,
+  "cpu_threshold": 20,
+  "memory_threshold": 70,
+  "vram_threshold_gb": 18,
+  "idle_minutes": 30,
+  "require_plugged": false,
+  "pause_on_game": true,
+  "pause_on_meeting_fullscreen": true,
+  "min_samples": 50,
+  "auto_trigger": true
+}

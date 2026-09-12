@@ -1,0 +1,127 @@
+[
+  {
+    "id": "story_A_data_flywheel_v3",
+    "title": "数据飞轮v3过滤评分去重安全",
+    "description": "安全过滤危险路径C:\\Windows System32 /etc password.txt csrss.exe不进训练，SHA256去重相似度>0.9跳过，重要性评分0.5-0.9，SimpleMem压缩30%，平衡模式允许write_file需验证，DPO reflection>20字",
+    "acceptance": [
+      "backend/memory/data_flywheel_v3.py存在且py_compile通过",
+      "backend/runtime/data_filter.py存在且py_compile通过",
+      "data/training/sft.jsonl危险样本C:\\Windows System32数量==0",
+      "去重后相似度>0.9数==0",
+      "重要性评分分布0.5-0.9",
+      "GET /api/evolution/data返回质量分布"
+    ],
+    "passes": true,
+    "attempts": 1,
+    "last_error": ""
+  },
+  {
+    "id": "story_B_model_resolver_training",
+    "title": "模型路径解析v3 GGUF+HF双轨+VRAM检测",
+    "description": "GGUF推理D:\\llama.cpp Qwen3.6，HF训练Qwen/Qwen3-30B-A3B，环境变量MODEL_PATH HF_MODEL_PATH，自动探测6候选，VRAM检测torch.cuda 24GB训30B 16GB训7B <12GB仅技能蒸馏，训练脚本生成py_compile通过",
+    "acceptance": [
+      "backend/learning/model_resolver.py存在且py_compile通过",
+      "config/model_paths.json含hf_model_path字段",
+      "GET /api/evolution/vram返回total/available/推荐模型",
+      "训练脚本生成后py_compile通过",
+      "环境变量MODEL_PATH HF_MODEL_PATH优先级正确"
+    ],
+    "passes": true,
+    "attempts": 1,
+    "last_error": ""
+  },
+  {
+    "id": "story_C_real_training_loop",
+    "title": "真实训练循环Unsloth真实执行监控LoRA版本",
+    "description": "subprocess.Popen真实执行训练脚本非阻塞，日志流data/logs/training_{id}.log每30秒解析Loss，状态流转IDLE→COLLECTING→TRAINING→EVALUATING→PROMOTING→IDLE，LoRA版本models/versions/lora_{timestamp}保存，失败3次指数退避5s10s20s",
+    "acceptance": [
+      "backend/learning/unsloth_trainer_v3.py存在且py_compile通过",
+      "训练状态流转正确",
+      "LoRA版本目录生成",
+      "日志文件data/logs/training_*.log生成",
+      "失败重试指数退避实现"
+    ],
+    "passes": true,
+    "attempts": 1,
+    "last_error": ""
+  },
+  {
+    "id": "story_D_eval_harness",
+    "title": "评估Harness Benchmark20任务Replay30%+2%阈值",
+    "description": "Benchmark 20任务5文件+5系统+5窗口+5安全真实执行，Replay Buffer 30%高质量评分>0.8旧样本混入，旧LoRA执行→old_success_rate，新LoRA执行→new_success_rate，通用任务5额外防遗忘，平衡模式+2%晋升，失败回滚删除新LoRA",
+    "acceptance": [
+      "backend/benchmark/evolution_eval.py存在且py_compile通过",
+      "backend/learning/replay_buffer.py存在且py_compile通过",
+      "Benchmark 20任务回放返回success_rate",
+      "Replay Buffer 30%数量正确",
+      "晋升逻辑+2%阈值可配置",
+      "POST /api/evolution/evaluate返回old/new/improvement/是否晋升"
+    ],
+    "passes": true,
+    "attempts": 1,
+    "last_error": ""
+  },
+  {
+    "id": "story_E_prompt_evolution",
+    "title": "Prompt进化Darwin Gödel Machine+EvolveR",
+    "description": "Prompt基因系统提示词工具描述验证规则存data/prompts/prompt_v{version}.json，变异随机改写一句话，交叉两个高分各取一半拼接，选择benchmark评估成功率高保留，EvolveR离线蒸馏成功轨迹提炼原则+在线原则实时添加，AlphaEvolve搜索最优工具链",
+    "acceptance": [
+      "backend/learning/prompt_evolution.py存在且py_compile通过",
+      "backend/learning/strategy_evolution.py存在且py_compile通过",
+      "data/prompts/目录存在",
+      "Prompt版本数增长",
+      "Prompt进化后benchmark提升",
+      "GET /api/evolution/prompts列出版本和评分"
+    ],
+    "passes": true,
+    "attempts": 1,
+    "last_error": ""
+  },
+  {
+    "id": "story_F_skill_gene",
+    "title": "技能基因进化变异交叉选择",
+    "description": "技能基因code+tests+success_count+fitness，适应度success/(success+failure)*importance，变异随机改参数整理下载→整理文档，交叉两个技能组合list_files+create_folder→organize_files，选择fitness>0.7保留<0.3遗忘，复合改进技能调用技能",
+    "acceptance": [
+      "backend/runtime/skill_gene.py存在且py_compile通过",
+      "技能数增长fitness分布",
+      "技能基因交叉产生新技能",
+      "GET /api/skills/gene返回进化树",
+      "experiments/skill_gene.py整合"
+    ],
+    "passes": true,
+    "attempts": 1,
+    "last_error": ""
+  },
+  {
+    "id": "story_G_scheduler_resource",
+    "title": "自主调度资源感知插电游戏检测",
+    "description": "APScheduler凌晨2点+每30分检查，资源感知CPU<20%内存<70%空闲30分+VRAM>18GB+插电Windows GetSystemPowerStatus+游戏会议检测game.exe Teams.exe全屏+iOS远程暂停，通知前端通知中心+日志，config/evolution_schedule.json可调整阈值",
+    "acceptance": [
+      "backend/autonomous/scheduler_v3.py存在且py_compile通过",
+      "backend/runtime/resource_monitor.py存在且py_compile通过",
+      "调度器日志data/logs/scheduler.log存在",
+      "GET /api/evolution/resources返回CPU/内存/VRAM/插电/游戏",
+      "空闲时自动触发可手动POST /api/evolution/start"
+    ],
+    "passes": true,
+    "attempts": 1,
+    "last_error": ""
+  },
+  {
+    "id": "story_H_memory_frontend",
+    "title": "记忆巩固4层统一遗忘DREAMS.md+前端仪表盘",
+    "description": "4层统一memory_v3.py整合memory_layer+simple_mem+dreaming+dream_loop全部走SimpleMem压缩，遗忘机制访问<3+重要性<0.3+30天自动遗忘，梦境每晚2点后Light→REM→Deep提炼长期记忆生成DREAMS.md人类可读，前端进化页frontend/js/evolution.js训练统计+日志流+版本历史+技能基因树+资源状态SSE推送",
+    "acceptance": [
+      "backend/memory/memory_v3.py存在且py_compile通过",
+      "backend/memory/forgetting.py存在且py_compile通过",
+      "4层记忆统一API GET /api/memory/v3",
+      "遗忘数统计",
+      "DREAMS.md生成",
+      "前端进化页frontend/js/evolution.js存在",
+      "SSE推送训练进度"
+    ],
+    "passes": true,
+    "attempts": 1,
+    "last_error": ""
+  }
+]

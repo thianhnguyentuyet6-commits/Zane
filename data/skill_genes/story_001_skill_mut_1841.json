@@ -1,0 +1,26 @@
+{
+  "id": "story_001_skill_mut_1841",
+  "name": "story_001_skill_变异",
+  "description": "从 修复裸except 提炼，可复用 (变异)",
+  "code": "\ndef story_001_func(path: str):\n    \"\"\"修复所有裸except - 从任务链提炼\"\"\"\n    import os\n    # 通用逻辑\n    return {\"success\": True, \"path\": path}\n",
+  "tests": [
+    {
+      "input": {
+        "path": "/tmp"
+      },
+      "expected": {
+        "success": true
+      }
+    }
+  ],
+  "success_count": 0,
+  "failure_count": 0,
+  "importance": 0.7,
+  "fitness": 0,
+  "parent": [
+    "story_001_skill"
+  ],
+  "created_at": 1789242391.8416102,
+  "last_used": 1789242391.8416104,
+  "generation": 2
+}

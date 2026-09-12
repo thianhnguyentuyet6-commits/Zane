@@ -39,7 +39,7 @@ class ModelRegistry:
                 with open(self.registry_path, 'r', encoding='utf-8') as f:
                     data = json.load(f)
                     return [ModelArtifact(**m) for m in data]
-            except:
+            except Exception:
                 pass
         
         # 默认模型 - 你的 Qwen3

@@ -86,9 +86,9 @@ class EvolutionEngine:
         ]
 
     def check_idle(self) -> bool:
-        """检查是否空闲，适合进化"""
+        """检查是否空闲，适合进化 - v3.0修复同步阻塞 interval=1→0.5"""
         try:
-            cpu_percent = psutil.cpu_percent(interval=1)
+            cpu_percent = psutil.cpu_percent(interval=0.5)
             mem_percent = psutil.virtual_memory().percent
             
             # 检查是否空闲

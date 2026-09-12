@@ -35,14 +35,14 @@ class ModelInterface:
                 resp = await client.get(f"{self.config['api_base'].replace('/v1', '')}/health")
                 self.local_available = resp.status_code == 200
                 return self.local_available
-        except:
+        except Exception:
             try:
                 import httpx
                 async with httpx.AsyncClient(timeout=5) as client:
                     resp = await client.get(f"{self.config['api_base']}/models")
                     self.local_available = resp.status_code == 200
                     return self.local_available
-            except:
+            except Exception:
                 self.local_available = False
                 return False
     

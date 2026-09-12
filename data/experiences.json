@@ -11,7 +11,7 @@
       "ocr_screenshot"
     ],
     "verification": "窗口存在且标题匹配，截图包含应用界面特征",
-    "created_at": 1789053395.572077,
+    "created_at": 1789069715.2257814,
     "reusable": true
   },
   {
@@ -24,7 +24,7 @@
       "get_system_state"
     ],
     "verification": "对比任务管理器数据，误差<5%",
-    "created_at": 1789139795.572077,
+    "created_at": 1789156115.2257814,
     "reusable": true
   },
   {
@@ -38,7 +38,7 @@
       "write_file"
     ],
     "verification": "目标文件夹文件数匹配，源文件夹已清空对应类型",
-    "created_at": 1789182995.572077,
+    "created_at": 1789199315.2257814,
     "reusable": true
   }
 ]

@@ -35,7 +35,7 @@ def _resolve_demo_path(path: str) -> str:
                     if "*" in sub:
                         return os.path.join(base, os.path.dirname(sub))
                     return os.path.join(base, sub)
-            except:
+            except Exception:
                 pass
         return base
     return path
@@ -177,10 +177,10 @@ def patch_tool_functions():
             def sync_search(**kwargs):
                 try:
                     return asyncio.run(real_search.search(kwargs.get("query", ""), kwargs.get("count", 5)))
-                except:
+                except Exception:
                     return {"query": kwargs.get("query"), "results": [], "error": "搜索失败"}
             TOOL_FUNCTIONS["web_search_real"] = sync_search
-        except:
+        except Exception:
             pass
         
         # 安全工具
@@ -188,13 +188,13 @@ def patch_tool_functions():
             from .security.cybersec_tools import cybersec_tools
             TOOL_FUNCTIONS["security_scan"] = lambda **kwargs: cybersec_tools.scan_vulnerability(**kwargs)
             TOOL_FUNCTIONS["scan_large_files"] = lambda **kwargs: cybersec_tools.scan_large_files(**kwargs)
-        except:
+        except Exception:
             pass
         
         try:
             from .security.linux_provider import wsl_provider
             TOOL_FUNCTIONS["wsl_exec"] = lambda **kwargs: wsl_provider.wsl_exec(**kwargs)
-        except:
+        except Exception:
             pass
         
         print(f"工具补全成功，当前工具数: {len(TOOL_FUNCTIONS)}")

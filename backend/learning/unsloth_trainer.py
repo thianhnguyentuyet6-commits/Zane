@@ -18,7 +18,7 @@ class UnslothTrainer:
         try:
             import unsloth
             return True
-        except:
+        except Exception:
             return False
 
     def generate_training_script(self, sft_file: str, output_dir: str, config: Dict) -> str:

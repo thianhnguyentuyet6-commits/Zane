@@ -193,14 +193,14 @@ async def health():
     if llm_client:
         try:
             local_available = await llm_client.is_local_available()
-        except:
+        except Exception:
             pass
     
     platform_info = {}
     try:
         if get_platform_provider:
             platform_info = get_platform_provider()
-    except:
+    except Exception:
         platform_info = {"name": "unknown"}
     
     return {
@@ -360,7 +360,7 @@ async def system_processes(sort_by: str = "memory", limit: int = 20, filter_name
         if get_platform_provider:
             provider = get_platform_provider()
             return provider["system"].get_processes(sort_by=sort_by, limit=limit)
-    except:
+    except Exception:
         pass
     if tool_executor:
         return tool_executor.inspect_processes(sort_by=sort_by, limit=limit, filter_name=filter_name)
@@ -503,7 +503,7 @@ async def get_tasks():
         try:
             tasks = agent_runtime.get_tasks()
             circuit = agent_runtime.get_circuit_status()
-        except:
+        except Exception:
             pass
     return {
         "tasks": tasks,
@@ -1040,14 +1040,14 @@ async def get_settings():
     if llm_client:
         try:
             local_available = await llm_client.is_local_available()
-        except:
+        except Exception:
             pass
     
     platform_provider = {"name": "unknown"}
     try:
         if get_platform_provider:
             platform_provider = get_platform_provider()
-    except:
+    except Exception:
         pass
     
     return {

@@ -1,0 +1,39 @@
+{
+  "model_path": "",
+  "qwen_path": "",
+  "gguf_path": "",
+  "hf_model_path": "",
+  "hf_path": "",
+  "train_model_path": "",
+  "base_model": "Qwen3-30B-A3B",
+  "quantization": "IQ4_XS",
+  "note": "模型路径优先级：环境变量 MODEL_PATH/QWEN_MODEL_PATH/LLM_MODEL_PATH > 本配置文件 > 自动探测候选 > 占位。支持Windows/Linux，修复硬编码D:\\路径14处，v3.0双轨：GGUF推理+HF训练",
+  "env_vars": ["MODEL_PATH", "QWEN_MODEL_PATH", "LLM_MODEL_PATH", "HF_MODEL_PATH", "HF_PATH", "TRAIN_MODEL_PATH", "BASE_MODEL", "QUANTIZATION"],
+  "gguf_candidates": [
+    "D:\\llama.cpp\\Qwen3.6-35B-A3B-Uncensored-HauhauCS-Aggressive-IQ4_XS.gguf",
+    "C:\\models\\qwen3.gguf",
+    "D:\\models\\qwen3.gguf",
+    "~/models/qwen3.gguf",
+    "~/.cache/qwen/model.gguf",
+    "./models/qwen3.gguf",
+    "/home/user/models/qwen3.gguf"
+  ],
+  "hf_candidates": [
+    "D:\\models\\Qwen3-30B-A3B",
+    "C:\\models\\Qwen3-30B-A3B",
+    "~/models/Qwen3-30B-A3B",
+    "~/.cache/huggingface/hub/models--Qwen--Qwen3-30B-A3B",
+    "./models/Qwen3-30B-A3B",
+    "/home/user/models/Qwen3-30B-A3B",
+    "Qwen/Qwen3-30B-A3B",
+    "Qwen/Qwen2.5-7B-Instruct"
+  ],
+  "vram_recommendation": {
+    "24GB": "Qwen3-30B-A3B 4bit QLoRA 可训练30B",
+    "16GB": "Qwen2.5-7B-Instruct 降级训练7B",
+    "8GB": "Qwen2.5-3B-Instruct 训练3B小模型",
+    "<12GB": "技能蒸馏，仅进化技能库+Prompt，不训练模型"
+  },
+  "resolved_by": "backend/learning/model_resolver.py ModelResolver类，_resolve_model_path() + resolve_gguf_path() + resolve_hf_path() + check_vram()，非硬编码",
+  "version": "v3.0 双轨+VRAM检测"
+}

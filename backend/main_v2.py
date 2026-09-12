@@ -165,7 +165,7 @@ async def system_processes(sort_by: str = "memory", limit: int = 20, filter_name
     try:
         provider = get_platform_provider()
         return provider["system"].get_processes(sort_by=sort_by, limit=limit)
-    except:
+    except Exception:
         return tool_executor.inspect_processes(sort_by=sort_by, limit=limit, filter_name=filter_name)
 
 @app.get("/api/system/windows")

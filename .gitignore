@@ -5,10 +5,8 @@ data/zane.db
 data/zane.db-shm
 data/zane.db-wal
 data/autonomous/
-data/memory/
-data/skills/
 data/traces/
-memory/
+/memory/
 __pycache__/
 *.pyc
 .venv/
@@ -17,3 +15,15 @@ frontend/index_v2_backup.html
 data/zane.db.lock
 data/backups/
 data/custom_models.json
+data/memory/
+data/skills/
+# 允许进化核心文件
+!data/training/
+!data/prompts/
+!data/skill_genes/
+!data/prd.json
+!data/prd_v3.json
+!config/model_paths.json
+!config/evolution_schedule.json
+*.pyc
+__pycache__/

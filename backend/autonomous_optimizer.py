@@ -297,7 +297,7 @@ class AutonomousOptimizer:
     def is_idle(self) -> Dict:
         try:
             import psutil
-            cpu = psutil.cpu_percent(interval=1)
+            cpu = psutil.cpu_percent(interval=0.5)
             last_task = self._get_last_task_time()
             idle_minutes = (time.time() - last_task) / 60 if last_task else 999
             has_active = self._has_active_task()
@@ -317,14 +317,14 @@ class AutonomousOptimizer:
             traces = database.list_traces(limit=1)
             if traces:
                 return traces[0].get("start_time", 0)
-        except:
+        except Exception:
             pass
         try:
             from .task_trace import trace_logger
             traces = trace_logger.list_traces(limit=1)
             if traces:
                 return traces[0].get("start_time", 0)
-        except:
+        except Exception:
             pass
         try:
             traces_dir = os.path.join(os.path.dirname(__file__), "..", "data", "traces")
@@ -333,7 +333,7 @@ class AutonomousOptimizer:
                 if files:
                     latest = max(files, key=os.path.getmtime)
                     return os.path.getmtime(latest)
-        except:
+        except Exception:
             pass
         return 0
     
@@ -361,7 +361,7 @@ class AutonomousOptimizer:
         try:
             with open(save_path, 'w', encoding='utf-8') as f:
                 json.dump(results, f, ensure_ascii=False, indent=2)
-        except:
+        except Exception:
             pass
         return results
     
@@ -480,9 +480,9 @@ class AutonomousOptimizer:
         # 检查是否是调度器触发（简单判断：CPU<50即可）
         try:
             import psutil
-            if psutil.cpu_percent(interval=1) < 50:
+            if psutil.cpu_percent(interval=0.5) < 50:
                 is_scheduled = True
-        except:
+        except Exception:
             pass
         
         if not idle_check.get("idle") and not is_scheduled:
@@ -599,7 +599,7 @@ class AutonomousOptimizer:
         try:
             with open(report_path, 'w', encoding='utf-8') as f:
                 json.dump(results, f, ensure_ascii=False, indent=2)
-        except:
+        except Exception:
             pass
         
         print(f"✅ 自主优化完成: 新增{len(results['new_skills'])}技能，习惯{len(habits)}个，20候选")
@@ -617,7 +617,7 @@ class AutonomousOptimizer:
                 row = cursor.fetchone()
                 if row:
                     latest = json.loads(row["report"])
-            except:
+            except Exception:
                 pass
             
             return {

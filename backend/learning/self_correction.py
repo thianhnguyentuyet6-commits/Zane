@@ -231,6 +231,6 @@ self_correction = SelfCorrection()
 try:
     from ..tools_impl import TOOL_FUNCTIONS
     import os
-except:
+except Exception:
     TOOL_FUNCTIONS = {}
     import os

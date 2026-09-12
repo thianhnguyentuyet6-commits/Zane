@@ -190,7 +190,7 @@ class TokenManager:
             try:
                 from .tools.network.web_search_real import web_search_real
                 web_search_real.bing_key = value
-            except:
+            except Exception:
                 pass
         elif token_id == "zane_token":
             os.environ["ZANE_TOKEN"] = value
@@ -198,7 +198,7 @@ class TokenManager:
                 from .middleware.security import auth_manager
                 auth_manager.token = value
                 auth_manager.enabled = bool(value)
-            except:
+            except Exception:
                 pass
         
         return {"success": True, "token_id": token_id, "message": f"已设置 {self.token_definitions[token_id]['name']}"}

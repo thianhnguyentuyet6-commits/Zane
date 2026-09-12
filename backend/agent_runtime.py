@@ -169,7 +169,7 @@ class AgentRuntime:
             try:
                 args_str = tool_call["function"]["arguments"] if isinstance(tool_call, dict) else tool_call.function.arguments
                 args = json.loads(args_str) if isinstance(args_str, str) else args_str
-            except:
+            except Exception:
                 args = {}
             
             # 检查熔断

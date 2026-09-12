@@ -145,7 +145,7 @@ class TraceLogger:
             try:
                 with open(trace_path, 'r', encoding='utf-8') as f:
                     return json.load(f)
-            except:
+            except Exception:
                 pass
         return None
 
@@ -168,9 +168,9 @@ class TraceLogger:
                                 "tools": data["selected_tools"],
                                 "timestamp": data["timestamp"]
                             })
-                    except:
+                    except Exception:
                         continue
-        except:
+        except Exception:
             pass
         return traces
 
