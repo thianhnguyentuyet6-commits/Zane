@@ -1,0 +1,118 @@
+[
+  {
+    "id": "skill_001",
+    "name": "微信自动启动与登录检查",
+    "description": "自动启动微信并验证是否成功登录，包含窗口检测和异常重试",
+    "steps": [
+      {
+        "tool": "list_windows",
+        "desc": "检查微信是否已运行"
+      },
+      {
+        "tool": "launch_application",
+        "desc": "启动微信"
+      },
+      {
+        "tool": "take_screenshot",
+        "desc": "截图验证登录界面"
+      },
+      {
+        "tool": "ocr_screenshot",
+        "desc": "识别登录状态"
+      }
+    ],
+    "created_at": 1788960878.1640735,
+    "usage_count": 12,
+    "success_rate": 0.92,
+    "tags": [
+      "微信",
+      "启动",
+      "自动化"
+    ]
+  },
+  {
+    "id": "skill_002",
+    "name": "系统内存清理流程",
+    "description": "分析内存占用，找出大户，安全清理临时文件",
+    "steps": [
+      {
+        "tool": "inspect_processes",
+        "desc": "按内存排序进程"
+      },
+      {
+        "tool": "get_system_state",
+        "desc": "获取整体内存状态"
+      },
+      {
+        "tool": "list_files",
+        "desc": "检查临时文件夹"
+      },
+      {
+        "tool": "delete_file",
+        "desc": "清理临时文件（需确认）"
+      }
+    ],
+    "created_at": 1788788078.1640735,
+    "usage_count": 8,
+    "success_rate": 0.88,
+    "tags": [
+      "内存",
+      "清理",
+      "性能"
+    ]
+  },
+  {
+    "id": "skill_003",
+    "name": "文件整理与归档",
+    "description": "将下载文件夹按类型自动分类整理",
+    "steps": [
+      {
+        "tool": "list_files",
+        "desc": "扫描下载文件夹"
+      },
+      {
+        "tool": "create_folder",
+        "desc": "创建分类文件夹"
+      },
+      {
+        "tool": "write_file",
+        "desc": "移动并记录日志"
+      }
+    ],
+    "created_at": 1789047278.1640735,
+    "usage_count": 15,
+    "success_rate": 0.95,
+    "tags": [
+      "文件",
+      "整理",
+      "自动化"
+    ]
+  },
+  {
+    "id": "skill_004",
+    "name": "窗口智能切换",
+    "description": "根据标题关键词快速切换窗口，支持模糊匹配",
+    "steps": [
+      {
+        "tool": "list_windows",
+        "desc": "枚举所有窗口"
+      },
+      {
+        "tool": "focus_window",
+        "desc": "聚焦目标窗口"
+      },
+      {
+        "tool": "get_window_info",
+        "desc": "验证窗口状态"
+      }
+    ],
+    "created_at": 1789133678.1640735,
+    "usage_count": 23,
+    "success_rate": 0.97,
+    "tags": [
+      "窗口",
+      "切换",
+      "效率"
+    ]
+  }
+]
