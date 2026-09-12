@@ -608,6 +608,57 @@ function escapeHtml(str){
   return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
+function saveSettings(){
+  const settings = {
+    model_path: document.getElementById('setting-model-path')?.value,
+    api_base: document.getElementById('setting-api-base')?.value,
+    temperature: document.getElementById('setting-temp')?.value,
+    top_p: document.getElementById('setting-topp')?.value,
+    context: document.getElementById('setting-context')?.value,
+    evo_enabled: document.getElementById('setting-evo-enabled')?.checked,
+    idle_min: document.getElementById('setting-idle-min')?.value,
+    cpu_thr: document.getElementById('setting-cpu-thr')?.value,
+    min_samples: document.getElementById('setting-min-samples')?.value,
+    lora_rank: document.getElementById('setting-lora-rank')?.value,
+    lr: document.getElementById('setting-lr')?.value,
+    train_time: document.getElementById('setting-train-time')?.value,
+  };
+  localStorage.setItem('zane_settings', JSON.stringify(settings));
+  // 显示通知
+  const notif = document.getElementById('notification-list');
+  if(notif){
+    notif.innerHTML = `<div class="notification-item">✅ 设置已保存<br><span style="font-size:10px">${new Date().toLocaleTimeString()} - 模型: ${settings.model_path?.split('\\').pop()}</span></div>` + notif.innerHTML;
+    toggleNotifications();
+    setTimeout(toggleNotifications, 2000);
+  }
+  alert('✅ 设置已保存到本地\n\n模型: '+settings.model_path+'\nTemperature: '+settings.temperature+'\n进化: '+(settings.evo_enabled?'启用':'禁用'));
+}
+
+function loadSettings(){
+  const saved = localStorage.getItem('zane_settings');
+  if(saved){
+    try{
+      const s = JSON.parse(saved);
+      if(document.getElementById('setting-model-path')) document.getElementById('setting-model-path').value = s.model_path||'';
+      if(document.getElementById('setting-temp')) {document.getElementById('setting-temp').value = s.temperature||0.7; document.getElementById('temp-value').textContent = s.temperature||0.7;}
+      if(document.getElementById('setting-topp')) {document.getElementById('setting-topp').value = s.top_p||0.9; document.getElementById('topp-value').textContent = s.top_p||0.9;}
+      alert('已加载本地设置');
+    }catch(e){}
+  }
+  // 绑定滑块事件
+  const tempSlider = document.getElementById('setting-temp');
+  if(tempSlider){
+    tempSlider.addEventListener('input', (e)=>{document.getElementById('temp-value').textContent = e.target.value;});
+  }
+  const toppSlider = document.getElementById('setting-topp');
+  if(toppSlider){
+    toppSlider.addEventListener('input', (e)=>{document.getElementById('topp-value').textContent = e.target.value;});
+  }
+}
+
+// 初始化设置页
+setTimeout(loadSettings, 1000);
+
 // v2 额外
 async function loadEvolution(){
   try{

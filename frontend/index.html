@@ -189,7 +189,76 @@
       <div class="view" id="view-memory"><div class="view-header"><h2>记忆层</h2></div><div class="memory-tabs"><button class="tab active" onclick="switchMemoryTab('semantic')">语义</button><button class="tab" onclick="switchMemoryTab('episodic')">情景</button><button class="tab" onclick="switchMemoryTab('conv')">会话</button></div><div class="memory-content" id="memory-content"></div></div>
       <div class="view" id="view-skills"><div class="view-header"><h2>技能库</h2><button class="btn" onclick="loadSkills()">刷新</button></div><div class="skills-grid" id="skills-grid"></div></div>
       <div class="view" id="view-experience"><div class="view-header"><h2>经验 - Unknown→Research→Verify→Store→Reuse</h2></div><div class="experience-flow"><div class="flow-step">❓ 未知</div><div class="flow-arrow">→</div><div class="flow-step">🔍 研究</div><div class="flow-arrow">→</div><div class="flow-step">📚 收集</div><div class="flow-arrow">→</div><div class="flow-step">✅ 验证</div><div class="flow-arrow">→</div><div class="flow-step">💡 结论</div><div class="flow-arrow">→</div><div class="flow-step">⚡ 执行</div><div class="flow-arrow">→</div><div class="flow-step">🧠 经验</div><div class="flow-arrow">→</div><div class="flow-step">♻️ 复用</div></div><div class="experience-list" id="experience-list"></div></div>
-      <div class="view" id="view-settings"><div class="view-header"><h2>设置 - Zane AGI v2.0</h2></div><div class="settings-grid"><div class="settings-card"><h3>🧠 Qwen3-30B-A3B</h3><div class="setting-row"><span>路径</span><code>D:\llama.cpp\Qwen3.6-35B-A3B...</code></div><div class="setting-row"><span>量化</span><code>IQ4_XS · 18.5GB</code></div><div class="setting-row"><span>激活</span><code>3B / 30B MoE</code></div><div class="setting-row"><span>状态</span><span class="badge warning">已部署 · 自我进化中</span></div></div><div class="settings-card"><h3>🧬 自我进化</h3><div id="evolution-settings">加载中...</div></div><div class="settings-card"><h3>🛡️ 策略防火墙 + 撤销</h3><div id="policy-list">加载中...</div></div><div class="settings-card"><h3>🏗️ 14层架构</h3><ol class="arch-list"><li><strong>感知</strong> - WMI真实</li><li><strong>推理</strong> - Qwen3思考链</li><li><strong>规划</strong> - DAG分解</li><li><strong>工具</strong> - 真实Windows API</li><li><strong>策略</strong> - 分级确认</li><li><strong>执行</strong> - 事务化+撤销</li><li><strong>验证</strong> - 多轮验证</li><li><strong>记忆</strong> - 向量+梦境</li><li><strong>技能</strong> - 自动蒸馏</li><li><strong>学习</strong> - 进化引擎</li><li><strong>模型</strong> - Qwen3管理</li><li><strong>远程</strong> - iOS预留</li><li><strong>系统</strong> - 性能监控</li><li><strong>教师</strong> - 可选云端</li></ol></div></div></div>
+      <div class="view" id="view-settings">
+        <div class="view-header"><h2>设置 - Zane AGI v2.3 商业级</h2><div class="view-actions"><button class="btn" onclick="saveSettings()">保存设置</button><button class="btn secondary" onclick="loadSettings()">重置</button></div></div>
+        <div class="settings-grid">
+          <div class="settings-card">
+            <h3>🧠 模型设置 - Qwen3-30B-A3B</h3>
+            <div class="setting-row"><span>模型路径</span><input id="setting-model-path" value="D:\llama.cpp\Qwen3.6-35B-A3B-Uncensored-HauhauCS-Aggressive-IQ4_XS.gguf" style="width:60%;font-size:11px"></div>
+            <div class="setting-row"><span>API地址</span><input id="setting-api-base" value="http://127.0.0.1:8080/v1" style="width:60%;font-size:11px"></div>
+            <div class="setting-row"><span>Temperature</span><div style="display:flex;align-items:center;gap:10px;width:60%"><input type="range" id="setting-temp" min="0" max="2" step="0.1" value="0.7" style="flex:1"><span id="temp-value">0.7</span></div></div>
+            <div class="setting-row"><span>Top P</span><div style="display:flex;align-items:center;gap:10px;width:60%"><input type="range" id="setting-topp" min="0" max="1" step="0.05" value="0.9" style="flex:1"><span id="topp-value">0.9</span></div></div>
+            <div class="setting-row"><span>上下文长度</span><select id="setting-context" style="width:60%"><option value="4096">4096</option><option value="8192">8192</option><option value="16384">16384</option><option value="32768" selected>32768</option></select></div>
+            <div class="setting-row"><span>量化</span><code>IQ4_XS · 18.5GB · 3B激活</code></div>
+            <div class="setting-row"><span>状态</span><span class="badge warning" id="setting-model-status">已部署 · 自我进化中</span></div>
+            <p class="setting-desc">Qwen3-30B-A3B MoE：128个专家，激活8个，推理时只用3B，适合本地私有+自我进化</p>
+          </div>
+          <div class="settings-card">
+            <h3>🧬 自我进化设置</h3>
+            <div class="setting-row"><span>启用进化</span><label style="width:60%"><input type="checkbox" id="setting-evo-enabled" checked> 自动在空闲时进化</label></div>
+            <div class="setting-row"><span>空闲检测</span><div style="width:60%;display:flex;gap:8px"><input id="setting-idle-min" type="number" value="30" style="width:60px"> 分钟 + CPU &lt; <input id="setting-cpu-thr" type="number" value="20" style="width:50px">%</div></div>
+            <div class="setting-row"><span>最小样本</span><input id="setting-min-samples" type="number" value="50" style="width:60%"> 条触发训练</div>
+            <div class="setting-row"><span>LoRA Rank</span><input id="setting-lora-rank" type="number" value="32" style="width:60%"></div>
+            <div class="setting-row"><span>学习率</span><input id="setting-lr" value="2e-4" style="width:60%"></div>
+            <div class="setting-row"><span>定时</span><input id="setting-train-time" value="02:00" style="width:60%"> 凌晨自动</div>
+            <div id="evolution-settings" style="margin-top:12px;font-size:12px"></div>
+          </div>
+          <div class="settings-card">
+            <h3>🛡️ 策略防火墙 + 撤销 - 可调整</h3>
+            <div class="setting-row"><span>只读自动放行</span><label style="width:60%"><input type="checkbox" checked> list_files, inspect_processes 等</label></div>
+            <div class="setting-row"><span>写入需确认</span><label style="width:60%"><input type="checkbox" checked> 需Toast预览+3秒后执行</label></div>
+            <div class="setting-row"><span>危险二次确认</span><label style="width:60%"><input type="checkbox" checked> 弹窗+输入原因</label></div>
+            <div class="setting-row"><span>撤销栈</span><span>最多 <input type="number" value="100" style="width:50px"> 条，可回滚</span></div>
+            <div id="policy-list" style="margin-top:12px">加载中...</div>
+          </div>
+          <div class="settings-card">
+            <h3>🎨 外观 + 系统</h3>
+            <div class="setting-row"><span>主题</span><select style="width:60%"><option>深色 - 商业级</option><option>浅色</option></select></div>
+            <div class="setting-row"><span>快捷键</span><code>Alt+Space 唤起 · Ctrl+Z 撤销</code></div>
+            <div class="setting-row"><span>系统托盘</span><label style="width:60%"><input type="checkbox" checked> 常驻托盘</label></div>
+            <div class="setting-row"><span>iOS远程</span><div style="width:60%;display:flex;gap:8px"><input type="checkbox"> 启用8002端口 <input value="token123" style="width:80px;font-size:11px"></div></div>
+            <div class="setting-row"><span>通知声音</span><label style="width:60%"><input type="checkbox" checked> 执行时提示音</label></div>
+          </div>
+          <div class="settings-card">
+            <h3>🏗️ 14层架构 - 技术栈</h3>
+            <ol class="arch-list" style="font-size:12px;line-height:1.8">
+              <li><strong>感知</strong> - WMI+Win32+UIA+DWM - 真实</li>
+              <li><strong>推理</strong> - Qwen3-30B-A3B + CoT + Extended Thinking</li>
+              <li><strong>规划</strong> - DAG分解 + 依赖分析 (DeepSeek)</li>
+              <li><strong>工具</strong> - 60+工具 + 严格Schema (OpenAI)</li>
+              <li><strong>策略</strong> - 分级确认 + 白名单学习</li>
+              <li><strong>执行</strong> - 事务化+撤销栈+熔断</li>
+              <li><strong>验证</strong> - 多轮验证+视觉验证 (Manus)</li>
+              <li><strong>记忆</strong> - 向量+KV+Dreaming+遗忘 (OpenClaw)</li>
+              <li><strong>技能</strong> - 自动蒸馏+参数化</li>
+              <li><strong>学习</strong> - 进化引擎+QLoRA</li>
+              <li><strong>模型</strong> - llama.cpp管理+模型市场</li>
+              <li><strong>远程</strong> - iOS API+WebSocket</li>
+              <li><strong>系统</strong> - 性能监控+崩溃恢复</li>
+              <li><strong>教师</strong> - 可选云端顾问</li>
+            </ol>
+            <p class="setting-desc">设计原则：代码维护现实，AI解释现实<br>对比OpenAI：我们增加WMI真实数据+撤销栈+中文容错<br>对比Claude：我们增加WMI+撤销+DPI感知<br>对比DeepSeek：我们增加验证闭环+数据飞轮+MoE特化</p>
+          </div>
+          <div class="settings-card">
+            <h3>📦 本地部署</h3>
+            <div class="setting-row"><span>一键安装</span><code>.\scripts\setup_windows.ps1</code></div>
+            <div class="setting-row"><span>启动</span><code>python run.py</code></div>
+            <div class="setting-row"><span>EXE打包</span><code>pyinstaller --onefile run.py</code></div>
+            <div class="setting-row"><span>前端</span><span>已写入content，无需单独部署</span></div>
+            <p class="setting-desc">前端已内嵌到 FastAPI /static，无需 Nginx。所有API在单一端口8000，商业级单体部署。</p>
+          </div>
+        </div>
+      </div>
     </div>
   </main>
 </div>
