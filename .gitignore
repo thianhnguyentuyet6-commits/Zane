@@ -4,19 +4,32 @@ data/tokens.json
 data/zane.db
 data/zane.db-shm
 data/zane.db-wal
+data/zane.db.lock
 data/autonomous/
 data/traces/
-/memory/
-__pycache__/
-*.pyc
-.venv/
-node_modules/
-frontend/index_v2_backup.html
-data/zane.db.lock
+data/logs/
+data/screenshots/
+data/test_eval/
 data/backups/
 data/custom_models.json
 data/memory/
 data/skills/
+/memory/
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+node_modules/
+# 前端备份
+frontend/index_v2_backup.html
+frontend/index_v7_backup.html
+# 模型
+*.gguf
+*.bin
+models/*.gguf
 # 允许进化核心文件
 !data/training/
 !data/prompts/
@@ -25,5 +38,4 @@ data/skills/
 !data/prd_v3.json
 !config/model_paths.json
 !config/evolution_schedule.json
-*.pyc
-__pycache__/
+!frontend/js/evolution.js
