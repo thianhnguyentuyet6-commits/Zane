@@ -147,6 +147,16 @@ async def lifespan(app: FastAPI):
         except:
             print("⚠️ OCR未安装，截图无OCR")
     
+    # 补全：截图清理定时
+    try:
+        from .utils.cleanup import cleanup_manager
+        # 启动时清理一次
+        cleanup_manager.cleanup_screenshots(keep=50)
+        cleanup_manager.cleanup_old_backups(keep=10, days=30)
+        print("✅ 清理任务：截图保留50张，备份保留10个/30天")
+    except Exception as e:
+        print(f"清理任务失败: {e}")
+    
     yield
     
     # 关闭

@@ -18,14 +18,14 @@ python-jose[cryptography]==3.3.0
 # pywin32==308  # Windows only
 
 # C自主 - 向量+OCR 轻量优先，重型可选
-# 轻量向量 - 优先安装
+# 轻量已安装 - 补全
 sqlite-vec==0.1.6
-# 重型可选 - 用户选择install_now时安装
-# sentence-transformers==3.3.1
+rapidocr_onnxruntime==1.3.12  # 轻量OCR 50MB，替代PaddleOCR 500MB，已安装
+# 重型可选 - 用户选择时安装
+# sentence-transformers==3.3.1  # 80MB语义，安装后自动启用
 # torch==2.5.0  # 由sentence-transformers依赖
-# rapidocr_onnxruntime==1.3.12  # 轻量OCR 50MB，替代PaddleOCR 500MB
 # paddlepaddle==3.0.0  # 重型
-# paddleocr==2.9.1  # 重型
+# paddleocr==2.9.1  # 重型 500MB
 
 # 自我进化
 datasets==3.0.0
