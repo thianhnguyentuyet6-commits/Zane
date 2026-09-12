@@ -16,3 +16,4 @@ node_modules/
 frontend/index_v2_backup.html
 data/zane.db.lock
 data/backups/
+data/custom_models.json

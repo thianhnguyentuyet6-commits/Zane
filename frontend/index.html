@@ -269,6 +269,7 @@ body{font-family:'SF Mono','JetBrains Mono','Noto Sans SC',system-ui,sans-serif;
 
 <script type="module">
 import { apiGet, apiPost, tokenApi, databaseApi, autonomousApi, systemApi, chatApi } from './js/api.js';
+import { modelsApi, renderModelsView } from './js/models.js';
 
 window.switchView = (view) => {
   document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
@@ -572,10 +573,7 @@ window.loadContracts = async () => {
 };
 
 window.loadModels = async () => {
-  try{
-    const data = await apiGet('/api/model-registry');
-    document.getElementById('models-grid').innerHTML = `<div class="card"><h3>当前</h3><div style="font-size:10px;font-family:monospace">${JSON.stringify(data.active||{}).slice(0,500)}</div></div>`;
-  }catch(e){console.error(e)}
+  await renderModelsView();
 };
 
 window.loadSettings = async () => {

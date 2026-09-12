@@ -158,16 +158,19 @@ async def security_middleware(request: Request, call_next):
     response = await call_next(request)
     return response
 
-# 引入routers - A夯实后端拆分
+# 引入routers - A夯实后端拆分 + 模型管理
 try:
-    from .routers import system_router, tokens_router, database_router, autonomous_router
+    from .routers import system_router, tokens_router, database_router, autonomous_router, models_router
     app.include_router(system_router.router)
     app.include_router(tokens_router.router)
     app.include_router(database_router.router)
     app.include_router(autonomous_router.router)
-    print("✅ Routers已挂载：system, tokens, database, autonomous - A夯实后端拆分")
+    app.include_router(models_router.router)
+    print("✅ Routers已挂载：system, tokens, database, autonomous, models - A夯实后端拆分+模型载入")
 except Exception as e:
     print(f"Routers挂载失败: {e}")
+    import traceback
+    traceback.print_exc()
 
 # 数据模型
 class ChatRequest(BaseModel):
