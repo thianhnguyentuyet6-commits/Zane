@@ -41,7 +41,7 @@ class FileSandbox:
     def _real_path(self, path: str) -> str:
         try:
             return os.path.realpath(path)
-        except:
+        except Exception:
             return path
 
     def check_path(self, path: str) -> Dict:
@@ -157,7 +157,7 @@ class FileSandbox:
             disk = psutil.disk_usage(os.path.dirname(path) or "/")
             if disk.free < 100 * 1024 * 1024:  # 小于100MB
                 raise RuntimeError(f"磁盘空间不足: 剩余 {disk.free/1024/1024:.1f}MB")
-        except:
+        except Exception:
             pass
         
         dir_path = os.path.dirname(path)
@@ -205,7 +205,7 @@ class ProcessSandbox:
             try:
                 proc = psutil.Process(pid)
                 target_name = proc.name()
-            except:
+            except Exception:
                 return {"allowed": False, "reason": f"进程不存在: {pid}", "risk": "low"}
         
         # 检查关键进程
@@ -256,7 +256,7 @@ class ProcessSandbox:
                         try:
                             proc.terminate()
                             killed.append(proc.info['pid'])
-                        except:
+                        except Exception:
                             continue
                 return {"success": True, "message": f"已结束 {len(killed)} 个 {name} 进程", "pids": killed}
         except Exception as e:

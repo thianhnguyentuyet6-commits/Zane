@@ -17,7 +17,7 @@ class WindowsSystemProvider:
                 import wmi
                 self.wmi = wmi.WMI()
                 self.wmi_available = True
-            except:
+            except Exception:
                 self.wmi_available = False
 
     def get_cpu_info(self) -> Dict:
@@ -38,7 +38,7 @@ class WindowsSystemProvider:
                     for cpu in self.wmi.Win32_Processor():
                         cpu_name = cpu.Name
                         break
-                except:
+                except Exception:
                     pass
             
             # GPU 信息
@@ -52,7 +52,7 @@ class WindowsSystemProvider:
                                 "driver": getattr(gpu, 'DriverVersion', ''),
                                 "ram": getattr(gpu, 'AdapterRAM', 0)
                             })
-                except:
+                except Exception:
                     pass
             
             return {
@@ -86,7 +86,7 @@ class WindowsSystemProvider:
                             "manufacturer": getattr(stick, 'Manufacturer', ''),
                             "part_number": getattr(stick, 'PartNumber', '').strip()
                         })
-                except:
+                except Exception:
                     pass
             
             return {
@@ -124,7 +124,7 @@ class WindowsSystemProvider:
                                 disk_type = "SSD"
                             else:
                                 disk_type = "HDD"
-                        except:
+                        except Exception:
                             pass
                     
                     disks.append({
@@ -137,7 +137,7 @@ class WindowsSystemProvider:
                         "percent": round(usage.used / usage.total * 100, 1),
                         "type": disk_type
                     })
-                except:
+                except Exception:
                     continue
             return disks
         except Exception as e:
@@ -161,7 +161,7 @@ class WindowsSystemProvider:
                     try:
                         parent = psutil.Process(info['ppid']) if info['ppid'] else None
                         parent_name = parent.name() if parent else ""
-                    except:
+                    except Exception:
                         pass
                     
                     processes.append({
@@ -221,7 +221,7 @@ class WindowsSystemProvider:
                     except OSError:
                         break
                 winreg.CloseKey(key)
-            except:
+            except Exception:
                 pass
             
             # HKLM Run
@@ -236,7 +236,7 @@ class WindowsSystemProvider:
                     except OSError:
                         break
                 winreg.CloseKey(key)
-            except:
+            except Exception:
                 pass
         except Exception as e:
             items.append({"error": str(e)})
@@ -260,6 +260,6 @@ class WindowsSystemProvider:
                     })
                     if len(services) >= 20:
                         break
-        except:
+        except Exception:
             pass
         return services

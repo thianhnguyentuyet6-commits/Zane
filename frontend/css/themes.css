@@ -1,0 +1,13 @@
+/* themes.css - 主题与动画 - v2.4 自我修正版 */
+:root{
+  --bg:#0a0e14; --bg2:#111820; --card:#161e2a; --card2:#1c2636; --border:#1e2d42;
+  --text:#e6edf3; --text2:#8b9bb4; --text3:#5a6d8a;
+  --accent:#38bdf8; --accent2:#818cf8; --success:#22c55e; --warning:#f59e0b; --danger:#ef4444;
+  --shadow:0 8px 32px rgba(0,0,0,0.4);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'SF Mono','JetBrains Mono','Noto Sans SC',system-ui,sans-serif;background:var(--bg);color:var(--text);height:100vh;overflow:hidden}
+.pulse{width:5px;height:5px;border-radius:50%;background:var(--accent);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+@keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}

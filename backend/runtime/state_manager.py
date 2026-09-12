@@ -89,7 +89,7 @@ class StateManager:
             from ..platform.base import get_platform_provider
             provider = get_platform_provider()
             return provider["window"].enum_windows()[:10]
-        except:
+        except Exception:
             return []
     
     def _get_top_processes(self) -> List[Dict]:
@@ -100,11 +100,11 @@ class StateManager:
                 try:
                     mem = p.info['memory_info'].rss / 1024 / 1024 if p.info['memory_info'] else 0
                     procs.append({"pid": p.info['pid'], "name": p.info['name'], "memory_mb": round(mem, 1)})
-                except:
+                except Exception:
                     continue
             procs.sort(key=lambda x: x["memory_mb"], reverse=True)
             return procs[:5]
-        except:
+        except Exception:
             return []
     
     def _build_scene(self) -> SceneRepresentation:
@@ -119,7 +119,7 @@ class StateManager:
                 scene.screenshot_path = result.get("image_path")
                 scene.width = result.get("width", 1920)
                 scene.height = result.get("height", 1080)
-        except:
+        except Exception:
             pass
         
         # 窗口
@@ -136,7 +136,7 @@ class StateManager:
                 dpi = ctypes.windll.gdi32.GetDeviceCaps(hdc, 88)
                 ctypes.windll.user32.ReleaseDC(0, hdc)
                 scene.dpi = dpi / 96.0
-            except:
+            except Exception:
                 scene.dpi = 1.0
         
         # 光标
@@ -145,7 +145,7 @@ class StateManager:
                 import win32gui
                 x, y = win32gui.GetCursorPos()
                 scene.cursor_pos = {"x": x, "y": y}
-            except:
+            except Exception:
                 scene.cursor_pos = {"x": 0, "y": 0}
         
         # UIA 预留

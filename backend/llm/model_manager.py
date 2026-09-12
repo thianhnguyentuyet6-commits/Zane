@@ -112,7 +112,7 @@ class ModelManager:
                 type="ollama",
                 is_active=False
             ))
-        except:
+        except Exception:
             pass
         
         return models
@@ -128,7 +128,7 @@ class ModelManager:
             result = sock.connect_ex((self.server_config["host"], self.server_config["port"]))
             port_open = result == 0
             sock.close()
-        except:
+        except Exception:
             pass
         
         # 检查进程
@@ -143,9 +143,9 @@ class ModelManager:
                             "name": proc.info['name'],
                             "cmdline": cmdline[:200]
                         })
-                except:
+                except Exception:
                     continue
-        except:
+        except Exception:
             pass
         
         return {

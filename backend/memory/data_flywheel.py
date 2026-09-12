@@ -29,7 +29,7 @@ class DataFlywheel:
             try:
                 with open(self.stats_path, 'r', encoding='utf-8') as f:
                     return json.load(f)
-            except:
+            except Exception:
                 pass
         return {"total_sft": 0, "total_dpo": 0, "last_train": 0, "samples_today": 0}
 
@@ -153,7 +153,7 @@ class DataFlywheel:
             if os.path.exists(self.replay_path):
                 with open(self.replay_path, 'r', encoding='utf-8') as f:
                     replay_count = sum(1 for _ in f)
-        except:
+        except Exception:
             pass
         
         return {
@@ -178,9 +178,9 @@ class DataFlywheel:
                     for line in lines:
                         try:
                             samples.append(json.loads(line))
-                        except:
+                        except Exception:
                             continue
-        except:
+        except Exception:
             pass
         return list(reversed(samples))
 

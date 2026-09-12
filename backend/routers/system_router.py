@@ -30,11 +30,11 @@ async def system_processes(sort_by: str = "memory", limit: int = 20, filter_name
         from ..platform.base import get_platform_provider
         provider = get_platform_provider()
         return provider["system"].get_processes(sort_by=sort_by, limit=limit)
-    except:
+    except Exception:
         try:
             from ..tools_impl import tool_executor
             return tool_executor.inspect_processes(sort_by=sort_by, limit=limit, filter_name=filter_name)
-        except:
+        except Exception:
             return {"processes": [], "total": 0}
 
 @router.get("/windows")
@@ -44,11 +44,11 @@ async def system_windows():
         provider = get_platform_provider()
         windows = provider["window"].enum_windows()
         return {"windows": windows, "total": len(windows), "real": windows[0].get("real", False) if windows else False}
-    except:
+    except Exception:
         try:
             from ..tools_impl import tool_executor
             return tool_executor.list_windows()
-        except:
+        except Exception:
             return {"windows": [], "total": 0}
 
 @router.get("/files")

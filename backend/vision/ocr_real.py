@@ -47,7 +47,7 @@ class OCRReal:
                             box, text, score = line
                             texts.append(text)
                             boxes.append({"box": box, "text": text, "score": score})
-                        except:
+                        except Exception:
                             continue
                 
                 return {
@@ -69,7 +69,7 @@ class OCRReal:
                             box, (text, score) = line
                             texts.append(text)
                             boxes.append({"box": box, "text": text, "score": score})
-                        except:
+                        except Exception:
                             continue
                 
                 return {

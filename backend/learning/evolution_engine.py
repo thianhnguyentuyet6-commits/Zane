@@ -58,7 +58,7 @@ class EvolutionEngine:
             try:
                 with open(history_path, 'r', encoding='utf-8') as f:
                     return json.load(f)
-            except:
+            except Exception:
                 pass
         return [
             {
@@ -100,7 +100,7 @@ class EvolutionEngine:
             is_night = now.hour >= 2 and now.hour <= 5
             
             return is_idle or is_night
-        except:
+        except Exception:
             return False
 
     def check_ready(self) -> Dict:

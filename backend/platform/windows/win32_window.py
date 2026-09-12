@@ -42,7 +42,7 @@ class WindowsWindowProvider:
                     process_name = ""
                     try:
                         process_name = psutil.Process(pid).name()
-                    except:
+                    except Exception:
                         pass
                     
                     # 检查最小化/最大化
@@ -68,7 +68,7 @@ class WindowsWindowProvider:
                         "dpi": 96,  # 可通过 GetDpiForWindow 获取
                         "real": True
                     })
-                except:
+                except Exception:
                     pass
                 return True
             

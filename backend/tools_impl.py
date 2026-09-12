@@ -19,8 +19,8 @@ from io import BytesIO
 try:
     from PIL import Image, ImageGrab
     PIL_AVAILABLE = True
-except:
-    PIL_AVAILABLE = False
+except ImportError as e:
+    PIL_AVAILABLE = False  # PIL未安装，截图回退: e
 
 class ToolExecutor:
     """工具执行器 - 执行真实系统操作"""
@@ -109,7 +109,7 @@ class ToolExecutor:
                             "size_readable": self._format_size(stat.st_size),
                             "modified": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(stat.st_mtime))
                         })
-                    except:
+                    except Exception:
                         pass
                 entries.append(info)
             
@@ -145,7 +145,7 @@ class ToolExecutor:
                 if not os.path.exists(fp):
                     with open(fp, 'w', encoding='utf-8') as f:
                         f.write(content)
-        except:
+        except Exception:
             pass
 
     def _format_size(self, size: int) -> str:
@@ -275,7 +275,7 @@ class ToolExecutor:
                             })
                 win32gui.EnumWindows(callback, None)
                 return {"windows": windows[:30], "total": len(windows)}
-            except:
+            except Exception:
                 pass
         
         # 演示数据
@@ -331,9 +331,9 @@ class ToolExecutor:
                                 img.save(filepath)
                                 self.last_screenshot_path = filepath
                                 return {"success": True, "image_path": filepath, "width": img.width, "height": img.height, "mode": mode, "size_kb": os.path.getsize(filepath)//1024}
-                            except:
+                            except Exception:
                                 pass
-                except:
+                except Exception:
                     pass
             
             # 演示：生成占位截图
@@ -442,7 +442,7 @@ Chrome - 百度搜索：本地AI助手原理
                 try:
                     import psutil
                     running = psutil.Process(proc.pid).is_running()
-                except:
+                except Exception:
                     running = True
                 
                 return {

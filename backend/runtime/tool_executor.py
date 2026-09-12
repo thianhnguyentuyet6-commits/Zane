@@ -133,7 +133,7 @@ class ToolExecutor:
                 import os
                 src = params.get("source", "")
                 return {"src_exists": os.path.exists(src)}
-        except:
+        except Exception:
             pass
         return None
     
@@ -142,7 +142,7 @@ class ToolExecutor:
             if tool == "launch_application":
                 # 验证：进程存在+窗口出现，非 API success
                 return {"api_success": result.get("success"), "pid": result.get("pid"), "verification": "需检查进程存在+窗口"}
-        except:
+        except Exception:
             pass
         return None
     

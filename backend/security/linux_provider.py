@@ -22,7 +22,7 @@ class WSLProvider:
         try:
             result = subprocess.run(["wsl", "--status"], capture_output=True, text=True, timeout=3)
             return result.returncode == 0 or "WSL" in result.stdout or "WSL" in result.stderr
-        except:
+        except Exception:
             return False
 
     def _list_distros(self) -> List[str]:
@@ -32,7 +32,7 @@ class WSLProvider:
             if result.returncode == 0:
                 distros = [d.strip() for d in result.stdout.splitlines() if d.strip()]
                 return distros
-        except:
+        except Exception:
             pass
         return ["Ubuntu", "Debian"]  # 演示
 

@@ -91,7 +91,7 @@ class VectorMemory:
             try:
                 with open(path, 'r', encoding='utf-8') as f:
                     data = json.load(f)
-            except:
+            except Exception:
                 data = []
         data.append({"id": mem_id, "content": content, "type": type, "created_at": time.time(), "metadata": metadata or {}})
         with open(path, 'w', encoding='utf-8') as f:
@@ -137,7 +137,7 @@ class VectorMemory:
             
             scored.sort(key=lambda x: x[0], reverse=True)
             return [{"id": item["id"], "content": item["content"], "type": item["type"], "score": score, "method": "keyword"} for score, item in scored[:limit]]
-        except:
+        except Exception:
             return []
 
 # 全局

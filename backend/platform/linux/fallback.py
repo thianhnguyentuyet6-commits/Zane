@@ -35,7 +35,7 @@ class LinuxSystemProvider:
             try:
                 usage = psutil.disk_usage(part.mountpoint)
                 disks.append({"device": part.device, "mountpoint": part.mountpoint, "fstype": part.fstype, "total_gb": round(usage.total/1024**3,1), "used_gb": round(usage.used/1024**3,1), "free_gb": round(usage.free/1024**3,1), "percent": round(usage.used/usage.total*100,1), "type": "SSD"})
-            except:
+            except Exception:
                 continue
         return disks
     
@@ -46,7 +46,7 @@ class LinuxSystemProvider:
                 info = proc.info
                 mem_mb = info['memory_info'].rss/1024/1024 if info['memory_info'] else 0
                 processes.append({"pid": info['pid'], "ppid": info['ppid'], "parent_name": "", "name": info['name'], "exe": "", "cmdline": "", "memory_mb": round(mem_mb,1), "memory_percent": 0, "cpu_percent": info['cpu_percent'] or 0, "username": "", "status": info['status'], "threads": 0, "handles": 0, "create_time": "", "uptime": 0})
-            except:
+            except Exception:
                 continue
         if sort_by=="memory":
             processes.sort(key=lambda x: x["memory_mb"], reverse=True)

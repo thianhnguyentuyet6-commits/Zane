@@ -39,7 +39,7 @@ class CleanupManager:
                         try:
                             os.remove(f)
                             cleaned += 1
-                        except:
+                        except Exception:
                             pass
                     kept = keep
                 else:
@@ -69,7 +69,7 @@ class CleanupManager:
                         cleaned += 1
                     else:
                         kept += 1
-                except:
+                except Exception:
                     pass
         except Exception as e:
             print(f"清理备份失败: {e}")

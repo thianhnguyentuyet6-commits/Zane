@@ -107,7 +107,7 @@ class Verifier:
                 # 验证窗口出现（Windows）
                 time.sleep(0.5)
                 return {"verified": True, "reason": f"进程 {pid} 存在且运行中", "method": "进程存在+窗口出现", "pid": pid, "note": "API success ≠ 真实成功，需进程存在"}
-        except:
+        except Exception:
             pass
         
         # 演示模式也算验证通过，但标记
@@ -123,7 +123,7 @@ class Verifier:
                 import psutil
                 psutil.Process(pid)
                 return {"verified": False, "reason": f"进程 {pid} 仍存在"}
-            except:
+            except Exception:
                 return {"verified": True, "reason": f"进程 {pid} 已不存在", "method": "进程不存在验证"}
         return {"verified": True, "reason": "已执行结束", "method": "API success"}
     

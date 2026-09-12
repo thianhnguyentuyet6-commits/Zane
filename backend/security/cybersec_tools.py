@@ -47,7 +47,7 @@ class CyberSecTools:
                                             "description": f"文件名含密码关键词: {file}",
                                             "suggestion": "请加密或移到安全位置"
                                         })
-                        except:
+                        except Exception:
                             pass
                     file_count += 1
                 
@@ -69,7 +69,7 @@ class CyberSecTools:
                             "description": f"端口 {port} 处于监听状态",
                             "suggestion": "若不需要请关闭"
                         })
-        except:
+        except Exception:
             pass
         
         # 3. 启动项检查
@@ -96,9 +96,9 @@ class CyberSecTools:
                             i += 1
                         except OSError:
                             break
-                except:
+                except Exception:
                     pass
-        except:
+        except Exception:
             pass
         
         # 4. 弱权限文件（所有人可写）
@@ -117,9 +117,9 @@ class CyberSecTools:
                                 "description": "文件可被所有人写入",
                                 "suggestion": "chmod 644"
                             })
-                except:
+                except Exception:
                     continue
-        except:
+        except Exception:
             pass
         
         return {
@@ -193,7 +193,7 @@ class CyberSecTools:
                             large_files.sort(key=lambda x: x["size_gb"], reverse=True)
                             if len(large_files) > limit:
                                 large_files = large_files[:limit]
-                    except:
+                    except Exception:
                         continue
                 
                 # 限制扫描文件数
@@ -228,7 +228,7 @@ class CyberSecTools:
                 checks.append({"item": "Windows防火墙", "status": "unknown", "suggestion": "请检查控制面板"})
             else:
                 checks.append({"item": "防火墙", "status": "unknown"})
-        except:
+        except Exception:
             pass
         
         # 检查自动更新
@@ -247,7 +247,7 @@ class CyberSecTools:
                 checks.append({"item": "杀毒软件", "status": "running", "detail": ", ".join(running_av)})
             else:
                 checks.append({"item": "杀毒软件", "status": "not_found", "risk": "medium", "suggestion": "建议安装杀毒软件"})
-        except:
+        except Exception:
             pass
         
         return {

@@ -41,7 +41,7 @@ class LocalLLMClient:
             async with httpx.AsyncClient(timeout=2.0) as client:
                 resp = await client.get(f"{self.config['api_base']}/models")
                 return resp.status_code == 200
-        except:
+        except Exception:
             return False
 
     async def chat_completion(self, messages: List[Dict], tools: List[Dict] = None, stream: bool = False) -> Dict[str, Any]:

@@ -72,7 +72,7 @@ class Database:
             try:
                 import sentence_transformers
                 print("✅ sentence-transformers 可用，可启用语义检索")
-            except:
+            except Exception:
                 pass
     
     def _init_tables(self):
@@ -375,7 +375,7 @@ class Database:
                 for field in ["trigger_conditions", "required_tools", "procedure", "parameters", "preconditions", "verification_rules", "failure_recovery", "tags"]:
                     try:
                         skill[field] = json.loads(skill[field]) if skill[field] else []
-                    except:
+                    except Exception:
                         pass
                 skills.append(skill)
             return skills

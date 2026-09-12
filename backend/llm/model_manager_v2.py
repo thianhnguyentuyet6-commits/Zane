@@ -132,10 +132,10 @@ class ModelManagerV2:
                         fp = os.path.join(dirpath, f)
                         try:
                             total += os.path.getsize(fp)
-                        except:
+                        except Exception:
                             pass
                 size_gb = round(total / 1024**3, 2)
-        except:
+        except Exception:
             size_gb = 0
         
         # 量化识别
@@ -258,7 +258,7 @@ class ModelManagerV2:
                     
                     try:
                         size_gb = round(os.path.getsize(gguf_path) / 1024**3, 2)
-                    except:
+                    except Exception:
                         size_gb = 0
                     
                     # 量化识别
@@ -340,11 +340,11 @@ class ModelManagerV2:
                                 is_active=False,
                                 exists=True
                             ))
-                    except:
+                    except Exception:
                         pass
-                except:
+                except Exception:
                     pass
-        except:
+        except Exception:
             pass
         
         # 如果没有模型，至少返回你的Qwen3演示
@@ -379,7 +379,7 @@ class ModelManagerV2:
             result = sock.connect_ex((self.server_config["host"], self.server_config["port"]))
             port_open = result == 0
             sock.close()
-        except:
+        except Exception:
             pass
         
         server_processes = []
@@ -396,7 +396,7 @@ class ModelManagerV2:
                             "cmdline": cmdline[:300],
                             "memory_mb": mem_mb
                         })
-                except:
+                except Exception:
                     continue
         except Exception as e:
             print(f"进程检测失败: {e}")
@@ -456,7 +456,7 @@ class ModelManagerV2:
                             p = psutil.Process(proc_info["pid"])
                             p.terminate()
                             steps.append(f"已终止进程 PID {proc_info['pid']}")
-                        except:
+                        except Exception:
                             pass
                     time.sleep(2)
                 except Exception as e:
