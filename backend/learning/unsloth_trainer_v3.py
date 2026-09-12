@@ -14,6 +14,19 @@ import time
 import subprocess
 import threading
 from pathlib import Path
+try:
+    from loguru import logger as loguru_logger
+    LOGURU_AVAILABLE = True
+except ImportError:
+    LOGURU_AVAILABLE = False
+    import logging
+    loguru_logger = logging.getLogger('zane')
+
+def _log_info(msg):
+    (loguru_logger.info if LOGURU_AVAILABLE else print)(msg)
+
+def _log_error(msg):
+    (loguru_logger.error if LOGURU_AVAILABLE else print)(f'❌ {msg}')
 from typing import Dict, List, Any, Optional
 from datetime import datetime
 

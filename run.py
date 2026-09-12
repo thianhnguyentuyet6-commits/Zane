@@ -50,8 +50,9 @@ def main():
     按 Ctrl+C 停止
     """)
     
-    # v7.0 模块化重构优化版优先，失败回退v6/v4/v3
+    # v8.0 终极模块化版优先，目标500行+71路由模块化，失败回退v7/v6/v4/v3
     for version, desc in [
+        ("backend.main_v8", "v8.0 终极模块化版 - 422行目标500行+71路由模块化10路由文件+自主进化v3.0 8模块闭环"),
         ("backend.main_v7", "v7.0 模块化重构优化版 - 6路由模块化 931行+51路由+自主进化v3.0 8模块闭环"),
         ("backend.main_v6", "v6.0 自主进化完整版 - 数据飞轮v3+模型双轨+真实训练+评估Harness+Prompt进化+技能基因"),
         ("backend.main_v4", "v4.0 A+C夯实 - SQLite唯一+20Skill+APScheduler+习惯学习+模块化+Canvas"),
