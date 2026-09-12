@@ -50,26 +50,32 @@ def main():
     按 Ctrl+C 停止
     """)
     
-    # 优先v4 A+C夯实，失败回退v3
-    try:
-        import backend.main_v4
-        print("✅ 启动 v4.0 A+C夯实 - SQLite唯一+20Skill+APScheduler+习惯学习+模块化+Canvas")
-        uvicorn.run(
-            "backend.main_v4:app",
-            host="0.0.0.0",
-            port=8000,
-            reload=False,
-            log_level="info"
-        )
-    except Exception as e:
-        print(f"v4启动失败，回退v3: {e}")
-        uvicorn.run(
-            "backend.main_v3:app",
-            host="0.0.0.0",
-            port=8000,
-            reload=False,
-            log_level="info"
-        )
+    # v7.0 模块化重构优化版优先，失败回退v6/v4/v3
+    for version, desc in [
+        ("backend.main_v7", "v7.0 模块化重构优化版 - 6路由模块化 931行+51路由+自主进化v3.0 8模块闭环"),
+        ("backend.main_v6", "v6.0 自主进化完整版 - 数据飞轮v3+模型双轨+真实训练+评估Harness+Prompt进化+技能基因"),
+        ("backend.main_v4", "v4.0 A+C夯实 - SQLite唯一+20Skill+APScheduler+习惯学习+模块化+Canvas"),
+        ("backend.main_v3", "v3.0 集成版"),
+    ]:
+        try:
+            __import__(version)
+            print(f"✅ 启动 {desc}")
+            uvicorn.run(
+                f"{version}:app",
+                host="0.0.0.0",
+                port=8000,
+                reload=False,
+                log_level="info"
+            )
+            return
+        except Exception as e:
+            print(f"⚠️ {version}启动失败: {e}，尝试下一版本...")
+            import traceback
+            traceback.print_exc()
+            continue
+    
+    print("❌ 所有版本启动失败")
+    print("请检查依赖: pip install -r requirements.txt")
 
 if __name__ == "__main__":
     main()
