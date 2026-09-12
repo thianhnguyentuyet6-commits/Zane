@@ -50,13 +50,26 @@ def main():
     按 Ctrl+C 停止
     """)
     
-    uvicorn.run(
-        "backend.main_v3:app",
-        host="0.0.0.0",
-        port=8000,
-        reload=False,
-        log_level="info"
-    )
+    # 优先v4 A+C夯实，失败回退v3
+    try:
+        import backend.main_v4
+        print("✅ 启动 v4.0 A+C夯实 - SQLite唯一+20Skill+APScheduler+习惯学习+模块化+Canvas")
+        uvicorn.run(
+            "backend.main_v4:app",
+            host="0.0.0.0",
+            port=8000,
+            reload=False,
+            log_level="info"
+        )
+    except Exception as e:
+        print(f"v4启动失败，回退v3: {e}")
+        uvicorn.run(
+            "backend.main_v3:app",
+            host="0.0.0.0",
+            port=8000,
+            reload=False,
+            log_level="info"
+        )
 
 if __name__ == "__main__":
     main()
