@@ -292,16 +292,17 @@ class Database:
         return self._with_lock(_do)
     
     def search_memories(self, query: str, types: List[str] = None, limit: int = 5) -> List[Dict]:
+        # 修复闭包变量名冲突 - 之前 types 变量在嵌套函数内赋值导致 UnboundLocalError
+        search_types = types or ["semantic", "episodic", "preference"]
         def _do():
-            types = types or ["semantic", "episodic", "preference"]
-            placeholders = ",".join(["?"] * len(types))
+            placeholders = ",".join(["?"] * len(search_types))
             sql = f"""
                 SELECT * FROM memories 
                 WHERE type IN ({placeholders})
                 ORDER BY importance DESC, last_accessed DESC
                 LIMIT ?
             """
-            cursor = self.conn.execute(sql, (*types, limit*3))
+            cursor = self.conn.execute(sql, (*search_types, limit*3))
             candidates = [dict(row) for row in cursor.fetchall()]
             query_lower = query.lower()
             scored = []

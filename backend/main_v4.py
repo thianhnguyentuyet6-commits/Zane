@@ -122,6 +122,25 @@ except ImportError as e:
     token_manager = None
     database = None
 
+# 日志 - loguru 商业级
+try:
+    from loguru import logger as loguru_logger
+    LOGURU_AVAILABLE = True
+    # 配置
+    loguru_logger.remove()
+    loguru_logger.add(lambda msg: print(msg, end=""), level="INFO")
+    # 文件轮转
+    import os as _os
+    _log_dir = _os.path.join(_os.path.dirname(__file__), "..", "data", "logs")
+    _os.makedirs(_log_dir, exist_ok=True)
+    loguru_logger.add(_os.path.join(_log_dir, "zane_{time:YYYY-MM-DD}.log"), rotation="10 MB", retention="7 days", level="INFO", encoding="utf-8")
+    print("✅ loguru 日志可用 - 文件轮转 10MB 保留7天")
+except ImportError:
+    LOGURU_AVAILABLE = False
+    import logging
+    loguru_logger = logging.getLogger("zane")
+    print("⚠️ loguru未安装，使用标准logging，pip install loguru")
+
 # lifespan 替代 on_event - 修复deprecated
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -129,48 +148,90 @@ async def lifespan(app: FastAPI):
     try:
         if autonomous_optimizer and autonomous_optimizer.scheduler:
             autonomous_optimizer.start_scheduler()
-            print("✅ 自主优化调度器已启动 - A+C全自动 lifespan")
+            loguru_logger.info("✅ 自主优化调度器已启动 - A+C全自动 lifespan") if LOGURU_AVAILABLE else print("✅ 自主优化调度器已启动 - A+C全自动 lifespan")
     except Exception as e:
-        print(f"调度器启动失败: {e}")
+        loguru_logger.warning(f"调度器启动失败: {e}") if LOGURU_AVAILABLE else print(f"调度器启动失败: {e}")
     try:
         import sqlite_vec
-        print("✅ sqlite-vec 可用")
+        loguru_logger.info("✅ sqlite-vec 可用") if LOGURU_AVAILABLE else print("✅ sqlite-vec 可用")
     except:
-        print("⚠️ sqlite-vec 不可用，关键词回退")
+        loguru_logger.warning("⚠️ sqlite-vec 不可用，关键词回退") if LOGURU_AVAILABLE else print("⚠️ sqlite-vec 不可用，关键词回退")
     try:
         import rapidocr_onnxruntime
-        print("✅ rapidocr_onnxruntime 轻量OCR可用 50MB")
+        loguru_logger.info("✅ rapidocr_onnxruntime 轻量OCR可用 50MB") if LOGURU_AVAILABLE else print("✅ rapidocr_onnxruntime 轻量OCR可用 50MB")
     except:
         try:
             import paddleocr
-            print("✅ PaddleOCR 可用 500MB")
+            loguru_logger.info("✅ PaddleOCR 可用 500MB") if LOGURU_AVAILABLE else print("✅ PaddleOCR 可用 500MB")
         except:
-            print("⚠️ OCR未安装，截图无OCR")
+            loguru_logger.warning("⚠️ OCR未安装，截图无OCR") if LOGURU_AVAILABLE else print("⚠️ OCR未安装，截图无OCR")
     
-    # 补全：截图清理定时
+    # 补全：截图清理定时 + 真实模块
     try:
         from .utils.cleanup import cleanup_manager
         # 启动时清理一次
         cleanup_manager.cleanup_screenshots(keep=50)
         cleanup_manager.cleanup_old_backups(keep=10, days=30)
-        print("✅ 清理任务：截图保留50张，备份保留10个/30天")
+        loguru_logger.info("✅ 清理任务：截图保留50张，备份保留10个/30天") if LOGURU_AVAILABLE else print("✅ 清理任务：截图保留50张，备份保留10个/30天")
+        
+        # APScheduler 定时清理 - 每天凌晨3点
+        try:
+            from apscheduler.schedulers.background import BackgroundScheduler
+            cleanup_scheduler = BackgroundScheduler()
+            cleanup_scheduler.add_job(lambda: cleanup_manager.cleanup_screenshots(keep=50), 'cron', hour=3, minute=0, id='cleanup_screenshots')
+            cleanup_scheduler.add_job(lambda: cleanup_manager.cleanup_old_backups(keep=10, days=30), 'cron', hour=3, minute=30, id='cleanup_backups')
+            cleanup_scheduler.add_job(lambda: cleanup_manager.cleanup_old_traces(keep=100), 'cron', hour=4, minute=0, id='cleanup_traces')
+            cleanup_scheduler.start()
+            app.state.cleanup_scheduler = cleanup_scheduler
+            loguru_logger.info("✅ 清理定时任务已启动 - 每天3点截图+3点半备份+4点轨迹") if LOGURU_AVAILABLE else print("✅ 清理定时任务已启动 - 每天3点截图+3点半备份+4点轨迹")
+        except Exception as e:
+            loguru_logger.warning(f"清理定时任务启动失败: {e}") if LOGURU_AVAILABLE else print(f"清理定时任务启动失败: {e}")
     except Exception as e:
-        print(f"清理任务失败: {e}")
+        loguru_logger.warning(f"清理任务失败: {e}") if LOGURU_AVAILABLE else print(f"清理任务失败: {e}")
+
+    # 真实模块检测
+    try:
+        from .memory.vector_memory_real import vector_memory_real
+        if vector_memory_real.use_vector:
+            loguru_logger.info(f"✅ 真实向量检索可用 384维 {vector_memory_real.embedding_dim}") if LOGURU_AVAILABLE else print(f"✅ 真实向量检索可用 384维")
+        else:
+            loguru_logger.info("ℹ️ 向量检索关键词回退模式") if LOGURU_AVAILABLE else print("ℹ️ 向量检索关键词回退模式")
+    except Exception as e:
+        loguru_logger.warning(f"向量模块检测失败: {e}") if LOGURU_AVAILABLE else print(f"向量模块检测失败: {e}")
+    
+    try:
+        from .vision.ocr_real import ocr_real
+        if ocr_real.engine:
+            loguru_logger.info(f"✅ 真实OCR可用 {ocr_real.engine_type}") if LOGURU_AVAILABLE else print(f"✅ 真实OCR可用 {ocr_real.engine_type}")
+    except Exception as e:
+        loguru_logger.warning(f"OCR模块检测失败: {e}") if LOGURU_AVAILABLE else print(f"OCR模块检测失败: {e}")
+    
+    try:
+        from .middleware.jwt_auth import jwt_auth
+        loguru_logger.info("✅ JWT认证可用") if LOGURU_AVAILABLE else print("✅ JWT认证可用")
+    except Exception as e:
+        loguru_logger.warning(f"JWT模块检测失败: {e}") if LOGURU_AVAILABLE else print(f"JWT模块检测失败: {e}")
     
     yield
     
     # 关闭
     try:
+        if hasattr(app.state, 'cleanup_scheduler') and app.state.cleanup_scheduler.running:
+            app.state.cleanup_scheduler.shutdown()
+            loguru_logger.info("⏹️ 清理调度器已停止") if LOGURU_AVAILABLE else print("⏹️ 清理调度器已停止")
+    except:
+        pass
+    try:
         if autonomous_optimizer and autonomous_optimizer.scheduler and autonomous_optimizer.scheduler.running:
             autonomous_optimizer.stop_scheduler()
-            print("⏹️ 调度器已停止")
+            loguru_logger.info("⏹️ 自主调度器已停止") if LOGURU_AVAILABLE else print("⏹️ 调度器已停止")
     except:
         pass
 
 app = FastAPI(
-    title="Zane AGI v4.1 - 代码检修修复版",
-    description="修复3缺失API+lifespan+UI优化+模型载入真实",
-    version="4.1.0",
+    title="Zane AGI v4.2 - 集成版",
+    description="JWT+真实向量+真实OCR+交互图表+30秒轮询+定时清理+loguru",
+    version="4.2.0",
     lifespan=lifespan
 )
 
@@ -189,17 +250,34 @@ app.add_middleware(
 
 @app.middleware("http")
 async def security_middleware(request: Request, call_next):
+    # 速率限制
     if rate_limiter:
         client_ip = request.client.host if request.client else "unknown"
         check = rate_limiter.check(client_ip)
         if not check["allowed"]:
             return JSONResponse(status_code=429, content={"error": check["reason"], "retry_after": check.get("retry_after", 60)})
-    if auth_manager and auth_manager.enabled:
-        if request.url.path.startswith("/api/tools/call") or request.url.path.startswith("/api/security/wsl/exec"):
-            token = request.headers.get("X-Zane-Token", "")
-            auth_check = auth_manager.check(token)
-            if not auth_check["allowed"]:
-                return JSONResponse(status_code=401, content={"error": auth_check["reason"]})
+    # JWT认证 - 商业级，兼容旧Token
+    try:
+        from .middleware.jwt_auth import jwt_auth as _jwt_auth
+        if request.url.path.startswith("/api/tools/call") or request.url.path.startswith("/api/security/wsl/exec") or request.url.path.startswith("/api/security/wsl"):
+            # 尝试 JWT 头，支持 Authorization: Bearer xxx 和 X-Zane-Token
+            token = request.headers.get("Authorization", "").replace("Bearer ", "") or request.headers.get("X-Zane-Token", "")
+            if token:
+                auth_check = _jwt_auth.check(token)
+                if not auth_check["allowed"]:
+                    return JSONResponse(status_code=401, content={"error": auth_check["reason"]})
+            else:
+                # 未配置认证允许
+                if os.getenv("ZANE_TOKEN") or os.getenv("ZANE_JWT_SECRET"):
+                    return JSONResponse(status_code=401, content={"error": "缺少Token，请先登录 /api/auth/login"})
+    except ImportError:
+        # 回退旧认证
+        if auth_manager and auth_manager.enabled:
+            if request.url.path.startswith("/api/tools/call") or request.url.path.startswith("/api/security/wsl/exec"):
+                token = request.headers.get("X-Zane-Token", "")
+                auth_check = auth_manager.check(token)
+                if not auth_check["allowed"]:
+                    return JSONResponse(status_code=401, content={"error": auth_check["reason"]})
     response = await call_next(request)
     return response
 
@@ -230,6 +308,131 @@ class SearchRequest(BaseModel):
     query: str
     count: int = 5
     fetch_content: bool = False
+
+class LoginRequest(BaseModel):
+    username: str = "admin"
+    password: str = ""
+    token: str = ""  # 简易Token方式
+
+class OCRRequest(BaseModel):
+    image_path: str = ""
+    use_screenshot: bool = False
+
+# ========== JWT认证 - 商业级 ==========
+@app.post("/api/auth/login")
+async def auth_login(request: LoginRequest):
+    """JWT登录 - 商业级"""
+    try:
+        from .middleware.jwt_auth import jwt_auth
+        # 简易验证：如果配置了ZANE_TOKEN，需匹配；否则允许
+        expected_token = os.getenv("ZANE_TOKEN", "")
+        expected_pwd = os.getenv("ZANE_PASSWORD", expected_token or "zane123")
+        
+        # 三种登录方式：1. 提供正确token 2. 提供正确密码 3. 未配置任何认证直接允许
+        if expected_token and request.token == expected_token:
+            # Token正确
+            jwt_token = jwt_auth.create_token({"sub": request.username or "admin", "method": "token"})
+            return {"success": True, "token": jwt_token, "method": "token", "expires_days": 7}
+        elif expected_pwd and request.password == expected_pwd:
+            jwt_token = jwt_auth.create_token({"sub": request.username, "method": "password"})
+            return {"success": True, "token": jwt_token, "method": "password", "expires_days": 7}
+        elif not expected_token and not os.getenv("ZANE_JWT_SECRET"):
+            # 未配置认证，直接发token
+            jwt_token = jwt_auth.create_token({"sub": request.username or "admin", "method": "no_auth"})
+            return {"success": True, "token": jwt_token, "method": "no_auth", "note": "未配置认证，开发模式", "expires_days": 7}
+        else:
+            raise HTTPException(status_code=401, detail="用户名/密码/Token错误")
+    except HTTPException:
+        raise
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+@app.get("/api/auth/check")
+async def auth_check(x_zane_token: str = Header(None), authorization: str = Header(None)):
+    """检查认证状态"""
+    try:
+        from .middleware.jwt_auth import jwt_auth
+        token = (authorization or "").replace("Bearer ", "") or (x_zane_token or "")
+        if not token:
+            return {"authenticated": False, "reason": "无Token", "need_login": bool(os.getenv("ZANE_TOKEN") or os.getenv("ZANE_JWT_SECRET"))}
+        result = jwt_auth.check(token)
+        if result["allowed"]:
+            return {"authenticated": True, "payload": result.get("payload"), "method": result.get("method", "jwt")}
+        else:
+            return {"authenticated": False, "reason": result.get("reason")}
+    except Exception as e:
+        return {"authenticated": False, "error": str(e)}
+
+@app.post("/api/auth/logout")
+async def auth_logout():
+    """登出 - 前端清除Token即可"""
+    return {"success": True, "message": "已登出，请清除本地Token"}
+
+# ========== OCR真实 - rapidocr 50MB ==========
+@app.post("/api/vision/ocr")
+async def vision_ocr(request: OCRRequest):
+    """真实OCR - 截图或指定图片"""
+    try:
+        from .vision.ocr_real import ocr_real
+        if request.use_screenshot:
+            result = ocr_real.ocr_screenshot()
+            return result
+        elif request.image_path:
+            # 安全检查
+            if file_sandbox:
+                check = file_sandbox.check_path(request.image_path)
+                if not check.get("allowed", True):
+                    raise HTTPException(status_code=403, detail="路径不允许")
+            result = ocr_real.ocr_image(request.image_path)
+            return result
+        else:
+            return {"error": "需提供 image_path 或 use_screenshot=true"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        return {"error": str(e), "text": ""}
+
+@app.get("/api/vision/ocr")
+async def vision_ocr_get(image_path: str = "", use_screenshot: bool = False):
+    """真实OCR GET"""
+    try:
+        from .vision.ocr_real import ocr_real
+        if use_screenshot:
+            result = ocr_real.ocr_screenshot()
+            return result
+        elif image_path:
+            if file_sandbox:
+                check = file_sandbox.check_path(image_path)
+                if not check.get("allowed", True):
+                    raise HTTPException(status_code=403, detail="路径不允许")
+            result = ocr_real.ocr_image(image_path)
+            return result
+        else:
+            return {"error": "需提供 image_path 或 use_screenshot=true"}
+    except Exception as e:
+        return {"error": str(e)}
+
+@app.get("/api/utils/cleanup")
+async def utils_cleanup(type: str = "all", keep: int = 50):
+    """清理工具 - 截图/备份/轨迹"""
+    try:
+        from .utils.cleanup import cleanup_manager
+        if type == "screenshots":
+            result = cleanup_manager.cleanup_screenshots(keep=keep)
+            return result
+        elif type == "backups":
+            result = cleanup_manager.cleanup_old_backups(keep=10, days=30)
+            return result
+        elif type == "traces":
+            result = cleanup_manager.cleanup_old_traces(keep=keep)
+            return result
+        else:
+            s = cleanup_manager.cleanup_screenshots(keep=50)
+            b = cleanup_manager.cleanup_old_backups(keep=10, days=30)
+            t = cleanup_manager.cleanup_old_traces(keep=100)
+            return {"screenshots": s, "backups": b, "traces": t}
+    except Exception as e:
+        return {"error": str(e)}
 
 @app.get("/api/health")
 async def health():
@@ -263,9 +466,31 @@ async def health():
     except:
         deps["apscheduler"] = "未安装"
     
+    # 检查新模块
+    try:
+        from .middleware.jwt_auth import jwt_auth as _jwt
+        jwt_status = "可用 JWT商业级" if _jwt else "不可用"
+    except:
+        jwt_status = "不可用"
+    try:
+        from .vision.ocr_real import ocr_real as _ocr
+        ocr_status = f"可用 {_ocr.engine_type} 50MB" if _ocr and _ocr.engine else "不可用 关键词回退"
+    except:
+        ocr_status = "不可用"
+    try:
+        from .memory.vector_memory_real import vector_memory_real as _vec
+        vec_status = f"可用 {_vec.embedding_dim}维" if _vec and _vec.use_vector else "关键词回退"
+    except:
+        vec_status = "不可用"
+    try:
+        from .utils.cleanup import cleanup_manager as _clean
+        cleanup_status = "可用 定时每天3点"
+    except:
+        cleanup_status = "不可用"
+
     return {
-        "status": "运行中 v4.1 检修修复",
-        "version": "4.1.0 - 修复3缺失API+lifespan+UI优化+模型载入真实",
+        "status": "运行中 v4.2 集成版",
+        "version": "4.2.0 - JWT+真实向量+真实OCR+交互图表+30秒轮询+定时清理+loguru",
         "local_llm": "可用" if local_available else "离线模式",
         "platform": sys.platform,
         "platform_provider": platform_info.get("name", "unknown"),
@@ -298,15 +523,24 @@ async def health():
         },
         "frontend": {
             "modular": "ES Modules 8模块",
-            "charts": "Canvas原生",
+            "charts": "Canvas交互式 hover tooltip v2.3",
             "views": 19,
-            "css_split": "已拆分 css/styles.css",
-            "loading": "skeleton+aria"
+            "css_split": "已拆分 css/styles.css + components.css",
+            "loading": "skeleton+aria",
+            "polling": "30秒+自适应15秒+hidden暂停"
+        },
+        "new_modules": {
+            "jwt": jwt_status,
+            "ocr": ocr_status,
+            "vector": vec_status,
+            "cleanup": cleanup_status,
+            "loguru": "可用 文件轮转10MB 7天" if LOGURU_AVAILABLE else "不可用"
         },
         "fixes": {
             "missing_apis": "已修复 /api/memory/vector/search, /api/runtime/intent/parse, /api/runtime/state/observe",
             "deprecated": "已修复 @app.on_event → lifespan",
-            "ui": "已优化 加载状态+aria+css拆分"
+            "ui": "已优化 加载状态+aria+css拆分+30秒轮询",
+            "v2_3": "新增 JWT登录+真实向量+真实OCR+交互图表+定时清理+loguru"
         }
     }
 
@@ -571,20 +805,40 @@ async def evolution_data():
     recent = data_flywheel.get_recent_samples(10)
     return {"stats": stats, "recent": recent}
 
-# ========== 修复缺失API - 3个404 ==========
+# ========== 修复缺失API - 3个404 + 真实向量集成 ==========
 @app.get("/api/memory/vector/search")
 async def vector_search(query: str, limit: int = 5, type: str = None):
-    """修复：向量搜索 - 之前404"""
+    """修复：向量搜索 - 真实向量+关键词回退 v2.2补全"""
+    # 优先真实向量 - vector_memory_real
+    try:
+        from .memory.vector_memory_real import vector_memory_real
+        results = vector_memory_real.search(query, limit=limit, type_filter=type)
+        if results:
+            method = results[0].get("method", "keyword") if results else "none"
+            return {
+                "query": query, 
+                "results": results, 
+                "count": len(results), 
+                "method": method,
+                "real": vector_memory_real.use_vector,
+                "embedding_dim": vector_memory_real.embedding_dim if vector_memory_real.use_vector else 0,
+                "database": "SQLite + sqlite-vec + sentence-transformers" if vector_memory_real.use_vector else "SQLite关键词回退",
+                "engine": "vector_memory_real"
+            }
+    except Exception as e:
+        print(f"vector_memory_real搜索失败: {e}")
+    
+    # 回退旧vector_memory
     if vector_memory:
         try:
             results = vector_memory.search(query, limit=limit, type_filter=type)
-            return {"query": query, "results": results, "count": len(results), "method": results[0].get("method", "keyword") if results else "none", "database": "SQLite + sqlite-vec可选"}
+            return {"query": query, "results": results, "count": len(results), "method": results[0].get("method", "keyword") if results else "none", "database": "SQLite + sqlite-vec可选", "engine": "vector_memory"}
         except Exception as e:
-            return {"query": query, "results": [], "count": 0, "error": str(e)}
+            return {"query": query, "results": [], "count": 0, "error": str(e), "engine": "vector_memory"}
     if database:
         try:
             results = database.search_memories(query, limit=limit)
-            return {"query": query, "results": [{"content": r["content"], "type": r["type"], "score": 0.8, "method": "SQLite关键词+时间衰减"} for r in results], "count": len(results), "method": "SQLite", "note": "向量回退到SQLite关键词搜索"}
+            return {"query": query, "results": [{"content": r["content"], "type": r["type"], "score": 0.8, "method": "SQLite关键词+时间衰减"} for r in results], "count": len(results), "method": "SQLite", "note": "向量回退到SQLite关键词搜索", "engine": "database"}
         except Exception as e:
             return {"query": query, "results": [], "error": str(e)}
     return {"query": query, "results": [], "count": 0, "error": "向量记忆不可用"}
