@@ -121,8 +121,19 @@ def get_modules():
 
 class ToolCallRequest(BaseModel):
     tool_name: str
-    parameters: Dict[str, Any]
+    parameters: Dict[str, Any] = {}
     auto_confirm: bool = False
+    # 兼容前端可能传的额外字段
+    args: Dict[str, Any] = {}
+    params: Dict[str, Any] = {}
+    
+    def get_params(self) -> Dict[str, Any]:
+        # 合并parameters, args, params，兼容不同前端
+        merged = {}
+        merged.update(self.args or {})
+        merged.update(self.params or {})
+        merged.update(self.parameters or {})
+        return merged
 
 @router.get("/tools")
 async def list_tools():
@@ -145,7 +156,8 @@ async def call_tool(request: ToolCallRequest, x_zane_token: str = Header(None)):
     decision = None
     if mods['policy_engine']:
         try:
-            decision = mods['policy_engine'].decide(request.tool_name, request.parameters)
+            params = request.get_params() if hasattr(request, 'get_params') else request.parameters
+            decision = mods['policy_engine'].decide(request.tool_name, params)
             dec_action = decision.get("decision") or decision.get("action", "allow")
             if dec_action == "deny":
                 raise HTTPException(status_code=403, detail=f"被策略拒绝: {decision['reason']}")
@@ -158,7 +170,8 @@ async def call_tool(request: ToolCallRequest, x_zane_token: str = Header(None)):
 
     if mods['policy_firewall']:
         try:
-            policy = mods['policy_firewall'].check_permission(request.tool_name, request.parameters)
+            params = request.get_params() if hasattr(request, 'get_params') else request.parameters
+            policy = mods['policy_firewall'].check_permission(request.tool_name, params)
             if policy.action.value == "deny":
                 raise HTTPException(status_code=403, detail=policy.reason)
             if policy.action.value == "need_confirm" and not request.auto_confirm:
@@ -170,10 +183,11 @@ async def call_tool(request: ToolCallRequest, x_zane_token: str = Header(None)):
 
     start = time.time()
     try:
+        params = request.get_params() if hasattr(request, 'get_params') else request.parameters
         func = mods['TOOL_FUNCTIONS'].get(request.tool_name)
         if not func:
             raise HTTPException(status_code=404, detail=f"工具未实现: {request.tool_name}")
-        result = func(**request.parameters)
+        result = func(**params)
         exec_time = int((time.time() - start) * 1000)
         if mods['policy_firewall']:
             try:

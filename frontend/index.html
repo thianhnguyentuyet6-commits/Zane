@@ -32,12 +32,12 @@
 
 * { margin:0; padding:0; box-sizing:border-box; }
 html { font-family: 'Inter', -apple-system, sans-serif; -webkit-font-smoothing: antialiased; }
-body { background: var(--bg); color: var(--text); min-height: 100vh; overflow: hidden; position: relative; }
+body { background: var(--bg); color: var(--text); min-height: 100vh; overflow: auto; position: relative; }
 body::before { content: ''; position: fixed; inset: 0; background: var(--gradient-mesh); pointer-events: none; z-index: 0; }
 body::after { content: ''; position: fixed; inset: 0; background: radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(99,102,241,0.06), transparent 40%); pointer-events: none; z-index: 0; opacity: 0; transition: opacity 0.3s; }
 body:hover::after { opacity: 1; }
 
-.app { display: grid; grid-template-columns: 280px 1fr; height: 100vh; position: relative; z-index: 1; }
+.app { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; position: relative; z-index: 1; }
 
 /* Sidebar - Glassmorphism */
 .sidebar {
@@ -48,7 +48,7 @@ body:hover::after { opacity: 1; }
   display: flex;
   flex-direction: column;
   position: relative;
-  overflow: hidden;
+  overflow: auto;
 }
 .sidebar::before {
   content: ''; position: absolute; inset: 0;
@@ -86,7 +86,7 @@ body:hover::after { opacity: 1; }
   align-items: center;
   gap: 10px;
   position: relative;
-  overflow: hidden;
+  overflow: auto;
 }
 .status-card::before {
   content: ''; position: absolute; inset: 0;
@@ -113,7 +113,7 @@ body:hover::after { opacity: 1; }
   color: var(--text-secondary); border-radius: 10px;
   cursor: pointer; font-size: 13px; font-weight: 500;
   text-align: left; width: 100%; transition: all 0.2s cubic-bezier(0.16,1,0.3,1);
-  position: relative; overflow: hidden;
+  position: relative; overflow: auto;
 }
 .nav-item::before {
   content: ''; position: absolute; inset: 0; background: var(--surface);
@@ -134,8 +134,8 @@ body:hover::after { opacity: 1; }
 .resource-header { display: flex; justify-content: space-between; font-size: 11px; }
 .resource-label { color: var(--text-tertiary); font-weight: 500; }
 .resource-value { color: var(--text-secondary); font-weight: 600; font-family: 'JetBrains Mono', monospace; }
-.resource-bar { height: 4px; background: rgba(255,255,255,0.06); border-radius: 20px; overflow: hidden; position: relative; }
-.resource-fill { height: 100%; border-radius: 20px; transition: width 0.5s cubic-bezier(0.16,1,0.3,1); position: relative; overflow: hidden; }
+.resource-bar { height: 4px; background: rgba(255,255,255,0.06); border-radius: 20px; overflow: auto; position: relative; }
+.resource-fill { height: 100%; border-radius: 20px; transition: width 0.5s cubic-bezier(0.16,1,0.3,1); position: relative; overflow: auto; }
 .resource-fill::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); animation: shimmer 2s infinite; }
 .resource-fill.cpu { background: var(--gradient-2); }
 .resource-fill.mem { background: var(--gradient-1); }
@@ -176,7 +176,7 @@ body:hover::after { opacity: 1; }
 .section { margin-bottom: 32px; }
 .section-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
 .section-title { font-size: 20px; font-weight: 700; letter-spacing: -0.02em; display: flex; align-items: center; gap: 12px; }
-.section-title-icon { width: 36px; height: 36px; border-radius: 10px; background: var(--surface); border: 1px solid var(--border); display: grid; place-items: center; position: relative; overflow: hidden; }
+.section-title-icon { width: 36px; height: 36px; border-radius: 10px; background: var(--surface); border: 1px solid var(--border); display: grid; place-items: center; position: relative; overflow: auto; }
 .section-title-icon::before { content: ''; position: absolute; inset: 0; background: var(--gradient-1); opacity: 0.1; }
 .section-desc { font-size: 13px; color: var(--text-secondary); margin-top: 4px; line-height: 1.5; max-width: 60ch; }
 
@@ -184,7 +184,7 @@ body:hover::after { opacity: 1; }
 .card {
   background: var(--surface); backdrop-filter: blur(16px) saturate(180%);
   border: 1px solid var(--border); border-radius: 16px;
-  position: relative; overflow: hidden;
+  position: relative; overflow: auto;
   transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
 }
 .card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, transparent 100%); pointer-events: none; }
@@ -207,7 +207,7 @@ body:hover::after { opacity: 1; }
   background: radial-gradient(600px circle at 50% 50%, rgba(99,102,241,0.06), transparent),
               linear-gradient(180deg, var(--bg-soft) 0%, var(--bg) 100%);
   border: 1px solid var(--border); border-radius: 16px;
-  position: relative; overflow: hidden;
+  position: relative; overflow: auto;
 }
 .graph-canvas { width: 100%; height: 100%; display: block; }
 .graph-legend { position: absolute; bottom: 12px; left: 12px; display: flex; gap: 12px; background: var(--surface); backdrop-filter: blur(12px); border: 1px solid var(--border); border-radius: 10px; padding: 8px 12px; font-size: 11px; }
@@ -225,7 +225,7 @@ body:hover::after { opacity: 1; }
 .list-icon { width: 36px; height: 36px; border-radius: 10px; background: var(--surface); border: 1px solid var(--border); display: grid; place-items: center; flex-shrink: 0; }
 .list-content { flex: 1; min-width: 0; }
 .list-title { font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 8px; }
-.list-desc { font-size: 11px; color: var(--text-secondary); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.list-desc { font-size: 11px; color: var(--text-secondary); margin-top: 2px; white-space: nowrap; overflow: auto; text-overflow: ellipsis; }
 .list-meta { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 
 .badge { display: inline-flex; align-items: center; padding: 3px 8px; border-radius: 20px; font-size: 10px; font-weight: 600; background: rgba(255,255,255,0.08); border: 1px solid var(--border); color: var(--text-secondary); }
@@ -247,7 +247,7 @@ body:hover::after { opacity: 1; }
 
 /* Chat */
 .chat { display: grid; grid-template-columns: 1fr 340px; gap: 20px; height: calc(100vh - 64px - 56px); max-height: 800px; }
-.chat-main { display: flex; flex-direction: column; background: var(--surface); backdrop-filter: blur(16px); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+.chat-main { display: flex; flex-direction: column; background: var(--surface); backdrop-filter: blur(16px); border: 1px solid var(--border); border-radius: 16px; overflow: auto; }
 .chat-messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 20px; }
 .message { display: flex; gap: 12px; }
 .message-avatar { width: 32px; height: 32px; border-radius: 10px; background: var(--gradient-1); display: grid; place-items: center; font-weight: 700; font-size: 13px; color: white; flex-shrink: 0; box-shadow: 0 2px 8px var(--primary-glow); }
@@ -297,14 +297,14 @@ body:hover::after { opacity: 1; }
         <div class="logo-icon">Z</div>
         <div class="logo-text">
           <div class="logo-title">Zane</div>
-          <div class="logo-subtitle">Windows智能管家 · 110API</div>
+          <div class="logo-subtitle">Windows智能管家</div>
         </div>
       </div>
       <div class="status-card">
         <div class="status-dot"></div>
         <div class="status-info">
           <div class="status-label">运行中 · WMI真实</div>
-          <div class="status-desc">110API · iOS默认禁用 · 8GB支持</div>
+          <div class="status-desc">本地运行 · 离线优先</div>
         </div>
         <div class="badge badge-success">在线</div>
       </div>
@@ -392,8 +392,8 @@ body:hover::after { opacity: 1; }
         </div>
       </div>
       <div class="topbar-actions">
-        <button class="btn btn-glass">110API</button>
-        <button class="btn btn-primary">Windows专注</button>
+        <button class="btn btn-glass">系统</button>
+        <button class="btn btn-primary">Windows</button>
       </div>
     </div>
 
@@ -432,14 +432,14 @@ body:hover::after { opacity: 1; }
           <div style="display: flex; flex-direction: column; gap: 16px;">
             <div class="card">
               <div class="card-header">
-                <div class="card-title">✨ 新特性</div>
-                <span class="badge" style="background: var(--gradient-1); color: white; border: none;">Impeccable</span>
+                <div class="card-title">系统状态</div>
+                
               </div>
               <div class="card-body" style="font-size: 12px; line-height: 1.6; color: var(--text-secondary);">
-                毛玻璃+渐变+知识图谱重构<br>
-                WMI真实硬件监控<br>
-                记忆图谱可视化<br>
-                设置完全可交互
+                
+                
+                
+                运行正常
               </div>
             </div>
             
@@ -457,8 +457,8 @@ body:hover::after { opacity: 1; }
             
             <div class="card" style="background: var(--gradient-1); border: none; color: white;">
               <div class="card-body">
-                <div style="font-weight: 700; margin-bottom: 4px;">Windows PC专注</div>
-                <div style="font-size: 12px; opacity: 0.9; line-height: 1.5;">iOS默认禁用，专注PC真实WMI+Win32，8GB 3060ti支持，后端基础打牢</div>
+                <div style="font-weight: 700; margin-bottom: 4px;">运行状态</div>
+                <div style="font-size: 12px; opacity: 0.9; line-height: 1.5;">本地运行，离线优先，数据安全</div>
               </div>
             </div>
           </div>
@@ -469,7 +469,7 @@ body:hover::after { opacity: 1; }
       <div class="view" id="view-system">
         <div class="section">
           <div class="section-header">
-            <div><div class="section-title"><span class="section-title-icon">🖥️</span>系统状态</div><div class="section-desc">WMI真实硬件监控，CPU每核心+内存条+磁盘SMART+GPU</div></div>
+            <div><div class="section-title"><span class="section-title-icon">🖥️</span>系统状态</div><div class="section-desc">系统资源监控</div></div>
             <div style="display: flex; gap: 8px;"><button class="btn btn-glass" onclick="loadSystem()">刷新</button><button class="btn btn-primary" onclick="loadWindowsFoundation()">详情</button></div>
           </div>
           <div class="grid grid-4" id="system-grid">
@@ -532,7 +532,7 @@ body:hover::after { opacity: 1; }
             <div style="display: flex; gap: 8px;"><button class="btn btn-glass" onclick="loadMemory()">刷新</button><button class="btn btn-primary" onclick="drawKnowledgeGraph()">图谱</button><button class="btn" onclick="loadDreams()">DREAMS.md</button></div>
           </div>
           
-          <div class="card" style="padding: 0; overflow: hidden;">
+          <div class="card" style="padding: 0; overflow: auto;">
             <div class="graph-container">
               <canvas class="graph-canvas" id="knowledge-graph" width="800" height="400"></canvas>
               <div class="graph-legend">
@@ -565,7 +565,7 @@ body:hover::after { opacity: 1; }
             <div style="display: flex; gap: 8px;"><button class="btn btn-glass" onclick="loadDatabase()">刷新</button><button class="btn btn-primary" onclick="drawDatabaseGraph()">图谱</button></div>
           </div>
           
-          <div class="card" style="padding: 0; overflow: hidden;">
+          <div class="card" style="padding: 0; overflow: auto;">
             <div class="graph-container" style="height: 320px;">
               <canvas class="graph-canvas" id="database-graph" width="800" height="320"></canvas>
               <div class="graph-legend">
@@ -588,7 +588,7 @@ body:hover::after { opacity: 1; }
       <div class="view" id="view-evolution">
         <div class="section">
           <div class="section-header">
-            <div><div class="section-title"><span class="section-title-icon" style="background: var(--gradient-3);">🧬</span>进化</div><div class="section-desc">数据飞轮+崩溃恢复+SSE重连，阈值可配置+真实回放，8GB 3060ti支持</div></div>
+            <div><div class="section-title"><span class="section-title-icon" style="background: var(--gradient-3);">🧬</span>进化</div><div class="section-desc">数据飞轮+崩溃恢复+SSE重连，阈值可配置+真实回放，</div></div>
             <button class="btn btn-primary" onclick="runRealBenchmark()">真实回放评估</button>
           </div>
           <div class="grid grid-2">
@@ -659,7 +659,7 @@ body:hover::after { opacity: 1; }
                 </div>
                 
                 <div style="border-top: 1px solid var(--border); padding-top: 16px;">
-                  <div style="font-size: 12px; font-weight: 600; margin-bottom: 8px;">VRAM设置 · 8GB 3060ti支持</div>
+                  <div style="font-size: 12px; font-weight: 600; margin-bottom: 8px;">VRAM设置 · </div>
                   <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 6px;"><span>GPU显存</span><span id="vram-total">检测中...</span></div>
                   <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
                     <span style="font-size: 12px;">CPU Offload</span>
@@ -965,7 +965,8 @@ window.checkModelPath = async () => {
   const status = document.getElementById('model-path-status');
   status.textContent = '检测中...';
   try {
-    const data = await get('/api/platform/status');
+    let data = {platform:{system:'--', is_demo:true, is_windows:false}, tools_count:0};
+    try { data = await get('/api/platform/status'); } catch(e) { console.warn('platform/status失败', e); }
     const model = data.model || {};
     status.innerHTML = `GGUF: ${model.gguf?.path||'未配置'} ${model.gguf?.exists?'✅':'❌'}<br>HF: ${model.hf?.path||'未配置'} ${model.hf?.exists?'✅':'❌'}<br>VRAM: ${model.vram?.total_gb||0}GB 可用${model.vram?.available_gb||0}GB<br>推荐: ${model.vram?.recommended?.model||''} ${model.vram?.recommended?.note||''}`;
   } catch(e) {
@@ -1004,7 +1005,8 @@ window.checkResources = async () => {
   const el = document.getElementById('resource-check-result');
   el.textContent = '检测中...';
   try {
-    const data = await get('/api/system/state');
+    let data = {cpu:{total_percent:0, physical_cores:'--', logical_cores:'--', gpus:[]}, memory:{}, disks:[]};
+    try { data = await get('/api/system/state'); } catch(e) { console.warn('system/state失败', e); }
     const resources = await get('/api/evolution/status').catch(()=>({}));
     el.innerHTML = `CPU ${data.cpu?.percent||0}% 内存 ${data.memory?.percent||0}%<br>摄像头麦克风检测: ${resources.resources?.camera_mic ? '检测中' : '需Windows真实环境'}`;
   } catch(e) {
@@ -1231,19 +1233,27 @@ window.drawDatabaseGraph = () => {
   ctx.fillText('知识库关系图 · SQLite 8表 · WAL+filelock', 12, 18);
 };
 
-// Load functions - Windows focused, matching backend 110API
-window.loadSystem = async () => {
-  const grid = document.getElementById('system-grid');
-  if(!grid) return;
-  grid.innerHTML = '<div class="card"><div class="card-body"><div class="skeleton skeleton-text"></div></div></div>'.repeat(4);
+// Load functions - Windows focused, matching backend <div class="card"><div class="card-body"><div class="skeleton skeleton-text"></div></div></div>'.repeat(4);
   try {
-    const state = await get('/api/system/state');
-    const platform = await get('/api/platform/status').catch(()=>({platform:{}}));
+    let state = {};
+    let platform = {platform:{}};
+    try {
+        state = await get('/api/system/state');
+    } catch(e) {
+        console.warn('系统状态获取失败:', e);
+        state = {cpu:{total_percent:0, physical_cores:'--', logical_cores:'--', gpus:[]}, memory:{total_gb:'--', used_gb:'--'}, disks:[]};
+    }
+    try {
+        platform = await get('/api/platform/status');
+    } catch(e) {
+        console.warn('平台状态获取失败:', e);
+        platform = {platform:{system:'--', is_demo:true, is_windows:false}, tools_count:0, demo_tools:[]};
+    }
     grid.innerHTML = `
-      <div class="card" style="background: var(--gradient-2); border: none; color: white;"><div class="card-body"><div class="metric"><div class="metric-value" style="color: white; background: none; -webkit-text-fill-color: white;">${state.cpu?.total_percent||state.cpu?.percent||'--'}%</div><div class="metric-label" style="color: rgba(255,255,255,0.7);">CPU · WMI每核心真实</div></div><div style="font-size: 11px; margin-top: 8px; opacity: 0.8;">物理${state.cpu?.physical_cores||'--'}核 逻辑${state.cpu?.logical_cores||'--'}核 GPU${state.cpu?.gpus?.length||0}个</div></div></div>
+      <div class="card" style="background: var(--gradient-2); border: none; color: white;"><div class="card-body"><div class="metric"><div class="metric-value" style="color: white; background: none; -webkit-text-fill-color: white;">${state.cpu?.total_percent||state.cpu?.percent||'--'}%</div><div class="metric-label" style="color: rgba(255,255,255,0.7);">CPU</div></div><div style="font-size: 11px; margin-top: 8px; opacity: 0.8;">物理${state.cpu?.physical_cores||'--'}核 逻辑${state.cpu?.logical_cores||'--'}核 GPU${state.cpu?.gpus?.length||0}个</div></div></div>
       <div class="card"><div class="card-body"><div class="metric"><div class="metric-value">${state.memory?.physical?.percent||state.memory?.percent||'--'}%</div><div class="metric-label">内存 · 真实内存条</div></div><div style="font-size: 11px; margin-top: 8px; color: var(--text-secondary);">${state.memory?.physical?.total_gb||state.memory?.total_gb||'--'}GB总数 ${state.memory?.physical?.sticks?.length||0}条内存条</div></div></div>
-      <div class="card"><div class="card-body"><div class="metric"><div class="metric-value">${platform.platform?.is_windows?'Win':'Linux'}</div><div class="metric-label">平台 · ${platform.platform?.is_demo?'演示':'真实'}</div></div><div style="font-size: 11px; margin-top: 8px; color: var(--text-secondary);">${platform.platform?.system||''} · 110API Windows专注</div></div></div>
-      <div class="card"><div class="card-body"><div class="metric"><div class="metric-value">${state.disks?.length||0}</div><div class="metric-label">磁盘 · SMART</div></div><div style="font-size: 11px; margin-top: 8px; color: var(--text-secondary);">WMI真实 · 8GB 3060ti支持</div></div></div>
+      <div class="card"><div class="card-body"><div class="metric"><div class="metric-value">${platform.platform?.is_windows?'Win':'Linux'}</div><div class="metric-label">平台 · ${platform.platform?.is_demo?'演示':'真实'}</div></div><div style="font-size: 11px; margin-top: 8px; color: var(--text-secondary);">${platform.platform?.system||''} · Windows</div></div></div>
+      <div class="card"><div class="card-body"><div class="metric"><div class="metric-value">${state.disks?.length||0}</div><div class="metric-label">磁盘 · SMART</div></div><div style="font-size: 11px; margin-top: 8px; color: var(--text-secondary);">系统信息</div></div></div>
     `;
     document.getElementById('mini-cpu').textContent = (state.cpu?.total_percent||state.cpu?.percent||0)+'%';
     document.getElementById('mini-cpu-bar').style.width = (state.cpu?.total_percent||state.cpu?.percent||0)+'%';
@@ -1292,7 +1302,7 @@ window.loadWindows = async () => {
     let data;
     try { data = await get('/api/windows/windows-enhanced'); } catch { data = await get('/api/system/windows'); }
     if(monitor) monitor.innerHTML = `<div style="font-size: 12px;"><div style="display: flex; justify-content: space-between; margin-bottom: 4px;"><span>显示器</span><span>${data.monitor_count||1}个</span></div><div style="display: flex; justify-content: space-between; margin-bottom: 4px;"><span>窗口</span><span>${data.total||0}个</span></div><div style="display: flex; justify-content: space-between;"><span>真实</span><span class="badge ${data.real?'badge-success':''}">${data.real?'Win32真实':'演示'}</span></div><div style="font-size: 11px; color: var(--text-tertiary); margin-top: 8px;">DPI统一处理，多显示器测试</div></div>`;
-    if(grid) grid.innerHTML = (data.windows||[]).slice(0,6).map(w=>`<div class="card"><div class="card-header"><div class="card-title" style="max-width: 18ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${w.title||'无标题'}</div>${w.is_topmost?'<span class="badge badge-warning">置顶</span>':''}</div><div class="card-body" style="font-size: 11px;"><div style="display: flex; justify-content: space-between;"><span>HWND</span><span style="font-family: monospace;">${w.hwnd}</span></div><div style="display: flex; justify-content: space-between;"><span>位置</span><span>${w.rect?.left||0},${w.rect?.top||0}</span></div><div style="display: flex; justify-content: space-between;"><span>DPI</span><span>${w.dpi||96} ${w.dpi_scale||1}x</span></div></div><div class="card-footer"><button class="btn" style="height: 28px; font-size: 11px;" onclick="focusWindow(${w.hwnd})">聚焦</button><span style="font-size: 10px; color: var(--text-tertiary);">${w.class||''}</span></div></div>`).join('') || '<div class="card"><div class="card-body"><div class="empty"><div class="empty-title">无窗口</div></div></div></div>';
+    if(grid) grid.innerHTML = (data.windows||[]).slice(0,6).map(w=>`<div class="card"><div class="card-header"><div class="card-title" style="max-width: 18ch; overflow: auto; text-overflow: ellipsis; white-space: nowrap;">${w.title||'无标题'}</div>${w.is_topmost?'<span class="badge badge-warning">置顶</span>':''}</div><div class="card-body" style="font-size: 11px;"><div style="display: flex; justify-content: space-between;"><span>HWND</span><span style="font-family: monospace;">${w.hwnd}</span></div><div style="display: flex; justify-content: space-between;"><span>位置</span><span>${w.rect?.left||0},${w.rect?.top||0}</span></div><div style="display: flex; justify-content: space-between;"><span>DPI</span><span>${w.dpi||96} ${w.dpi_scale||1}x</span></div></div><div class="card-footer"><button class="btn" style="height: 28px; font-size: 11px;" onclick="focusWindow(${w.hwnd})">聚焦</button><span style="font-size: 10px; color: var(--text-tertiary);">${w.class||''}</span></div></div>`).join('') || '<div class="card"><div class="card-body"><div class="empty"><div class="empty-title">无窗口</div></div></div></div>';
   } catch(e) { if(grid) grid.innerHTML = `错误: ${e.message}`; }
 };
 
@@ -1362,26 +1372,10 @@ window.loadSettings = async () => {
   } catch(e) { console.error(e); }
 };
 
-window.loadIOS = async () => { /* iOS默认禁用 */ };
-
-// Init
-document.addEventListener('DOMContentLoaded', () => {
-  console.log('✅ Zane Beautiful - 毛玻璃+渐变+知识图谱，Windows PC专注版');
-  loadSystem();
-  loadWindowsFoundation();
-  drawKnowledgeGraph();
-  drawDatabaseGraph();
-  
-  fetch('/api/health').then(r=>r.json()).then(d=>{
-    document.getElementById('status-text').textContent = `运行中 · 110API · ${d.system_platform==='linux'?'Linux演示结构真实':'Windows真实'} · iOS禁用`;
-  }).catch(()=>{});
-  
-  setInterval(()=>{ if(document.hidden) return; const active = document.querySelector('.view.active'); if(active?.id==='view-system') loadSystem(); }, 30000);
-});
-</script>
+window.loadIOS = async () => { /* </script>
 
 <script>
-// ===== Tauri桌面端适配 v0914 - Windows PC专注 =====
+// ===== Tauri桌面端适配 v0914 -  =====
 const isTauri = !!window.__TAURI__;
 console.log('🖥️ Tauri桌面端:', isTauri);
 window.sendTauriNotification = async (title, body) => {

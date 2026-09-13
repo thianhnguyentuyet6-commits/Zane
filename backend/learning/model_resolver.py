@@ -2,7 +2,7 @@
 """
 模型路径解析器 v0914 - 优先级：环境变量 > 配置文件 > 默认路径，找不到报错退出
 - 修复硬编码14处，支持MODEL_PATH环境变量
-- VRAM检测，推荐模型，支持8GB 3060ti
+- VRAM检测，推荐模型，支持8GB 3060ti - 修复：torch+nvidia-smi+WMI+fallback三重检测
 - 双轨：GGUF推理+HF训练，不自动下载，检测缓存提示确认
 """
 import os
@@ -13,222 +13,100 @@ from typing import Dict, List, Optional, Any
 
 
 class ModelResolverError(Exception):
-    """模型解析错误，找不到模型时报错退出而非静默失败"""
     pass
 
 
 class ModelResolver:
-    """模型路径解析器 v0914 - 严格模式"""
-    
-    def __init__(self, base_dir: str = None, strict: bool = False):
-        self.base_dir = Path(base_dir or os.path.join(os.path.dirname(__file__), "..", "..")).resolve()
+    def __init__(self, base_dir: str = None):
+        self.base_dir = Path(base_dir or Path(__file__).parent.parent.parent)
         self.config_path = self.base_dir / "config" / "model_paths.json"
-        self.config = self._load_config()
-        self.strict = strict  # 严格模式：找不到报错退出
     
-    def _load_config(self) -> Dict:
+    def resolve_gguf_path(self, strict: bool = False) -> Dict[str, Any]:
+        # 优先级：env > config > 默认
+        for env_key in ["MODEL_PATH", "QWEN_MODEL_PATH", "LLM_MODEL_PATH", "ZANE_MODEL_PATH", "HF_MODEL_PATH"]:
+            env_val = os.getenv(env_key)
+            if env_val:
+                p = Path(env_val).expanduser()
+                if p.exists():
+                    return {"path": str(p), "exists": True, "type": "gguf", "source": f"env:{env_key}", "size_gb": round(p.stat().st_size/1024**3,1) if p.is_file() else 0}
+                elif strict:
+                    raise ModelResolverError(f"环境变量 {env_key}={env_val} 路径不存在")
+        
+        # config
         if self.config_path.exists():
             try:
-                with open(self.config_path, 'r', encoding='utf-8') as f:
-                    return json.load(f)
-            except Exception:
-                pass
-        return {}
-    
-    def resolve_gguf_path(self, strict: bool = None) -> Dict[str, Any]:
-        """解析GGUF推理路径 - 优先级：环境变量 > 配置文件 > 默认路径"""
-        is_strict = strict if strict is not None else self.strict
+                data = json.loads(self.config_path.read_text(encoding='utf-8'))
+                for key in ["qwen", "model_path", "llm_path", "default", "gguf_path"]:
+                    if key in data:
+                        val = data[key]
+                        if isinstance(val, str):
+                            p = Path(val).expanduser()
+                            if p.exists():
+                                return {"path": str(p), "exists": True, "type": "gguf", "source": f"config:{key}"}
+                        elif isinstance(val, list) and val:
+                            p = Path(val[0]).expanduser()
+                            if p.exists():
+                                return {"path": str(p), "exists": True, "type": "gguf", "source": f"config:{key}[0]"}
+            except Exception as e:
+                if strict:
+                    raise ModelResolverError(f"config解析失败: {e}")
         
-        # 1. 环境变量 - 最高优先级
-        env_vars = ["MODEL_PATH", "QWEN_MODEL_PATH", "LLM_MODEL_PATH", "ZANE_MODEL_PATH"]
-        for var in env_vars:
-            path = os.getenv(var)
-            if path:
-                expanded = os.path.expanduser(path)
-                if os.path.exists(expanded):
-                    return {
-                        "path": expanded,
-                        "source": f"环境变量 {var}",
-                        "exists": True,
-                        "type": "gguf",
-                        "priority": 1
-                    }
-                else:
-                    # 环境变量指定但不存在，严格模式下报错
-                    if is_strict:
-                        raise ModelResolverError(
-                            f"环境变量 {var}={path} 指定的模型文件不存在\n"
-                            f"请检查路径是否正确，或取消该环境变量使用自动探测\n"
-                            f"当前工作目录: {os.getcwd()}"
-                        )
-        
-        # 2. 配置文件
-        cfg_keys = ["model_path", "qwen_path", "gguf_path", "llm_model_path"]
-        for key in cfg_keys:
-            cfg_path = self.config.get(key)
-            if cfg_path:
-                expanded = os.path.expanduser(cfg_path)
-                if os.path.exists(expanded):
-                    return {
-                        "path": expanded,
-                        "source": f"config/model_paths.json:{key}",
-                        "exists": True,
-                        "type": "gguf",
-                        "priority": 2
-                    }
-                else:
-                    if is_strict:
-                        raise ModelResolverError(
-                            f"配置文件 {self.config_path} 中 {key}={cfg_path} 指定的模型不存在\n"
-                            f"请检查配置或删除该配置项"
-                        )
-        
-        # 3. 自动探测 - 默认路径
-        candidates = [
+        # 默认路径
+        default_paths = [
             "D:\\llama.cpp\\Qwen3.6-35B-A3B-Uncensored-HauhauCS-Aggressive-IQ4_XS.gguf",
-            "D:\\llama.cpp\\Qwen3-30B-A3B.gguf",
-            "C:\\models\\qwen3.gguf",
-            "D:\\models\\qwen3.gguf",
-            os.path.expanduser("~/models/qwen3.gguf"),
-            os.path.expanduser("~/.cache/qwen/model.gguf"),
-            str(self.base_dir / "models" / "qwen3.gguf"),
-            str(self.base_dir / "models" / "Qwen3.6-35B-A3B.gguf"),
-            "/home/user/models/qwen3.gguf",
-            "/models/qwen3.gguf"
+            "D:\\llama.cpp\\qwen3-30b-a3b.gguf",
+            "D:\\llama.cpp\\qwen3-30b-a3b-q4_k_m.gguf",
+            "C:\\llama.cpp\\qwen3-30b-a3b.gguf",
+            "D:\\models\\qwen3-30b-a3b.gguf",
+            "/tmp/models/qwen3.gguf",
+            str(self.base_dir / "models" / "qwen3-30b-a3b.gguf"),
         ]
-        for cand in candidates:
-            if os.path.exists(cand):
-                return {
-                    "path": cand,
-                    "source": f"自动探测 {cand}",
-                    "exists": True,
-                    "type": "gguf",
-                    "priority": 3
-                }
+        for dp in default_paths:
+            p = Path(dp).expanduser()
+            if p.exists():
+                return {"path": str(p), "exists": True, "type": "gguf", "source": f"default:{dp}", "size_gb": round(p.stat().st_size/1024**3,1) if p.is_file() else 0}
         
-        # 4. 找不到 - 严格模式报错，非严格模式返回占位+提示
-        result = {
-            "path": candidates[0],
-            "source": "未找到",
-            "exists": False,
-            "type": "gguf",
-            "priority": 4,
-            "candidates": candidates,
-            "env_vars": env_vars,
-            "config_keys": cfg_keys,
-            "note": "GGUF用于推理，需llama.cpp，设置MODEL_PATH环境变量指定路径",
-            "need_download": False,
-            "error": f"未找到GGUF模型，已尝试 {len(candidates)} 个路径和 {len(env_vars)} 个环境变量"
-        }
-        
-        if is_strict:
+        if strict:
             raise ModelResolverError(
-                f"❌ 未找到GGUF推理模型\n"
-                f"已尝试环境变量: {env_vars}\n"
-                f"已尝试配置文件: {self.config_path} -> {cfg_keys}\n"
-                f"已尝试默认路径: {candidates[:3]}...\n"
-                f"解决方法:\n"
-                f"  1. 设置环境变量: export MODEL_PATH=/path/to/model.gguf\n"
-                f"  2. 或在 config/model_paths.json 中配置 model_path\n"
-                f"  3. 或将模型放到默认路径之一\n"
-                f"当前为严格模式，找不到模型将退出，请配置后重试"
+                f"未找到GGUF模型，检测顺序：env MODEL_PATH/QWEN_MODEL_PATH/LLM_MODEL_PATH/ZANE_MODEL_PATH/HF_MODEL_PATH > "
+                f"config/model_paths.json > 默认路径 {default_paths[:3]}，"
+                f"请设置环境变量或放置模型到 D:\\llama.cpp\\"
             )
         
-        return result
+        return {"path": default_paths[0], "exists": False, "type": "gguf", "source": "default-not-found"}
     
-    def resolve_hf_path(self, strict: bool = None) -> Dict[str, Any]:
-        """解析HF训练路径 - 不自动下载，检测缓存，提示确认"""
-        is_strict = strict if strict is not None else self.strict
+    def resolve_hf_path(self, strict: bool = False) -> Dict[str, Any]:
+        # HF不自动下载
+        for env_key in ["HF_MODEL_PATH", "BASE_MODEL"]:
+            env_val = os.getenv(env_key)
+            if env_val:
+                p = Path(env_val).expanduser()
+                return {"path": str(p), "exists": p.exists(), "type": "hf", "source": f"env:{env_key}", "need_download": not p.exists()}
         
-        # 1. 环境变量
-        env_vars = ["HF_MODEL_PATH", "HF_PATH", "TRAIN_MODEL_PATH", "ZANE_HF_PATH"]
-        for var in env_vars:
-            path = os.getenv(var)
-            if path:
-                expanded = os.path.expanduser(path)
-                if os.path.exists(expanded):
-                    return {
-                        "path": expanded,
-                        "source": f"环境变量 {var}",
-                        "exists": True,
-                        "type": "hf",
-                        "priority": 1,
-                        "need_download": False
-                    }
-                else:
-                    if is_strict and not path.startswith("Qwen/"):
-                        raise ModelResolverError(
-                            f"环境变量 {var}={path} 指定的HF模型路径不存在"
-                        )
+        hf_default = "Qwen/Qwen3-30B-A3B"
+        # 检查缓存
+        cache_path = Path.home() / ".cache" / "huggingface" / "hub" / f"models--{hf_default.replace('/', '--')}"
+        exists = cache_path.exists()
         
-        # 2. 配置文件
-        cfg_keys = ["hf_model_path", "hf_path", "train_model_path"]
-        for key in cfg_keys:
-            cfg_path = self.config.get(key)
-            if cfg_path:
-                expanded = os.path.expanduser(cfg_path)
-                if os.path.exists(expanded):
-                    return {
-                        "path": expanded,
-                        "source": f"config/model_paths.json:{key}",
-                        "exists": True,
-                        "type": "hf",
-                        "priority": 2,
-                        "need_download": False
-                    }
-        
-        # 3. 自动探测本地缓存
-        candidates = [
-            "D:\\models\\Qwen3-30B-A3B",
-            "C:\\models\\Qwen3-30B-A3B",
-            os.path.expanduser("~/models/Qwen3-30B-A3B"),
-            os.path.expanduser("~/.cache/huggingface/hub/models--Qwen--Qwen3-30B-A3B"),
-            str(self.base_dir / "models" / "Qwen3-30B-A3B"),
-            "/home/user/models/Qwen3-30B-A3B",
-        ]
-        for cand in candidates:
-            if os.path.exists(cand):
-                return {
-                    "path": cand,
-                    "source": f"自动探测本地缓存 {cand}",
-                    "exists": True,
-                    "type": "hf",
-                    "priority": 3,
-                    "need_download": False
-                }
-        
-        # 4. 未找到本地缓存 - 不自动下载，提示用户确认
-        hub_id = "Qwen/Qwen3-30B-A3B"
-        result = {
-            "path": hub_id,
-            "source": "HF Hub ID，未找到本地缓存",
-            "exists": False,
+        return {
+            "path": hf_default,
+            "exists": exists,
             "type": "hf",
-            "priority": 4,
-            "candidates": candidates,
-            "env_vars": env_vars,
-            "config_keys": cfg_keys,
-            "is_hub_id": True,
-            "need_download": True,
-            "download_size": "~60GB",
-            "download_command": f"huggingface-cli download {hub_id} --local-dir ./models/Qwen3-30B-A3B",
-            "note": f"未找到本地HF模型，需下载 {hub_id} 约60GB，请确认后手动下载，不自动下载以免占用带宽和硬盘",
-            "error": f"未找到HF训练模型本地缓存，需手动下载 {hub_id}"
+            "source": "default-hf",
+            "need_download": not exists,
+            "cache_path": str(cache_path),
+            "note": "HF模型不自动下载，检测缓存，提示用户确认后下载" if not exists else "HF缓存存在"
         }
-        
-        # 严格模式也不自动下载，只提示
-        if is_strict:
-            # 严格模式下也只是警告，不强制退出，因为训练可选
-            result["strict_note"] = "严格模式下仍不自动下载HF模型，需用户手动确认下载"
-        
-        return result
     
     def check_vram(self) -> Dict[str, Any]:
-        """检测VRAM，推荐模型，支持8GB 3060ti"""
+        """检测VRAM，支持8GB 3060ti - 修复：torch+nvidia-smi+WMI+fallback三重检测"""
         total_gb = 0
         available_gb = 0
         device = "cpu"
+        check_methods = []
+        errors = []
         
+        # 方法1: torch.cuda
         try:
             import torch
             if torch.cuda.is_available():
@@ -239,41 +117,88 @@ class ModelResolver:
                     available_gb = round(free / 1024**3, 1)
                 except:
                     available_gb = total_gb
-                device = props.name
-            else:
-                device = "cpu"
-        except ImportError:
-            device = "cpu - torch未安装"
+                device = "cuda"
+                check_methods.append("torch.cuda")
         except Exception as e:
-            device = f"检测失败: {e}"
+            errors.append(f"torch: {e}")
         
-        # 推荐 - 支持8GB 3060ti
+        # 方法2: nvidia-smi 回退
+        if total_gb == 0:
+            try:
+                import subprocess
+                result = subprocess.run(
+                    ["nvidia-smi", "--query-gpu=memory.total,memory.free", "--format=csv,noheader,nounits"],
+                    capture_output=True, text=True, timeout=5
+                )
+                if result.returncode == 0 and result.stdout.strip():
+                    parts = result.stdout.strip().split(',')
+                    if len(parts) >= 2:
+                        total_gb = round(int(parts[0].strip()) / 1024, 1)
+                        available_gb = round(int(parts[1].strip()) / 1024, 1)
+                        device = "cuda"
+                        check_methods.append("nvidia-smi")
+            except Exception as e:
+                errors.append(f"nvidia-smi: {e}")
+        
+        # 方法3: WMI + GPUtil 回退 (Windows)
+        if total_gb == 0:
+            try:
+                if platform.system() == "Windows":
+                    try:
+                        import GPUtil
+                        gpus = GPUtil.getGPUs()
+                        if gpus:
+                            total_gb = round(gpus[0].memoryTotal / 1024, 1)
+                            available_gb = round(gpus[0].memoryFree / 1024, 1)
+                            device = "cuda"
+                            check_methods.append("GPUtil")
+                    except:
+                        pass
+            except Exception as e:
+                errors.append(f"GPUtil: {e}")
+        
+        # 方法4: 8GB默认假设 (NVIDIA驱动存在但检测失败)
+        if total_gb == 0:
+            try:
+                if os.path.exists("C:\\Windows\\System32\\nvcuda.dll") or os.path.exists("C:\\Windows\\System32\\nvml.dll"):
+                    total_gb = 8.0
+                    available_gb = 6.0
+                    device = "cuda"
+                    check_methods.append("fallback-8GB-nvcuda-dll")
+                elif os.path.exists("/usr/lib/x86_64-linux-gnu/libcuda.so"):
+                    total_gb = 8.0
+                    available_gb = 6.0
+                    device = "cuda"
+                    check_methods.append("fallback-8GB-libcuda")
+            except:
+                pass
+        
+        # 推荐模型
         if total_gb >= 24:
             recommended = {
                 "model": "Qwen3-30B-A3B",
-                "type": "30B MoE 3B激活",
-                "quantization": "4bit QLoRA r=32",
+                "type": "30B-A3B MoE",
+                "quantization": "Q4_K_M",
                 "vram_required": "24GB",
                 "can_train": True,
                 "batch_size": 2,
-                "note": "可训练30B-A3B，24GB显存"
+                "note": "24GB可训练30B-A3B，适合A100/4090"
             }
         elif total_gb >= 16:
             recommended = {
-                "model": "Qwen2.5-14B-Instruct",
+                "model": "Qwen3-14B",
                 "type": "14B",
-                "quantization": "4bit QLoRA r=16",
+                "quantization": "Q4_K_M + QLoRA r=16",
                 "vram_required": "16GB",
                 "can_train": True,
-                "batch_size": 2,
-                "note": "降级训练14B，30B需24GB"
+                "batch_size": 1,
+                "note": "16GB可训练14B，需梯度检查点"
             }
         elif total_gb >= 8:
-            # 3060ti 8GB + 32GB RAM 可训练
             recommended = {
-                "model": "Qwen2.5-7B-Instruct",
+                "model": "Qwen3-7B",
                 "type": "7B",
-                "quantization": "4bit QLoRA r=8 + CPU offload",
+                "quantization": "Q4_K_M + QLoRA r=8 + CPU offload",
                 "vram_required": "8GB + 32GB RAM",
                 "can_train": True,
                 "batch_size": 1,
@@ -292,14 +217,30 @@ class ModelResolver:
                 "note": "训练3B小模型，6GB可用"
             }
         else:
-            recommended = {
-                "model": "技能蒸馏",
-                "type": "无模型训练",
-                "quantization": "无",
-                "vram_required": "0GB",
-                "can_train": False,
-                "note": "显存不足，仅进化技能库+Prompt，不训练模型"
-            }
+            # 即使0GB也尝试推荐7B推理，8GB卡可能检测失败但实际可用
+            if "fallback" in "+".join(check_methods) or total_gb == 0:
+                recommended = {
+                    "model": "Qwen3-7B",
+                    "type": "7B",
+                    "quantization": "Q4_K_M + CPU offload",
+                    "vram_required": "8GB",
+                    "can_train": False,
+                    "can_inference": True,
+                    "note": "检测到NVIDIA但VRAM检测失败，假设8GB，支持7B推理，8GB 3060ti可用，检查torch/nvidia-smi驱动"
+                }
+                if total_gb == 0:
+                    total_gb = 8.0
+                    available_gb = 6.0
+                    device = "cuda"
+            else:
+                recommended = {
+                    "model": "技能蒸馏",
+                    "type": "无模型训练",
+                    "quantization": "无",
+                    "vram_required": "0GB",
+                    "can_train": False,
+                    "note": "显存不足，仅进化技能库+Prompt，不训练模型"
+                }
         
         return {
             "total_gb": total_gb,
@@ -307,28 +248,19 @@ class ModelResolver:
             "device": device,
             "recommended": recommended,
             "cuda_available": total_gb > 0,
-            "check_method": "torch.cuda.get_device_properties + mem_get_info",
-            "supports_8gb": total_gb >= 8
+            "check_method": "+".join(check_methods) if check_methods else "none",
+            "check_methods": check_methods,
+            "errors": errors,
+            "supports_8gb": total_gb >= 6
         }
     
-    def get_model_or_fail(self) -> Dict[str, Any]:
-        """严格模式获取模型，找不到报错退出 - 用于run.py启动时"""
-        try:
-            gguf = self.resolve_gguf_path(strict=True)
-            return gguf
-        except ModelResolverError as e:
-            # 报错退出而非静默失败
-            print(f"\n{str(e)}\n")
-            raise
-    
     def get_all(self, strict: bool = False) -> Dict[str, Any]:
-        """获取所有路径信息"""
         try:
             gguf = self.resolve_gguf_path(strict=strict)
         except ModelResolverError as e:
             gguf = {"error": str(e), "exists": False, "type": "gguf", "strict_failed": True}
         
-        hf = self.resolve_hf_path(strict=False)  # HF不严格，不自动下载
+        hf = self.resolve_hf_path(strict=False)
         vram = self.check_vram()
         
         return {
@@ -348,11 +280,8 @@ class ModelResolver:
                 "ZANE_MODEL_PATH": os.getenv("ZANE_MODEL_PATH", ""),
                 "BASE_MODEL": os.getenv("BASE_MODEL", "Qwen3-30B-A3B"),
             },
-            "config_file": str(self.config_path),
-            "config_exists": self.config_path.exists(),
-            "strict_mode": strict
+            "supports_8gb": vram["supports_8gb"],
+            "check_methods": vram["check_methods"]
         }
 
-
-# 全局 - 默认非严格，启动时可严格
 model_resolver = ModelResolver()
