@@ -294,7 +294,7 @@ try:
         "cpu_offload": {str(cpu_offload).lower()},
         "trainer_stats": str(trainer_stats) if 'trainer_stats' in locals() else ""
     }}
-    with open(os.path.join(output_dir, "training_info.json"), 'w', encoding='utf-8') as f:
+    with open(os.path.join(output_dir, "training_info.json", encoding='utf-8', errors='ignore'), 'w', encoding='utf-8') as f:
         json.dump(info, f, ensure_ascii=False, indent=2)
     
     print("="*60)
@@ -350,9 +350,9 @@ except Exception as e:
                     log_f.write("SSE推送：前端可订阅 /api/evolution/stream\\n")
                 
                 Path(output_dir).mkdir(parents=True, exist_ok=True)
-                with open(Path(output_dir) / "adapter_config.json", 'w') as f:
+                with open(Path(output_dir, encoding='utf-8', errors='ignore') / "adapter_config.json", 'w') as f:
                     json.dump({"r": config.get("lora_rank", 32), "mock": True, "vram_gb": config.get("vram_gb", 0)}, f)
-                with open(Path(output_dir) / "training_info.json", 'w', encoding='utf-8') as f:
+                with open(Path(output_dir, encoding='utf-8', errors='ignore') / "training_info.json", 'w', encoding='utf-8') as f:
                     json.dump({"mock": True, "samples": config.get("samples", 0), "vram_gb": config.get("vram_gb", 0)}, f, ensure_ascii=False, indent=2)
                 
                 state = {

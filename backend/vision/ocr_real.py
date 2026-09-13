@@ -183,7 +183,7 @@ class OCRRealV0914:
             if engine == "tesseract":
                 import pytesseract
                 from PIL import Image
-                img = Image.open(image_path)
+                img = Image.open(image_path, encoding='utf-8', errors='ignore')
                 text = pytesseract.image_to_string(img, lang='chi_sim+eng')
                 return {
                     "success": True,

@@ -177,7 +177,7 @@ class DPIOCRUUnified:
                 from PIL import Image
                 
                 if image_path:
-                    img = Image.open(image_path)
+                    img = Image.open(image_path, encoding='utf-8', errors='ignore')
                     text = pytesseract.image_to_string(img, lang='chi_sim+eng')
                     result["text"] = text
                     result["engine"] = "tesseract"
