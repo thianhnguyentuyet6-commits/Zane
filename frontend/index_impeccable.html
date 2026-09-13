@@ -28,7 +28,7 @@
   --border-strong: #3f3f46;
   --text: #fafafa;
   --text-secondary: #a1a1aa;
-  --text-tertiary: #a1a1aa; /* Fixed contrast 4.5:1, was #71717a 3.9:1 per impeccable detector */
+  --text-tertiary: #71717a;
   --accent: #e4e4e7; /* Restrained - near white, not saturated */
   --accent-hover: #fafafa;
   --accent-active: #d4d4d8;
@@ -1121,11 +1121,11 @@ a:focus-visible,
     <div style="padding: var(--space-4); border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: var(--space-3);">
       <div style="display: flex; flex-direction: column; gap: var(--space-1);">
         <div style="display: flex; justify-content: space-between; font-size: var(--text-xs);"><span class="tertiary">CPU</span><span id="mini-cpu" class="small">--</span></div>
-        <div style="height: 2px; background: var(--border); border-radius: var(--radius-full); overflow: hidden;"><div id="mini-cpu-bar" style="height: 100%; background: var(--text); width: 0%; transition: transform var(--duration-base) var(--ease-out);"></div></div>
+        <div style="height: 2px; background: var(--border); border-radius: var(--radius-full); overflow: hidden;"><div id="mini-cpu-bar" style="height: 100%; background: var(--text); width: 0%; transition: width var(--duration-base) var(--ease-out);"></div></div>
       </div>
       <div style="display: flex; flex-direction: column; gap: var(--space-1);">
         <div style="display: flex; justify-content: space-between; font-size: var(--text-xs);"><span class="tertiary">内存</span><span id="mini-mem" class="small">--</span></div>
-        <div style="height: 2px; background: var(--border); border-radius: var(--radius-full); overflow: hidden;"><div id="mini-mem-bar" style="height: 100%; background: var(--text-secondary); width: 0%; transition: transform var(--duration-base) var(--ease-out);"></div></div>
+        <div style="height: 2px; background: var(--border); border-radius: var(--radius-full); overflow: hidden;"><div id="mini-mem-bar" style="height: 100%; background: var(--text-secondary); width: 0%; transition: width var(--duration-base) var(--ease-out);"></div></div>
       </div>
       <div class="small tertiary" style="line-height: 1.4; margin-top: var(--space-1);">
         Windows专注 · PC做好<br>前端写好 · 后端打牢<br>iOS默认禁用
