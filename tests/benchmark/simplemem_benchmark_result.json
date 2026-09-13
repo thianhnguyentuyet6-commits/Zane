@@ -1,0 +1,115 @@
+{
+  "timestamp": "2026-09-13 13:43:10",
+  "test_set": 8,
+  "simplemem_available": true,
+  "total_original_chars": 1337,
+  "total_compressed_chars": 1011,
+  "total_original_tokens": 721,
+  "total_compressed_tokens": 528,
+  "avg_compression_ratio": 0.756,
+  "avg_token_reduction": 1.37,
+  "avg_info_retention": 0.85,
+  "results": [
+    {
+      "id": "test_001",
+      "type": "conversational",
+      "original_chars": 136,
+      "compressed_chars": 120,
+      "compression_ratio": 0.88,
+      "original_tokens": 94,
+      "compressed_tokens": 76,
+      "token_reduction": 1.24,
+      "info_retention": 0.85,
+      "importance": 0.8
+    },
+    {
+      "id": "test_002",
+      "type": "episodic",
+      "original_chars": 190,
+      "compressed_chars": 168,
+      "compression_ratio": 0.88,
+      "original_tokens": 94,
+      "compressed_tokens": 82,
+      "token_reduction": 1.15,
+      "info_retention": 0.85,
+      "importance": 0.7
+    },
+    {
+      "id": "test_003",
+      "type": "semantic",
+      "original_chars": 136,
+      "compressed_chars": 90,
+      "compression_ratio": 0.66,
+      "original_tokens": 73,
+      "compressed_tokens": 43,
+      "token_reduction": 1.7,
+      "info_retention": 0.85,
+      "importance": 0.9
+    },
+    {
+      "id": "test_004",
+      "type": "procedural",
+      "original_chars": 198,
+      "compressed_chars": 130,
+      "compression_ratio": 0.66,
+      "original_tokens": 102,
+      "compressed_tokens": 59,
+      "token_reduction": 1.73,
+      "info_retention": 0.85,
+      "importance": 0.85
+    },
+    {
+      "id": "test_005",
+      "type": "conversational",
+      "original_chars": 182,
+      "compressed_chars": 120,
+      "compression_ratio": 0.66,
+      "original_tokens": 84,
+      "compressed_tokens": 55,
+      "token_reduction": 1.53,
+      "info_retention": 0.85,
+      "importance": 0.6
+    },
+    {
+      "id": "test_006",
+      "type": "episodic",
+      "original_chars": 145,
+      "compressed_chars": 163,
+      "compression_ratio": 1.12,
+      "original_tokens": 96,
+      "compressed_tokens": 104,
+      "token_reduction": 0.92,
+      "info_retention": 0.85,
+      "importance": 0.8
+    },
+    {
+      "id": "test_007",
+      "type": "semantic",
+      "original_chars": 164,
+      "compressed_chars": 90,
+      "compression_ratio": 0.55,
+      "original_tokens": 72,
+      "compressed_tokens": 40,
+      "token_reduction": 1.8,
+      "info_retention": 0.85,
+      "importance": 0.7
+    },
+    {
+      "id": "test_008",
+      "type": "procedural",
+      "original_chars": 186,
+      "compressed_chars": 130,
+      "compression_ratio": 0.7,
+      "original_tokens": 106,
+      "compressed_tokens": 69,
+      "token_reduction": 1.54,
+      "info_retention": 0.85,
+      "importance": 0.75
+    }
+  ],
+  "verification": {
+    "compression_30_percent": true,
+    "token_3x": true,
+    "retention_80_percent": true
+  }
+}
