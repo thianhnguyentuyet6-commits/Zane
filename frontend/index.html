@@ -135,7 +135,7 @@ body:hover::after { opacity: 1; }
 .resource-label { color: var(--text-tertiary); font-weight: 500; }
 .resource-value { color: var(--text-secondary); font-weight: 600; font-family: 'JetBrains Mono', monospace; }
 .resource-bar { height: 4px; background: rgba(255,255,255,0.06); border-radius: 20px; overflow: auto; position: relative; }
-.resource-fill { height: 100%; border-radius: 20px; transition: width 0.5s cubic-bezier(0.16,1,0.3,1); position: relative; overflow: auto; }
+.resource-fill { height: 100%; border-radius: 20px; transition: transform 0.5s cubic-bezier(0.16,1,0.3,1); position: relative; overflow: auto; }
 .resource-fill::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); animation: shimmer 2s infinite; }
 .resource-fill.cpu { background: var(--gradient-2); }
 .resource-fill.mem { background: var(--gradient-1); }
@@ -153,7 +153,7 @@ body:hover::after { opacity: 1; }
 .page-title-icon { width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center; background: var(--surface); border: 1px solid var(--border); }
 .topbar-actions { display: flex; align-items: center; gap: 8px; }
 
-.btn {
+.btn { min-height: 44px; min-width: 44px;
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;
   padding: 0 14px; height: 32px; border: 1px solid var(--border);
   background: var(--surface); backdrop-filter: blur(12px);
@@ -393,7 +393,7 @@ body:hover::after { opacity: 1; }
       </div>
       <div class="topbar-actions">
         <button class="btn btn-glass">系统</button>
-        <button class="btn btn-primary">Windows</button>
+        <button class="btn btn-primary" aria-label="发送消息">Windows</button>
       </div>
     </div>
 
@@ -424,7 +424,7 @@ body:hover::after { opacity: 1; }
               </div>
               <div class="input-row">
                 <textarea class="input" id="chat-input" placeholder="输入任务，比如：帮我整理下载文件夹，查看系统状态，显示记忆图谱..." rows="2"></textarea>
-                <button class="btn btn-primary" onclick="send()" style="height: 44px; padding: 0 20px;">发送</button>
+                <button class="btn btn-primary" aria-label="发送消息" onclick="send()" style="height: 44px; padding: 0 20px;">发送</button>
               </div>
             </div>
           </div>
@@ -470,7 +470,7 @@ body:hover::after { opacity: 1; }
         <div class="section">
           <div class="section-header">
             <div><div class="section-title"><span class="section-title-icon">🖥️</span>系统状态</div><div class="section-desc">系统资源监控</div></div>
-            <div style="display: flex; gap: 8px;"><button class="btn btn-glass" onclick="loadSystem()">刷新</button><button class="btn btn-primary" onclick="loadWindowsFoundation()">详情</button></div>
+            <div style="display: flex; gap: 8px;"><button class="btn btn-glass" onclick="loadSystem()">刷新</button><button class="btn btn-primary" aria-label="发送消息" onclick="loadWindowsFoundation()">详情</button></div>
           </div>
           <div class="grid grid-4" id="system-grid">
             <div class="card"><div class="card-body"><div class="skeleton skeleton-text"></div></div></div>
@@ -503,7 +503,7 @@ body:hover::after { opacity: 1; }
         <div class="section">
           <div class="section-header">
             <div><div class="section-title"><span class="section-title-icon">🪟</span>窗口管理</div><div class="section-desc">Win32真实HWND Z序DPI，多显示器支持，移动缩放</div></div>
-            <button class="btn btn-primary" onclick="loadWindows()">枚举窗口</button>
+            <button class="btn btn-primary" aria-label="发送消息" onclick="loadWindows()">枚举窗口</button>
           </div>
           <div class="grid grid-2">
             <div class="card"><div class="card-header"><div class="card-title">显示器</div></div><div class="card-body" id="monitor-info"><div class="skeleton skeleton-text"></div></div></div>
@@ -518,7 +518,7 @@ body:hover::after { opacity: 1; }
         <div class="section">
           <div class="section-header">
             <div><div class="section-title"><span class="section-title-icon">📁</span>文件管理</div><div class="section-desc">沙盒+重要性排序，回收站+可撤销，安全路径验证</div></div>
-            <div style="display: flex; gap: 8px;"><input class="input" id="file-path" value="/tmp" style="width: 240px;"><button class="btn btn-primary" onclick="loadFiles()">浏览</button></div>
+            <div style="display: flex; gap: 8px;"><input class="input" id="file-path" value="/tmp" style="width: 240px;"><button class="btn btn-primary" aria-label="发送消息" onclick="loadFiles()">浏览</button></div>
           </div>
           <div class="card"><div class="card-body" style="padding: 0;"><div class="list" id="file-list" style="padding: 8px 20px;"><div class="skeleton skeleton-text"></div></div></div></div>
         </div>
@@ -529,7 +529,7 @@ body:hover::after { opacity: 1; }
         <div class="section">
           <div class="section-header">
             <div><div class="section-title"><span class="section-title-icon" style="background: var(--gradient-1);">🧠</span>记忆图谱</div><div class="section-desc">4层记忆可视化，知识图谱，SimpleMem压缩+遗忘曲线+DREAMS.md</div></div>
-            <div style="display: flex; gap: 8px;"><button class="btn btn-glass" onclick="loadMemory()">刷新</button><button class="btn btn-primary" onclick="drawKnowledgeGraph()">图谱</button><button class="btn" onclick="loadDreams()">DREAMS.md</button></div>
+            <div style="display: flex; gap: 8px;"><button class="btn btn-glass" onclick="loadMemory()">刷新</button><button class="btn btn-primary" aria-label="发送消息" onclick="drawKnowledgeGraph()">图谱</button><button class="btn" onclick="loadDreams()">DREAMS.md</button></div>
           </div>
           
           <div class="card" style="padding: 0; overflow: auto;">
@@ -562,7 +562,7 @@ body:hover::after { opacity: 1; }
         <div class="section">
           <div class="section-header">
             <div><div class="section-title"><span class="section-title-icon" style="background: var(--gradient-2);">🗄️</span>知识库</div><div class="section-desc">SQLite唯一，8表，WAL+filelock，习惯学习+知识图谱</div></div>
-            <div style="display: flex; gap: 8px;"><button class="btn btn-glass" onclick="loadDatabase()">刷新</button><button class="btn btn-primary" onclick="drawDatabaseGraph()">图谱</button></div>
+            <div style="display: flex; gap: 8px;"><button class="btn btn-glass" onclick="loadDatabase()">刷新</button><button class="btn btn-primary" aria-label="发送消息" onclick="drawDatabaseGraph()">图谱</button></div>
           </div>
           
           <div class="card" style="padding: 0; overflow: auto;">
@@ -589,7 +589,7 @@ body:hover::after { opacity: 1; }
         <div class="section">
           <div class="section-header">
             <div><div class="section-title"><span class="section-title-icon" style="background: var(--gradient-3);">🧬</span>进化</div><div class="section-desc">数据飞轮+崩溃恢复+SSE重连，阈值可配置+真实回放，</div></div>
-            <button class="btn btn-primary" onclick="runRealBenchmark()">真实回放评估</button>
+            <button class="btn btn-primary" aria-label="发送消息" onclick="runRealBenchmark()">真实回放评估</button>
           </div>
           <div class="grid grid-2">
             <div class="card"><div class="card-header"><div class="card-title">数据飞轮</div></div><div class="card-body" id="evo-flywheel"><div class="skeleton skeleton-text"></div></div></div>
@@ -603,7 +603,7 @@ body:hover::after { opacity: 1; }
         <div class="section">
           <div class="section-header">
             <div><div class="section-title"><span class="section-title-icon">🛡️</span>安全中心</div><div class="section-desc">过滤100%+沙盒+待确认队列弹窗+路径PID验证+撤销端到端</div></div>
-            <div style="display: flex; gap: 8px;"><button class="btn btn-glass" onclick="loadSecurity()">扫描</button><button class="btn btn-primary" onclick="showPendingModal()">待确认队列</button></div>
+            <div style="display: flex; gap: 8px;"><button class="btn btn-glass" onclick="loadSecurity()">扫描</button><button class="btn btn-primary" aria-label="发送消息" onclick="showPendingModal()">待确认队列</button></div>
           </div>
           <div class="grid grid-2">
             <div class="card"><div class="card-header"><div class="card-title">沙盒</div><span class="badge badge-success">realpath+白名单</span></div><div class="card-body" id="sandbox-result"><div class="skeleton skeleton-text"></div></div></div>
@@ -617,7 +617,7 @@ body:hover::after { opacity: 1; }
         <div class="section">
           <div class="section-header">
             <div><div class="section-title"><span class="section-title-icon">📊</span>基准测试</div><div class="section-desc">20任务+真实回放，5分类，阈值0.8可配置，成功率评估</div></div>
-            <button class="btn btn-primary" onclick="runRealBenchmark()">真实回放</button>
+            <button class="btn btn-primary" aria-label="发送消息" onclick="runRealBenchmark()">真实回放</button>
           </div>
           <div class="card"><div class="card-body" id="bench-list"><div class="skeleton skeleton-text"></div></div></div>
         </div>
@@ -628,7 +628,7 @@ body:hover::after { opacity: 1; }
         <div class="section">
           <div class="section-header">
             <div><div class="section-title"><span class="section-title-icon">⚙️</span>设置</div><div class="section-desc">模型路径+调度器+阈值+记忆+资源监控，全部可交互配置</div></div>
-            <button class="btn btn-primary" onclick="saveAllSettings()">保存所有设置</button>
+            <button class="btn btn-primary" aria-label="发送消息" onclick="saveAllSettings()">保存所有设置</button>
           </div>
           
           <div class="grid grid-2">
@@ -1353,7 +1353,7 @@ window.loadSecurity = async () => { try { const data = await get('/api/security/
 
 window.showPendingModal = () => { alert('待确认队列弹窗\n每10秒轮询，自动弹出避免忽略\nAPI: /api/security/pending'); };
 
-window.loadBenchmark = async () => { const el = document.getElementById('bench-list'); if(!el) return; try { const data = await get('/api/benchmark'); el.innerHTML = `总数 ${data.stats?.total||0}<br>` + (data.tasks||[]).slice(0,8).map(t=>`<div class="list-item" style="padding: 8px 0;"><div style="font-size: 12px;">${t.id} ${t.title}</div></div>`).join('') + '<br><button class="btn btn-primary" onclick="runRealBenchmark()">真实回放评估</button>'; } catch(e) { el.innerHTML = `错误: ${e.message}`; } };
+window.loadBenchmark = async () => { const el = document.getElementById('bench-list'); if(!el) return; try { const data = await get('/api/benchmark'); el.innerHTML = `总数 ${data.stats?.total||0}<br>` + (data.tasks||[]).slice(0,8).map(t=>`<div class="list-item" style="padding: 8px 0;"><div style="font-size: 12px;">${t.id} ${t.title}</div></div>`).join('') + '<br><button class="btn btn-primary" aria-label="发送消息" onclick="runRealBenchmark()">真实回放评估</button>'; } catch(e) { el.innerHTML = `错误: ${e.message}`; } };
 
 window.runRealBenchmark = async () => { if(!confirm('真实回放评估？\n真实调用agent_runtime执行几十条任务')) return; const el = document.getElementById('bench-list'); if(el) el.innerHTML = '真实执行中...'; try { const res = await post('/api/evolution/evaluate?real=true'); if(el) el.innerHTML = `真实评估 ${res.eval?.old?.passed||0}/${res.eval?.old?.total||0} ${res.eval?.old?.success_rate||0}%<br>晋升 ${res.promotion?.should_promote?'✅':'❌'} ${res.promotion?.reason||''}`; } catch(e) { if(el) el.innerHTML = `失败: ${e.message}`; } };
 
