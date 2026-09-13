@@ -20,6 +20,14 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
+import argparse as _tauri_argparse
+_tauri_parser = _tauri_argparse.ArgumentParser(description="Zane Backend v0914", add_help=False)
+_tauri_parser.add_argument("--port", type=int, default=8000, help="端口，Tauri sidecar指定")
+try:
+    _tauri_known, _ = _tauri_parser.parse_known_args()
+    BACKEND_PORT = _tauri_known.port
+except:
+    BACKEND_PORT = 8000
 from pydantic import BaseModel
 
 try:

@@ -1379,5 +1379,37 @@ document.addEventListener('DOMContentLoaded', () => {
   setInterval(()=>{ if(document.hidden) return; const active = document.querySelector('.view.active'); if(active?.id==='view-system') loadSystem(); }, 30000);
 });
 </script>
+
+<script>
+// ===== Tauri桌面端适配 v0914 - Windows PC专注 =====
+const isTauri = !!window.__TAURI__;
+console.log('🖥️ Tauri桌面端:', isTauri);
+window.sendTauriNotification = async (title, body) => {
+    if (isTauri && window.__TAURI__?.notification) {
+        try { await window.__TAURI__.notification.sendNotification({ title, body }); } catch(e) {}
+    } else if ('Notification' in window) {
+        new Notification(title, { body });
+    }
+};
+window.toggleTauriAutostart = async (enabled) => {
+    if (!isTauri) return false;
+    try {
+        const { enable, disable } = window.__TAURI__.autostart;
+        if (enabled) await enable(); else await disable();
+        return true;
+    } catch(e) { return false; }
+};
+if (isTauri) {
+    window.addEventListener('DOMContentLoaded', async () => {
+        try {
+            const { listen } = window.__TAURI__.event;
+            await listen('navigate-to-settings', () => {
+                if (typeof switchView === 'function') switchView('settings');
+            });
+        } catch(e) {}
+    });
+}
+</script>
+
 </body>
 </html>

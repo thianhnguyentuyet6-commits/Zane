@@ -1,0 +1,56 @@
+{
+  "productName": "Zane",
+  "version": "0.9.14",
+  "identifier": "com.zane.windows",
+  "build": {
+    "beforeDevCommand": "",
+    "devUrl": "http://localhost:8000",
+    "beforeBuildCommand": "",
+    "frontendDist": "../frontend"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Zane — Windows PC智能管家",
+        "width": 1200,
+        "height": 800,
+        "minWidth": 900,
+        "minHeight": 600,
+        "resizable": true,
+        "center": true
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["msi", "nsis"],
+    "icon": ["icons/icon.ico", "icons/icon.png"],
+    "resources": ["../config", "../data"],
+    "externalBin": ["binaries/zane-backend", "binaries/llama-server"],
+    "windows": {
+      "certificateThumbprint": null,
+      "digestAlgorithm": "sha256"
+    }
+  },
+  "plugins": {
+    "shell": {
+      "all": false,
+      "open": true,
+      "scope": [
+        {
+          "name": "binaries/zane-backend",
+          "sidecar": true,
+          "args": true
+        },
+        {
+          "name": "binaries/llama-server",
+          "sidecar": true,
+          "args": true
+        }
+      ]
+    }
+  }
+}

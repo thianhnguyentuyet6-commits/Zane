@@ -1,0 +1,4 @@
+/target
+/binaries/*.exe
+/binaries/zane-backend*
+/binaries/llama-server*
