@@ -1,0 +1,7 @@
+{
+  "use_llm_for_fuzzy": false,
+  "fuzzy_threshold_low": 0.3,
+  "fuzzy_threshold_high": 0.7,
+  "enable_two_level": true,
+  "note": "v0914 两级评估：先关键词快速判断，模糊区间再LLM确认，兼顾速度准确性，环境变量ZANE_THINKING_USE_LLM覆盖，默认false速度快"
+}

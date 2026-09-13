@@ -1,7 +1,8 @@
 import { apiGet, apiPost, tokenApi, databaseApi, autonomousApi, systemApi } from './api.js';
 import { modelsApi, renderModelsView } from './models.js';
 import { drawInteractiveCpuChart, drawInteractiveMemoryChart } from './charts.js';
-import './platform_status.js'; // v0913 平台状态条 真实/演示区分
+import './platform_status.js'; // v0913 平台状态条
+import './pending_modal.js'; // v0914 待确认队列弹窗
 window.drawInteractiveCpuChart = drawInteractiveCpuChart;
 window.drawInteractiveMemoryChart = drawInteractiveMemoryChart;
 
@@ -414,3 +415,292 @@ document.querySelectorAll('.nav-item').forEach(btn=>{
   btn.addEventListener('click',()=>switchView(btn.dataset.view));
   btn.addEventListener('keydown',(e)=>{if(e.key==='Enter') switchView(btn.dataset.view);});
 });
+
+// ========== v0914 新增函数 - 29条反馈修复 ==========
+
+window.checkModelPath = async () => {
+  try {
+    const data = await apiGet('/api/platform/status');
+    const model = data.model || {};
+    document.getElementById('vram-info').innerHTML = `
+      <div style="font-size:11px">
+        <div>GGUF: ${model.gguf?.path || '未配置'} ${model.gguf?.exists ? '✅' : '❌'} 来源:${model.gguf?.source || ''}</div>
+        <div>HF: ${model.hf?.path || '未配置'} ${model.hf?.exists ? '✅' : model.hf?.need_download ? '需下载' : '❌'} ${model.hf?.need_download ? `大小:${model.hf?.download_size}` : ''}</div>
+        <div>VRAM: ${model.vram?.total_gb || 0}GB 可用:${model.vram?.available_gb || 0}GB 设备:${model.vram?.device || ''}</div>
+        <div>推荐: ${model.vram?.recommended?.model || ''} ${model.vram?.recommended?.note || ''} ${model.vram?.recommended?.cpu_offload ? 'CPU Offload✅' : ''}</div>
+        <div>优先级: 环境变量MODEL_PATH>配置>默认，找不到报错退出</div>
+        <div>HF下载: ${model.hf?.need_download ? `需手动确认，不自动下载，命令:${model.hf?.download_command || ''}` : '已缓存或无需'}</div>
+      </div>
+    `;
+  } catch(e) { console.error(e); }
+};
+
+window.loadIOSTokens = async () => {
+  try {
+    const data = await apiGet('/api/ios/tokens');
+    document.getElementById('ios-tokens-list').innerHTML = `
+      <div style="font-size:11px">
+        <div>总数: ${data.total} 吊销: ${data.revoked_count}</div>
+        <pre style="font-size:9px;background:var(--bg);padding:8px;border-radius:4px;max-height:100px;overflow:auto">${JSON.stringify(data.tokens, null, 2).slice(0,500)}</pre>
+      </div>
+    `;
+  } catch(e) { document.getElementById('ios-tokens-list').innerHTML = '错误: '+e.message; }
+};
+
+window.loadIOS = async () => {
+  try {
+    const status = await apiGet('/api/ios/status');
+    const system = await apiGet('/api/ios/system');
+    document.getElementById('ios-status').innerHTML = `
+      <div style="font-size:11px">
+        <div>查看中: ${status.viewing ? '📱 查看中❌暂停训练' : '无✅'}</div>
+        <div>最近: ${status.is_recent ? '5分钟内' : '无'}</div>
+        <div>设备: ${status.state?.device || ''}</div>
+        <div>应暂停: ${status.should_pause_training ? '是' : '否'}</div>
+      </div>
+    `;
+    document.getElementById('ios-system').innerHTML = `
+      <div style="font-size:11px">
+        <div>只读: ${system.readonly ? '✅' : '❌'} 无控制功能</div>
+        <div>资源: CPU ${system.system?.resources?.cpu_memory?.cpu || 0}% 内存 ${system.system?.resources?.cpu_memory?.memory || 0}%</div>
+        <div>可训练: ${system.system?.resources?.can_train ? '✅' : '❌'}</div>
+        <div>SFT: ${system.system?.training_stats?.sft_samples || 0}条</div>
+      </div>
+    `;
+    document.getElementById('ios-tokens').innerHTML = `
+      <div style="font-size:11px">
+        <div>Token有效: ${system.token_valid ? '✅' : '❌ 无或未提供'}</div>
+        <div>用途: ${system.token_purpose || '无'}</div>
+        <div>只读页面: <a href="/api/ios/readonly" target="_blank">/api/ios/readonly</a></div>
+      </div>
+    `;
+  } catch(e) { console.error(e); }
+};
+
+window.createIOSToken = async () => {
+  const deviceId = prompt('设备ID:', 'iphone_'+Date.now());
+  if (!deviceId) return;
+  const deviceName = prompt('设备名:', 'iPhone') || 'iPhone';
+  try {
+    const res = await apiPost('/api/ios/token', {device_id: deviceId, device_name: deviceName, purpose: 'readonly'});
+    if (res.success) {
+      alert(`iOS Token已生成：\n${res.token}\n有效期:${res.expires_hours}h\n用途:${res.purpose}\n\n请保存，Header X-IOS-Token携带`);
+      localStorage.setItem('ios_token', res.token);
+      loadIOS();
+      loadIOSTokens();
+    } else {
+      alert(`失败: ${res.error}`);
+    }
+  } catch(e) { alert(e.message); }
+};
+
+window.openIOSPage = () => {
+  window.open('/api/ios/readonly', '_blank');
+};
+
+window.showPendingModal = () => {
+  if (window.pendingModal) {
+    window.pendingModal.showModal();
+    window.pendingModal.refresh();
+  } else {
+    alert('待确认弹窗未加载');
+  }
+};
+
+window.loadProcessSecurity = async () => {
+  try {
+    const data = await apiGet('/api/security/pending');
+    document.getElementById('proc-security').innerHTML = `
+      <div style="font-size:11px">
+        <div>待确认: ${data.total || 0}个</div>
+        <div>防火墙: ${data.firewall_version || ''} v0914安全加固</div>
+        <div>kill_process: 白名单外可疑+强制确认+路径PID双重验证防伪造</div>
+        <div>弹窗: 前端弹窗主动提醒，每10秒轮询，自动弹出</div>
+        <pre style="font-size:9px;background:var(--bg);padding:4px;border-radius:4px;max-height:60px;overflow:auto">${JSON.stringify(data.pending?.slice(0,2) || [], null, 2).slice(0,300)}</pre>
+      </div>
+    `;
+  } catch(e) { document.getElementById('proc-security').innerHTML = '错误: '+e.message; }
+};
+
+window.testUndo = async () => {
+  document.getElementById('undo-test').innerHTML = '测试中...';
+  document.getElementById('contracts-undo').innerHTML = '测试中...';
+  try {
+    // 调用测试API或显示说明
+    document.getElementById('undo-test').innerHTML = `
+      <div style="font-size:11px">
+        <div>测试: 回收站清空权限变化边界</div>
+        <div>运行: python tests/test_undo_e2e.py</div>
+        <div>结果: 需手动运行测试脚本</div>
+        <div>可撤销不是心理安慰，需端到端验证</div>
+      </div>
+    `;
+    document.getElementById('contracts-undo').innerHTML = document.getElementById('undo-test').innerHTML;
+  } catch(e) { document.getElementById('undo-test').innerHTML = '错误: '+e.message; }
+};
+
+window.loadDreams = async () => {
+  try {
+    const data = await apiGet('/api/memory/v3');
+    // 尝试读取DREAMS.md
+    let dreamsContent = 'DREAMS.md未生成或无内容';
+    try {
+      const dreamsRes = await fetch('/static/../data/DREAMS.md');
+      if (dreamsRes.ok) {
+        dreamsContent = (await dreamsRes.text()).slice(0,500);
+      }
+    } catch {}
+    
+    document.getElementById('dreams-content').innerHTML = `<pre style="font-size:9px;max-height:100px;overflow:auto">${dreamsContent}</pre>`;
+    document.getElementById('dream-dreams').innerHTML = `<pre style="font-size:9px;max-height:100px;overflow:auto">${dreamsContent}</pre>`;
+    document.getElementById('dream-cycle').innerHTML = `
+      <div style="font-size:11px">
+        <div>记忆总数: ${data.total || 0}</div>
+        <div>遗忘机制: 4层曲线7/30/90/180天+阈值访问<3重要性<0.3</div>
+        <div>DREAMS.md: 人类可读日记，记录遗忘记忆</div>
+        <div>测试: python tests/test_forgetting.py 时间流逝模拟</div>
+      </div>
+    `;
+  } catch(e) { console.error(e); }
+};
+
+window.loadMemoryV3 = async () => {
+  try {
+    const data = await apiGet('/api/memory/v3');
+    document.getElementById('mem-v3').innerHTML = `
+      <div style="font-size:11px">
+        <div>总数: ${data.total || 0} 压缩率: ${data.compression_ratio || ''}</div>
+        <div>类型: ${JSON.stringify(data.by_type || {})}</div>
+        <div>遗忘: 4层曲线+阈值，DREAMS.md记录</div>
+      </div>
+    `;
+    const simple = await apiGet('/api/memory/simple');
+    document.getElementById('mem-simple').innerHTML = `
+      <div style="font-size:11px">
+        <div>总数: ${simple.total || 0} 压缩: ${simple.compression_ratio || ''} Token减少:${simple.token_reduction || ''}x</div>
+        <div>方法: ${JSON.stringify(simple.by_method || {})}</div>
+        <div>配置: use_llm=${simple.config?.use_llm} 固定长度离线+LLM可选</div>
+        <div>重要性排序: 最近访问+上次任务引用加权</div>
+      </div>
+    `;
+  } catch(e) { console.error(e); }
+};
+
+window.forgetMemory = async () => {
+  if (!confirm('遗忘低价值记忆？\n访问<3重要性<0.3超30天，4层曲线7/30/90/180天')) return;
+  try {
+    const res = await apiPost('/api/memory/v3/forget');
+    alert(`遗忘: ${res.forgotten || 0}条，保留${res.retained || 0}条\nDREAMS.md已生成`);
+    loadMemoryV3();
+    loadDreams();
+  } catch(e) { alert(e.message); }
+};
+
+window.loadThinking = async () => {
+  try {
+    const budget = await apiGet('/api/thinking/budget');
+    const ralph = await apiGet('/api/ralph/status');
+    const correction = await apiGet('/api/correction/stats');
+    document.getElementById('thinking-budget').innerHTML = `
+      <div style="font-size:11px">
+        <div>模式: ${budget.mode || ''} 预算:${budget.budget || ''} 置信度:${budget.confidence || ''}</div>
+        <div>两级: ${budget.two_level ? '✅ 关键词快速+LLM确认模糊区间' : '❌ 仅关键词'}</div>
+        <div>模糊区间: ${budget.is_fuzzy ? '是' : '否'} 分数:${budget.complexity_score || ''}</div>
+        <div>原因: ${budget.reason || ''}</div>
+      </div>
+    `;
+    document.getElementById('ralph-status').innerHTML = `<pre style="font-size:9px">${JSON.stringify(ralph, null, 2).slice(0,300)}</pre>`;
+    document.getElementById('correction-stats').innerHTML = `<pre style="font-size:9px">${JSON.stringify(correction, null, 2).slice(0,300)}</pre>`;
+  } catch(e) { console.error(e); }
+};
+
+window.testThinking = async () => {
+  const tests = [
+    "列出文件",
+    "分析系统性能并优化",
+    "整理下载文件夹",
+    "设计一个复杂的分布式系统架构"
+  ];
+  
+  let html = '<div style="font-size:11px">';
+  for (const t of tests) {
+    try {
+      const res = await apiPost('/api/thinking/budget', {text: t});
+      html += `<div><b>${t}</b> -> ${res.mode} 预算${res.budget} 模糊:${res.is_fuzzy} ${res.reason}</div>`;
+    } catch(e) {
+      html += `<div>${t} -> 错误: ${e.message}</div>`;
+    }
+  }
+  html += '<div style="margin-top:8px;color:var(--text-muted)">两级评估：先关键词快速，模糊区间再LLM确认，兼顾速度准确性</div></div>';
+  
+  document.getElementById('thinking-budget').innerHTML = html;
+};
+
+window.runRealBenchmark = async () => {
+  if (!confirm('真实回放评估？\n真实调用agent_runtime执行几十条任务统计成功率，非模拟冒烟，可信度高，耗时较长')) return;
+  
+  document.getElementById('bench-list').innerHTML = '真实执行中... 需几十秒到几分钟，请等待...';
+  
+  try {
+    const res = await apiPost('/api/evolution/evaluate?real=true');
+    document.getElementById('bench-list').innerHTML = `
+      <div style="font-size:11px">
+        <div>真实评估: ${res.eval?.old?.passed || 0}/${res.eval?.old?.total || 0} ${res.eval?.old?.success_rate || 0}%</div>
+        <div>分类: ${JSON.stringify(res.eval?.old?.by_category || {}).slice(0,200)}</div>
+        <div>晋升: ${res.promotion?.should_promote ? '✅' : '❌'} ${res.promotion?.reason || ''}</div>
+        <div>模式: ${res.real_eval ? '真实agent_runtime执行可信度高' : '模拟冒烟'}</div>
+      </div>
+    `;
+    document.getElementById('bench-eval').innerHTML = document.getElementById('bench-list').innerHTML;
+  } catch(e) {
+    document.getElementById('bench-list').innerHTML = '真实评估失败: '+e.message+'<br>回退模拟：需检查agent_runtime';
+  }
+};
+
+window.loadConfigCenter = async () => {
+  try {
+    const evoSchedule = await apiGet('/api/config/evolution_schedule').catch(() => ({enabled: false}));
+    const replay = await apiGet('/api/evolution/filter/stats').catch(() => ({}));
+    document.getElementById('config-center').innerHTML = `
+      <div>调度器: ${evoSchedule.enabled ? '✅启用' : '❌禁用(默认)'} 空闲${evoSchedule.idle_minutes || 30}分 CPU<${evoSchedule.cpu_threshold || 20}% GPU<${evoSchedule.gpu_util_threshold || 30}%</div>
+      <div>Replay阈值: ${replay.config?.min_quality || 0.8} 可配置 验证脚本: tests/test_threshold_validation.py</div>
+      <div>SimpleMem: use_llm=${false} 固定长度离线+LLM可选 config/simplemem.json</div>
+      <div>思考: 两级评估关键词快速+LLM确认模糊区间 config/thinking_config.json</div>
+      <div>资源: 5维度+摄像头麦克风检测 config/resource_config.json</div>
+      <div style="margin-top:4px;color:var(--text-muted)">环境变量: ZANE_AUTO_EVOLVE ZANE_REPLAY_QUALITY ZANE_SIMPLEMEM_USE_LLM ZANE_THINKING_USE_LLM</div>
+    `;
+  } catch(e) { document.getElementById('config-center').innerHTML = '错误: '+e.message; }
+};
+
+// 初始化时加载配置中心
+setTimeout(() => { if (document.getElementById('config-center')) loadConfigCenter(); }, 1000);
+
+// 扩展原有函数以支持v0914
+const originalLoadSecurity = window.loadSecurity;
+window.loadSecurity = async () => {
+  if (originalLoadSecurity) await originalLoadSecurity();
+  try {
+    const pending = await apiGet('/api/security/pending');
+    document.getElementById('pending-queue').innerHTML = `
+      <div style="font-size:11px">
+        <div>待确认: ${pending.total || 0}个 ${pending.total > 0 ? '🛡️ 需处理' : '✅ 无'}</div>
+        <div>弹窗: 前端弹窗主动提醒，每10秒轮询，自动弹出避免忽略</div>
+        <div>安全: kill_process白名单外+强制确认+路径PID双重验证</div>
+        <pre style="font-size:9px;background:var(--bg);padding:4px;border-radius:4px;max-height:60px;overflow:auto">${JSON.stringify(pending.pending?.slice(0,2) || [], null, 2).slice(0,300)}</pre>
+      </div>
+    `;
+    // 更新迷你徽章
+    const miniBadge = document.getElementById('pending-badge-mini');
+    const miniCount = document.getElementById('pending-count-mini');
+    if (miniBadge && miniCount) {
+      if (pending.total > 0) {
+        miniBadge.style.display = 'inline';
+        miniCount.textContent = pending.total;
+      } else {
+        miniBadge.style.display = 'none';
+      }
+    }
+  } catch(e) { console.error(e); }
+};
+
+console.log('✅ app.js v0914已加载 - 29条反馈修复+待确认弹窗+iOS只读+8GB支持');

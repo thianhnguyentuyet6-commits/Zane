@@ -1,0 +1,54 @@
+{
+  "total_samples": 2,
+  "quality_stats": {
+    "min": 0.5,
+    "max": 0.5,
+    "mean": 0.5,
+    "median": 0.5
+  },
+  "thresholds": {
+    "0.5": {
+      "threshold": 0.5,
+      "high_quality_count": 2,
+      "high_quality_ratio": 1.0,
+      "replay_count": 1,
+      "replay_ratio": 0.5,
+      "total": 2
+    },
+    "0.6": {
+      "threshold": 0.6,
+      "high_quality_count": 2,
+      "high_quality_ratio": 1.0,
+      "replay_count": 1,
+      "replay_ratio": 0.5,
+      "total": 2
+    },
+    "0.7": {
+      "threshold": 0.7,
+      "high_quality_count": 2,
+      "high_quality_ratio": 1.0,
+      "replay_count": 1,
+      "replay_ratio": 0.5,
+      "total": 2
+    },
+    "0.8": {
+      "threshold": 0.8,
+      "high_quality_count": 2,
+      "high_quality_ratio": 1.0,
+      "replay_count": 1,
+      "replay_ratio": 0.5,
+      "total": 2
+    },
+    "0.9": {
+      "threshold": 0.9,
+      "high_quality_count": 0,
+      "high_quality_ratio": 0.0,
+      "replay_count": 0,
+      "replay_ratio": 0.0,
+      "total": 2
+    }
+  },
+  "reasonable_thresholds": [],
+  "recommended": null,
+  "note": "0.8阈值无理论依据，需实验确定，此脚本提供数据支持"
+}

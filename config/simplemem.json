@@ -1,0 +1,17 @@
+{
+  "use_llm": false,
+  "compression_ratio": 0.3,
+  "fallback_fixed_length": true,
+  "fixed_lengths": {
+    "conversational": 100,
+    "episodic": 150,
+    "semantic": 80,
+    "procedural": 120
+  },
+  "llm_config": {
+    "model": "local",
+    "prompt": "将以下内容压缩到30%，保留关键实体和意图，去除冗余：\n{content}\n压缩后：",
+    "max_tokens": 200
+  },
+  "note": "v0914 use_llm=false默认固定长度离线可用，有算力用户true用LLM高质量压缩，兼顾两类用户，环境变量ZANE_SIMPLEMEM_USE_LLM覆盖"
+}
