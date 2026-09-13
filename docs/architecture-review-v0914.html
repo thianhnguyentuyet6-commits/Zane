@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Architecture Review - Zane Windows PC专注版</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<style>
+body { font-family: Inter, -apple-system, sans-serif; background: #0a0a0b; color: #fafafa; }
+.card { background: rgba(22,22,24,0.8); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; }
+.badge-strong { background: #ef4444; color: white; }
+.badge-worth { background: #f59e0b; color: black; }
+.badge-spec { background: #6b7280; color: white; }
+</style>
+</head>
+<body class="p-8">
+<h1 class="text-3xl font-bold mb-2">Architecture Review - Zane Windows PC专注版 v0914</h1>
+<p class="text-zinc-400 mb-8">Deepening opportunities: turn shallow modules into deep ones, improve testability and AI-navigability</p>
+
+<div class="grid gap-6">
+
+<!-- Candidate 1 -->
+<div class="card p-6">
+  <div class="flex justify-between items-start mb-4">
+    <div>
+      <h2 class="text-xl font-bold">1. Tools Module - 单文件26工具过重</h2>
+      <p class="text-sm text-zinc-400 mt-1">Files: backend/tools_impl.py (933行, 48KB) + backend/tool_registry.py + backend/policy/undo_stack.py</p>
+    </div>
+    <span class="badge-strong px-3 py-1 rounded-full text-xs font-bold">Strong</span>
+  </div>
+  
+  <div class="grid grid-2 gap-6">
+    <div>
+      <h3 class="font-semibold mb-2 text-red-400">Problem - Shallow Module</h3>
+      <p class="text-sm text-zinc-300 leading-relaxed">
+        tools_impl.py 包含26工具，接口复杂度≈实现复杂度，933行单文件难以维护。理解一个工具需阅读整个文件，测试需mock整个ToolExecutor。删除测试：删除会分散复杂度，但当前集中也造成大文件。违反locality - pure functions extracted for testability but bugs hide in how they're called.
+      </p>
+      <div class="mt-4 p-3 bg-zinc-900 rounded-lg">
+        <div class="text-xs font-mono">Before: 单文件26工具<br>ToolExecutorV0914<br>├─ list_files<br>├─ read_file<br>├─ write_file<br>├─ ...24 more<br>└─ 933行</div>
+      </div>
+    </div>
+    <div>
+      <h3 class="font-semibold mb-2 text-green-400">Solution - Deepen Module</h3>
+      <p class="text-sm text-zinc-300 leading-relaxed">
+        按Windows功能分层：FileTools, ProcessTools, WindowTools, VisionTools, SystemTools，每个深模块有清晰接口。ToolExecutor作为facade，内部委托。每个子模块可独立测试，接口是test surface。Leverage: 一次修改文件工具只需改FileTools，不触及其他。Locality: 工具逻辑+测试+安全检查在同一模块。
+      </p>
+      <div class="mt-4 p-3 bg-zinc-900 rounded-lg">
+        <div class="text-xs font-mono">After: 分层深模块<br>tools/<br>├─ file_tools.py (深, 150行)<br>├─ process_tools.py (深, 120行)<br>├─ window_tools.py (深, 100行)<br>├─ vision_tools.py (深, 80行)<br>└─ executor.py (facade, 50行)</div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="mt-4 flex gap-4 text-xs">
+    <span class="text-zinc-400">Benefits: <span class="text-white">Locality↑ 测试可独立，Leverage↑ 修改一处不波及他处，AI-navigability↑ 按功能找文件</span></span>
+  </div>
+</div>
+
+<!-- Candidate 2 -->
+<div class="card p-6">
+  <div class="flex justify-between items-start mb-4">
+    <div>
+      <h2 class="text-xl font-bold">2. Frontend 单文件78KB过重</h2>
+      <p class="text-sm text-zinc-400 mt-1">Files: frontend/index.html (1383行, 78KB) + frontend/js/*.js 14文件冲突</p>
+    </div>
+    <span class="badge-strong px-3 py-1 rounded-full text-xs font-bold">Strong</span>
+  </div>
+  
+  <div class="grid grid-2 gap-6">
+    <div>
+      <h3 class="font-semibold mb-2 text-red-400">Problem - Shallow + Duplicated</h3>
+      <p class="text-sm text-zinc-300 leading-relaxed">
+        index.html单文件包含所有视图逻辑+CSS+JS，78KB，难以测试。旧版有app.js+app_windows.js同定义window.loadSystem冲突，事件覆盖导致点击无反应。理解一个视图需阅读整个文件。Deletion test: 删除会分散到多文件，但当前单文件也难以维护。No locality - UI逻辑+API调用+渲染混一起。
+      </p>
+      <div class="mt-4">
+        <div class="mermaid">
+          graph TD
+            A[index.html 78KB] --> B[Chat]
+            A --> C[System]
+            A --> D[Processes]
+            A --> E[Files]
+            A --> F[Memory]
+            A --> G[Settings]
+            style A fill:#ef4444
+        </div>
+      </div>
+    </div>
+    <div>
+      <h3 class="font-semibold mb-2 text-green-400">Solution - Modular Deep Modules</h3>
+      <p class="text-sm text-zinc-300 leading-relaxed">
+        按视图分深模块：views/chat.js, views/system.js, views/memory.js等，每个有清晰接口render(data)+bindEvents()。共享components: card, list, graph, input。App.js作为router，委托视图。每个视图独立测试，接口是test surface。已用impeccable skill重构为Operate模式Restrained+毛玻璃+知识图谱，但仍需模块化。
+      </p>
+      <div class="mt-4">
+        <div class="mermaid">
+          graph TD
+            R[app.js router] --> V1[views/chat.js]
+            R --> V2[views/system.js]
+            R --> V3[views/memory.js]
+            V1 --> C1[components/card]
+            V2 --> C1
+            V3 --> C2[components/graph]
+            style R fill:#22c55e
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Candidate 3 -->
+<div class="card p-6">
+  <div class="flex justify-between items-start mb-4">
+    <div>
+      <h2 class="text-xl font-bold">3. Memory 概念分散6文件</h2>
+      <p class="text-sm text-zinc-400 mt-1">Files: backend/memory/memory.py + simple_mem.py + forgetting.py + vector_memory.py + data_flywheel.py</p>
+    </div>
+    <span class="badge-worth px-3 py-1 rounded-full text-xs font-bold">Worth exploring</span>
+  </div>
+  
+  <div class="grid grid-2 gap-6">
+    <div>
+      <h3 class="font-semibold mb-2 text-yellow-400">Problem - Bouncing Between Modules</h3>
+      <p class="text-sm text-zinc-300 leading-relaxed">
+        理解记忆需bounce between 6文件：memory.py 4层统一, simple_mem.py压缩, forgetting.py遗忘曲线, vector_memory.py向量, data_flywheel.py数据飞轮。概念分散，接口浅，每个文件小但关联紧密。Tests need to mock multiple modules. Leaks across seams - forgetting logic leaks into memory.py.
+      </p>
+    </div>
+    <div>
+      <h3 class="font-semibold mb-2 text-green-400">Solution - Deep Memory Module</h3>
+      <p class="text-sm text-zinc-300 leading-relaxed">
+        统一为Memory深模块，内部包含layers, compression, forgetting, vector, flywheel作为私有实现，外部接口add_memory(), search(), forget_low_value(), get_stats()。CONTEXT.md中定义"Memory"概念，深模块名匹配。Interface is test surface - 测试只需调接口，不需知内部。Locality: 记忆相关逻辑+测试在同一模块。
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- Candidate 4 -->
+<div class="card p-6">
+  <div class="flex justify-between items-start mb-4">
+    <div>
+      <h2 class="text-xl font-bold">4. Routers 18文件API分散</h2>
+      <p class="text-sm text-zinc-400 mt-1">Files: backend/routers/*.py 18文件 110API</p>
+    </div>
+    <span class="badge-spec px-3 py-1 rounded-full text-xs font-bold">Speculative</span>
+  </div>
+  
+  <div class="grid grid-2 gap-6">
+    <div>
+      <h3 class="font-semibold mb-2 text-zinc-400">Problem - Interface Dispersion</h3>
+      <p class="text-sm text-zinc-300 leading-relaxed">
+        18路由文件，每个小，API分散110API。理解系统状态需查system_router.py, windows.py, platform等多个路由。Shotgun surgery - 添加一个Windows功能需改多个路由文件。Interface nearly as complex as implementation - 每个路由文件只是薄包装。
+      </p>
+    </div>
+    <div>
+      <h3 class="font-semibold mb-2 text-green-400">Solution - Domain Routers</h3>
+      <p class="text-sm text-zinc-300 leading-relaxed">
+        按领域合并：system.py (system+windows+platform), memory.py (memory+vector), evolution.py等，深模块每个领域。每个领域路由有统一前缀和清晰接口。Two adapters = real seam - 当有Windows和Linux两种实现时，seam才真实。当前可先按领域合并，减少文件数，提高locality。
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- Top Recommendation -->
+<div class="card p-6 border-2 border-violet-500">
+  <h2 class="text-xl font-bold mb-3">🏆 Top Recommendation: Tools Module Deepening</h2>
+  <p class="text-sm text-zinc-300 leading-relaxed">
+    <strong>Why first:</strong> Hot spot - 最近39次提交中17次改frontend/index.html, 6次改tools_impl.py，是最频繁变更区域。Shallow module造成最大friction - 每次加工具都要改933行文件，测试困难，AI难以导航。Deepening后leverage最高 - 文件工具修改不影响进程工具，Windows真实测试可按模块进行。符合YAGNI - 未来还会频繁加Windows工具。
+  </p>
+  <div class="mt-4 flex gap-2">
+    <span class="px-3 py-1 bg-violet-600 rounded-full text-xs font-bold">High Leverage</span>
+    <span class="px-3 py-1 bg-green-600 rounded-full text-xs font-bold">High Locality</span>
+    <span class="px-3 py-1 bg-blue-600 rounded-full text-xs font-bold">Hot Spot</span>
+  </div>
+</div>
+
+</div>
+
+<script>mermaid.initialize({startOnLoad:true, theme:'dark'});</script>
+</body>
+</html>
