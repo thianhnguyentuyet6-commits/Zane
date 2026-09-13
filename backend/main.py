@@ -449,7 +449,7 @@ try:
 except Exception as e:
     _log_error(f"旧Routers失败: {e}")
 
-# 挂载新模块化路由 v0914 - 单版本16路由文件103API
+# 挂载新模块化路由 v0914 - 单版本16路由文件103API，iOS默认禁用专注Windows
 try:
     from .routers.evolution import router as evolution_router
     from .routers.thinking import router as thinking_router
@@ -461,7 +461,7 @@ try:
     from .routers.benchmark import router as benchmark_router
     from .routers.vector import router as vector_router
     from .routers.config import router as config_router
-    from .routers.ios import router as ios_router
+    from .routers.windows import router as windows_router
     app.include_router(evolution_router)
     app.include_router(thinking_router)
     app.include_router(memory_router)
@@ -472,8 +472,21 @@ try:
     app.include_router(benchmark_router)
     app.include_router(vector_router)
     app.include_router(config_router)
-    app.include_router(ios_router)
-    _log_info("✅ v0914 模块化Routers已挂载：evolution(18)+thinking(6)+memory(12)+security(8)+vision(8)+runtime(10)+auth(3)+benchmark(3)+vector(2)+config(4)+ios(8)=79路由模块化单版本 + 32兼容=111API")
+    app.include_router(windows_router)
+    
+    # iOS路由 - 默认禁用，专注PC Windows，通过环境变量ZANE_ENABLE_IOS=true启用
+    enable_ios = os.getenv("ZANE_ENABLE_IOS", "false").lower() in ("true", "1", "yes")
+    if enable_ios:
+        try:
+            from .routers.ios import router as ios_router
+            app.include_router(ios_router)
+            _log_info("✅ iOS路由已挂载（显式启用 ZANE_ENABLE_IOS=true）")
+        except Exception as e:
+            _log_warning(f"iOS路由挂载失败: {e}")
+    else:
+        _log_info("⏸️ iOS路由默认禁用，专注PC Windows，通过ZANE_ENABLE_IOS=true启用")
+    
+    _log_info("✅ v0914 模块化Routers已挂载：evolution(18)+thinking(6)+memory(12)+security(8)+vision(8)+runtime(10)+auth(3)+benchmark(3)+vector(2)+config(4)+windows(7)=78路由模块化单版本 + 32兼容=110API（iOS 8路由默认禁用，专注Windows PC）")
 except Exception as e:
     _log_error(f"v0914 Routers失败: {e}")
     import traceback
