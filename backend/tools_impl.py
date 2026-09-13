@@ -459,6 +459,66 @@ Chrome - 百度搜索：本地AI助手原理
         else:
             return {"success": True, "pid": 99999, "app": app_name, "path": actual_path, "demo": True, "demo_mode": True, "message": f"演示模式：已模拟启动 {app_name}"}
 
+
+    def kill_process(self, pid: int = None, name: str = None, force: bool = False) -> Dict:
+        """结束进程 - 危险进程过滤"""
+        try:
+            import psutil
+            DANGEROUS_PROCESSES = ["csrss.exe", "winlogon.exe", "services.exe", "lsass.exe", "smss.exe", "wininit.exe", "svchost.exe"]
+            if name and name.lower() in [p.lower() for p in DANGEROUS_PROCESSES]:
+                return {"success": False, "error": f"危险进程禁止结束: {name}", "security": "危险进程拦截"}
+            if pid:
+                proc = psutil.Process(pid)
+                if proc.name().lower() in [p.lower() for p in DANGEROUS_PROCESSES]:
+                    return {"success": False, "error": f"危险进程禁止: {proc.name()}", "security": "拦截"}
+                proc.terminate()
+                return {"success": True, "pid": pid, "message": f"已结束进程 {pid}", "demo_mode": False}
+            elif name:
+                killed = []
+                for proc in psutil.process_iter(['pid', 'name']):
+                    if name.lower() in proc.info['name'].lower():
+                        if proc.info['name'].lower() in [p.lower() for p in DANGEROUS_PROCESSES]:
+                            continue
+                        proc.terminate()
+                        killed.append(proc.info['pid'])
+                return {"success": True, "killed": killed, "message": f"已结束 {len(killed)} 个进程", "demo_mode": False}
+            return {"success": False, "error": "需提供pid或name"}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+
+    def get_window_info(self, hwnd: int = None, title_keyword: str = None) -> Dict:
+        """获取窗口详情 - DPI统一"""
+        try:
+            windows = self.list_windows(only_visible=False)
+            target = None
+            for w in windows.get("windows", []):
+                if hwnd and w.get("hwnd") == hwnd:
+                    target = w
+                    break
+                if title_keyword and title_keyword.lower() in w.get("title", "").lower():
+                    target = w
+                    break
+            if target:
+                return {"success": True, "info": target, "demo_mode": target.get("demo_mode", False)}
+            return {"success": False, "error": "窗口未找到"}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+
+    def analyze_ui(self, hwnd: int = None) -> Dict:
+        """UI分析 - DPI统一+UIA树"""
+        try:
+            # 尝试dpi_ocr_unified
+            try:
+                from .vision.dpi_ocr_unified import dpi_ocr_unified
+                result = dpi_ocr_unified.ocr_with_dpi()
+                return {"success": True, "controls": result.get("uia", {}).get("windows", []), "dpi_info": result.get("dpi_info"), "demo_mode": True, "flow": "DPI统一→OCR→UIA树"}
+            except Exception:
+                pass
+            # 回退演示
+            return {"success": True, "controls": [{"name": "按钮", "type": "Button", "rect": {"x": 100, "y": 100, "width": 80, "height": 30}}], "demo_mode": True, "note": "演示UI分析，真实需UIA"}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+
     def web_search(self, query: str, count: int = 5) -> Dict:
         """网络搜索 - 演示，可接入真实Bing API"""
         demo_results = [{"title": f"关于 {query} 的解决方案", "url": "https://example.com/1", "snippet": f"这是关于{query}的详细解释...", "source": "CSDN"}, {"title": f"{query} 官方文档", "url": "https://example.com/2", "snippet": "官方文档提供了最权威的说明...", "source": "官方"}]
@@ -499,6 +559,9 @@ TOOL_FUNCTIONS = {
     "keyboard_input": lambda **kwargs: {"success": True, "input": kwargs.get("text") or kwargs.get("keys"), "demo_mode": True},
     "key_press": lambda **kwargs: {"success": True, "input": kwargs.get("keys") or kwargs.get("key"), "demo_mode": True},  # 兼容
     "key_type": lambda **kwargs: {"success": True, "input": kwargs.get("text"), "demo_mode": True},  # 兼容
+    "kill_process": lambda **kwargs: tool_executor.kill_process(**kwargs),
+    "get_window_info": lambda **kwargs: tool_executor.get_window_info(**kwargs),
+    "analyze_ui": lambda **kwargs: tool_executor.analyze_ui(**kwargs),
 }
 
 # 安全工具 - 动态加载

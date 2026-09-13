@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Zane AGI v7.0 - 模块化重构优化版 | 自主进化8模块闭环+51路由模块化</title>
+<title>Zane AGI v0913 - 模块化重构优化版 | 自主进化8模块闭环+103API 8层架构单版本整合</title>
 <link rel="stylesheet" href="/css/styles.css">
 <link rel="stylesheet" href="/css/components.css">
 <link rel="stylesheet" href="/css/layout.css">
@@ -14,12 +14,12 @@
 <div class="app" role="application" aria-label="Zane AGI 控制台">
   <aside class="sidebar" role="navigation" aria-label="主导航">
     <div class="sidebar-header">
-      <div class="logo"><div class="logo-icon" aria-hidden="true">Z</div><div class="logo-text"><div class="logo-title">Zane AGI v7.0</div><div class="logo-sub">模块化重构 51路由模块化</div></div></div>
+      <div class="logo"><div class="logo-icon" aria-hidden="true">Z</div><div class="logo-text"><div class="logo-title">Zane AGI v0913</div><div class="logo-sub">模块化重构 103API 8层架构单版本整合</div></div></div>
       <div class="status-line" role="status" aria-live="polite"><div class="status-dot" aria-hidden="true"></div><span class="status-text" id="status-text">Qwen3-30B-A3B</span><span class="status-tag">SQLite唯一</span></div>
       <div class="evo-mini"><div style="font-size:9px;font-weight:700;display:flex;justify-content:space-between"><span>🧬 进化v3.0+资源感知</span><span id="evo-status" style="color:var(--success)">空闲</span></div><div style="font-size:9px;margin-top:4px">样本 <span id="evo-samples">0/50</span> | 习惯 <span id="evo-habits">0</span> | VRAM <span id="evo-vram">0GB</span></div><div class="progress" style="margin-top:6px"><div id="evo-fill" class="progress-fill" style="width:0%"></div></div></div>
     </div>
     <nav class="sidebar-nav" aria-label="视图导航">
-      <div class="nav-section">主控 v7.0模块化</div>
+      <div class="nav-section">主控 v0913模块化</div>
       <button class="nav-item active" data-view="chat" aria-current="page" aria-label="控制台"><span class="nav-icon" aria-hidden="true">◧</span><span class="nav-label">控制台</span><span class="nav-badge new">70API</span></button>
       <button class="nav-item" data-view="evolution" aria-label="进化仪表盘"><span class="nav-icon" aria-hidden="true">🧬</span><span class="nav-label">进化仪表盘</span><span class="nav-badge new">v3.0 8模块</span></button>
       <button class="nav-item" data-view="models" aria-label="模型管理"><span class="nav-icon" aria-hidden="true">🦙</span><span class="nav-label">模型 双轨</span><span class="nav-badge new">GGUF+HF</span></button>
@@ -47,13 +47,13 @@
     <div class="sidebar-footer">
       <div class="mini-stat"><span>CPU</span><span id="mini-cpu" aria-live="polite">--</span></div><div class="mini-bar"><div class="mini-fill" id="mini-cpu-bar" style="width:0%"></div></div>
       <div class="mini-stat" style="margin-top:4px"><span>内存</span><span id="mini-mem" aria-live="polite">--</span></div><div class="mini-bar"><div class="mini-fill mem" id="mini-mem-bar" style="width:0%"></div></div>
-      <div class="footer-note">v7.0模块化: 931行+6路由模块化51路由+自主进化v3.0 8模块闭环<br>过滤器修复: System32拦截100% security 60%→100%<br>UI: 21KB<30KB + 4CSS + 8JS模块 + Canvas交互</div>
+      <div class="footer-note">v0913模块化: 931行+10路由模块化71路由+自主进化v3.0 8模块闭环<br>过滤器修复: System32拦截100% security 60%→100%<br>UI: 21KB<30KB + 4CSS + 8JS模块 + Canvas交互</div>
     </div>
   </aside>
 
   <main class="main" role="main">
     <header class="topbar">
-      <div><div class="breadcrumb" id="breadcrumb" aria-label="当前位置">Console / v7.0模块化</div><div class="page-title" id="page-title">v7.0 模块化重构 - 6路由模块化+自主进化8模块闭环</div></div>
+      <div><div class="breadcrumb" id="breadcrumb" aria-label="当前位置">Console / v0913模块化</div><div class="page-title" id="page-title">v0913 模块化重构 - 10路由模块化71路由+自主进化8模块闭环</div></div>
       <div class="topbar-right">
         <div class="model-pill" role="status"><span class="model-dot" aria-hidden="true"></span><span id="top-model">Qwen3-30B-A3B</span></div>
         <button class="icon-btn" onclick="switchView('evolution')" title="进化仪表盘" aria-label="进化">🧬</button>
@@ -80,9 +80,9 @@
               <div class="message assistant">
                 <div class="msg-avatar" aria-hidden="true">Z</div>
                 <div class="msg-content">
-                  <div class="msg-header"><span class="msg-role">Zane v7.0 模块化重构优化版</span><span class="msg-time">刚刚 · 自主进化8模块闭环+51路由模块化</span></div>
+                  <div class="msg-header"><span class="msg-role">Zane v0913 模块化重构优化版</span><span class="msg-time">刚刚 · 自主进化8模块闭环+103API 8层架构单版本整合</span></div>
                   <div class="msg-text">
-                    <p><strong>🧬 v7.0 模块化重构 - 1839行→931行+6路由模块化：</strong></p>
+                    <p><strong>🧬 v0913 模块化重构 - 1839行→931行+10路由模块化71路由：</strong></p>
                     <div class="execution-stream">
                       <div class="stream-header"><span class="pulse"></span> 路由拆分</div>
                       <div class="stream-steps">
@@ -139,7 +139,7 @@
             </div>
           </div>
           <div class="chat-side">
-            <div class="side-card"><div class="side-title">模块化重构</div><div id="api-status" style="font-size:10px">检测中... v7.0 6路由模块化</div></div>
+            <div class="side-card"><div class="side-title">模块化重构</div><div id="api-status" style="font-size:10px">检测中... v0913 10路由模块化71路由</div></div>
             <div class="side-card"><div class="side-title">自主进化v3.0</div><div style="font-size:9px;font-family:monospace">✅ 数据飞轮v3过滤安全<br>✅ 模型双轨VRAM检测<br>✅ 真实训练非阻塞<br>✅ 评估20任务100%<br>✅ Prompt进化0.795<br>✅ 技能基因变异交叉<br>✅ 资源感知5维度<br>✅ 记忆v3 4层+遗忘</div></div>
             <div class="side-card"><div class="side-title">安全过滤100%</div><div style="font-size:9px">System32+delete_file → False ✅<br>整理下载+list/create → True 0.75 ✅<br>security 60%→100% ✅</div></div>
             <div class="side-card"><div class="side-title">资源监控</div><canvas id="mini-cpu-canvas" class="canvas-chart" width="260" height="80" aria-label="CPU图表"></canvas><div id="resource-mini" style="font-size:9px;margin-top:4px">检测中...</div></div>
@@ -163,7 +163,7 @@
       <div class="view" id="view-security"><div class="view-header"><h2>安全 - 过滤100%+沙盒+filelock+slowapi+JWT+10MB</h2><div class="view-actions"><button class="btn" onclick="loadSecurity()">扫描</button><button class="btn" onclick="testFilter()">过滤测试</button><button class="btn" onclick="checkSandbox()">沙盒检查</button></div></div><div class="grid grid-2"><div class="card"><h3>过滤测试 危险路径11+文件8+进程7+命令6 security 100%</h3><div id="filter-test-sec" aria-busy="true"><div class="skeleton"></div></div></div><div class="card"><h3>沙盒 realpath+白名单+filelock+回收站</h3><div id="sandbox-result" aria-busy="true"><div class="skeleton"></div></div></div></div><div class="grid grid-2" style="margin-top:10px"><div class="card"><h3>策略 权限分级L0只读L1写入L2危险+保护路径</h3><div id="sec-policy"></div></div><div class="card"><h3>漏洞扫描 明文密码+高危端口+启动项</h3><div id="sec-scan" aria-busy="true"><div class="skeleton"></div></div></div></div></div>
       <div class="view" id="view-contracts"><div class="view-header"><h2>契约 23 - 工具契约+风险分级</h2><button class="btn" onclick="loadContracts()">刷新</button></div><div id="contracts-list" class="list" aria-busy="true"><div class="skeleton"></div></div></div>
       <div class="view" id="view-thinking"><div class="view-header"><h2>🧠 思考预算 - Qwen3 2026 /think 32K /no_think 8K</h2><div class="view-actions"><button class="btn" onclick="loadThinking()">刷新</button><button class="btn" onclick="testThinking()">测试复杂度</button></div></div><div class="grid grid-2"><div class="card"><h3>思考预算 复杂度评估+三档采样</h3><div id="thinking-budget" aria-busy="true"><div class="skeleton"></div></div></div><div class="card"><h3>Ralph Loop bash while全新上下文+三护栏</h3><div id="ralph-status" aria-busy="true"><div class="skeleton"></div></div></div></div><div class="grid grid-2" style="margin-top:10px"><div class="card"><h3>有界自校正 UCSL不确定度+3轮预算</h3><div id="correction-stats" aria-busy="true"><div class="skeleton"></div></div></div><div class="card"><h3>技能库 SAGE Sequential Rollout</h3><div id="skill-library" aria-busy="true"><div class="skeleton"></div></div></div></div></div>
-      <div class="view" id="view-settings"><div class="view-header"><h2>设置 - v7.0模块化技术栈+8层+自主进化v3.0</h2></div><div class="grid grid-2" id="settings-grid" aria-busy="true"><div class="skeleton"></div></div></div>
+      <div class="view" id="view-settings"><div class="view-header"><h2>设置 - v0913模块化技术栈+8层+自主进化v3.0</h2></div><div class="grid grid-2" id="settings-grid" aria-busy="true"><div class="skeleton"></div></div></div>
       <div class="view" id="view-benchmark"><div class="view-header"><h2>基准 20任务 5分类 file/system/window/security/network 95% security 100%</h2><div class="view-actions"><button class="btn" onclick="loadBenchmark()">刷新</button><button class="btn primary" onclick="runBenchmark()">运行20任务</button><button class="btn" onclick="runEvaluate()">评估Harness</button></div></div><div id="bench-list" aria-busy="true"><div class="skeleton"></div></div><div class="card" style="margin-top:10px"><h3>评估Harness Benchmark 20任务+Replay 30%+2%晋升</h3><div id="bench-eval" aria-busy="true"><div class="skeleton"></div></div></div></div>
     </div>
   </main>

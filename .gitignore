@@ -14,6 +14,20 @@ data/backups/
 data/custom_models.json
 data/memory/
 data/skills/
+data/*.json
+data/diary_*.json
+data/dreams.json
+data/episodic.json
+data/experiences.json
+data/semantic.json
+data/skills.json
+data/simple_mem.json
+data/skill_library.json
+data/prd.json
+data/prd_v3.json
+data/evolution_experiences.jsonl
+data/security/
+data/screenshots/
 /memory/
 # Python
 __pycache__/

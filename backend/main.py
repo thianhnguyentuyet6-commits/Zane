@@ -448,16 +448,20 @@ async def health():
             deps[mod[0]] = "未安装"
     
     v3_techniques = {
-        "data_flywheel_v3": "✅ 过滤评分去重安全 危险0相似度>0.9重要性0.5-0.9 SimpleMem30% 规格透明",
+        "data_flywheel_v3": "✅ 过滤评分去重安全 危险0相似度>0.9重要性0.5-0.9 SimpleMem30% 规格透明 docs/FLYWHEEL_SPEC.md",
         "model_resolver": "✅ GGUF+HF双轨 VRAM检测24GB→30B 16GB→7B <12GB蒸馏",
         "real_training": "✅ Unsloth非阻塞+日志流+LoRA版本+指数退避",
-        "eval_harness": "✅ Benchmark 20任务+Replay 30%+2%晋升 security 100%",
+        "eval_harness": "✅ Benchmark 20任务+Replay 30%+2%晋升 security 100% tests/eval_tasks.jsonl 50条",
         "prompt_evolution": "✅ Darwin+EvolveR 4版本0.795",
         "skill_gene": "✅ 技能基因变异交叉fitness>0.7保留",
         "resource_monitor": "✅ CPU/内存/VRAM/插电/游戏/iOS 5维度",
         "memory_v3": "✅ 4层统一+SimpleMem+遗忘+DREAMS.md",
-        "tools_unified": "✅ 单文件统一21工具分节真实/演示兼容/安全增强+demo_mode字段",
-        "policy_firewall": "✅ v0913硬化版 NEED_CONFIRM阻断等待确认+前端确认事件+超时自动拒绝"
+        "tools_unified": "✅ 单文件统一26工具分节真实/演示兼容/安全增强+demo_mode字段 消除覆盖隐患",
+        "policy_firewall": "✅ v0913硬化版 NEED_CONFIRM阻断等待确认+前端确认事件+超时自动拒绝+待确认队列",
+        "cybersec_trend": "✅ 安全趋势时间序列端口/启动项异常感知 cybersec_trend.py",
+        "dpi_ocr_unified": "✅ DPI坐标系统一先统一DPI缩放再OCR最后UIA树 dpi_ocr_unified.py",
+        "platform_status": "✅ 前端平台状态条Provider/真实/演示/不可用工具+demo_mode视觉区分",
+        "simplemem_benchmark": "✅ SimpleMem Benchmark可复现 tests/benchmark/test_simplemem.py"
     }
     
     return {
