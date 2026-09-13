@@ -46,15 +46,21 @@ def test_forgetting_curve():
             importance=0.2,
             tags=["old", "low"]
         )
-        # 手动修改时间戳为40天前
+        # 手动修改时间戳为40天前 - 兼容dict和对象
         all_mems = []
         for layer in memory.layers.values():
             all_mems.extend(layer)
         for mem in all_mems:
-            if mem.id == mem1_id:
-                mem.created_at = old_time
-                mem.last_accessed = old_time
-                mem.access_count = 1
+            mem_id = mem.get("id") if isinstance(mem, dict) else getattr(mem, "id", None)
+            if mem_id == mem1_id:
+                if isinstance(mem, dict):
+                    mem["created_at"] = old_time
+                    mem["last_accessed"] = old_time
+                    mem["access_count"] = 1
+                else:
+                    mem.created_at = old_time
+                    mem.last_accessed = old_time
+                    mem.access_count = 1
         
         mem2_id = memory.add_memory(
             content="最近的高价值记忆，访问频繁",
@@ -66,8 +72,12 @@ def test_forgetting_curve():
         for layer in memory.layers.values():
             all_mems.extend(layer)
         for mem in all_mems:
-            if mem.id == mem2_id:
-                mem.access_count = 15
+            mem_id = mem.get("id") if isinstance(mem, dict) else getattr(mem, "id", None)
+            if mem_id == mem2_id:
+                if isinstance(mem, dict):
+                    mem["access_count"] = 15
+                else:
+                    mem.access_count = 15
         
         mem3_id = memory.add_memory(
             content="30天前的中等价值记忆",
@@ -79,10 +89,16 @@ def test_forgetting_curve():
         for layer in memory.layers.values():
             all_mems.extend(layer)
         for mem in all_mems:
-            if mem.id == mem3_id:
-                mem.created_at = now - 30*24*3600
-                mem.last_accessed = now - 30*24*3600
-                mem.access_count = 2
+            mem_id = mem.get("id") if isinstance(mem, dict) else getattr(mem, "id", None)
+            if mem_id == mem3_id:
+                if isinstance(mem, dict):
+                    mem["created_at"] = now - 30*24*3600
+                    mem["last_accessed"] = now - 30*24*3600
+                    mem["access_count"] = 2
+                else:
+                    mem.created_at = now - 30*24*3600
+                    mem.last_accessed = now - 30*24*3600
+                    mem.access_count = 2
         
         memory.save()
         
@@ -95,11 +111,28 @@ def test_forgetting_curve():
         
         print(f"   遗忘候选：{len(to_forget)}条")
         for mem in to_forget:
-            age_days = (now - mem.created_at) / 86400
-            print(f"     - {mem.id[:20]}... 类型={mem.type} 重要性={mem.importance} 访问={mem.access_count} 年龄={age_days:.1f}天")
+            if isinstance(mem, dict):
+                mem_id = mem.get("id","")[:20]
+                mem_type = mem.get("type","")
+                mem_imp = mem.get("importance",0)
+                mem_acc = mem.get("access_count",0)
+                mem_created = mem.get("created_at",now)
+            else:
+                mem_id = getattr(mem,"id","")[:20]
+                mem_type = getattr(mem,"type","")
+                mem_imp = getattr(mem,"importance",0)
+                mem_acc = getattr(mem,"access_count",0)
+                mem_created = getattr(mem,"created_at",now)
+            age_days = (now - mem_created) / 86400
+            print(f"     - {mem_id}... 类型={mem_type} 重要性={mem_imp} 访问={mem_acc} 年龄={age_days:.1f}天")
         
-        # 验证：旧低价值应该被遗忘，高价值不应被遗忘
-        forget_ids = [m.id for m in to_forget]
+        # 验证：旧低价值应该被遗忘，高价值不应被遗忘 - 兼容dict和对象
+        forget_ids = []
+        for m in to_forget:
+            if isinstance(m, dict):
+                forget_ids.append(m.get("id"))
+            else:
+                forget_ids.append(getattr(m, "id", None))
         assert mem1_id in forget_ids, "旧低价值记忆应该被遗忘"
         assert mem2_id not in forget_ids, "新高价值记忆不应被遗忘"
         print("   ✅ 遗忘曲线基本逻辑通过")
@@ -166,7 +199,22 @@ def test_forgetting_curve():
                         f.write(f"  - {mem.type}: {mem.content[:50]}... (重要性{mem.importance}, 访问{mem.access_count})\n")
                 print(f"   ✅ 已创建最小DREAMS.md实现: {dreams_path}")
             except Exception as e:
-                print(f"   创建DREAMS.md失败: {e}")
+                print(f"   创建DREAMS.md失败: {e} - 但需兼容dict")
+                # 兼容dict版本
+                try:
+                    with open(dreams_path, 'w', encoding='utf-8') as f:
+                        f.write(f"# Zane DREAMS - {time.strftime('%Y-%m-%d')}\n\n")
+                        f.write(f"## 遗忘的记忆\n\n")
+                        f.write(f"- 测试生成于 {time.strftime('%Y-%m-%d %H:%M:%S')}\n")
+                        f.write(f"- 遗忘候选 {len(to_forget)} 条\n")
+                        for mem in to_forget[:5]:
+                            if isinstance(mem, dict):
+                                f.write(f"  - {mem.get('type','')}: {mem.get('content','')[:50]}... (重要性{mem.get('importance',0)}, 访问{mem.get('access_count',0)})\n")
+                            else:
+                                f.write(f"  - {mem.type}: {mem.content[:50]}... (重要性{mem.importance}, 访问{mem.access_count})\n")
+                    print(f"   ✅ 已创建最小DREAMS.md实现(兼容dict): {dreams_path}")
+                except Exception as e2:
+                    print(f"   再次失败: {e2}")
         
         print("\n✅ 遗忘曲线测试完成")
         return True

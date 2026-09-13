@@ -51,18 +51,27 @@ class ForgettingCurveV0914:
         days_since_created = (time.time() - created_at) / 86400
         days_since_access = (time.time() - last_accessed) / 86400
         
-        # 高价值保留：访问>10重要性>0.8保留，不遗忘
-        if access_count > self.high_value_access and importance > self.high_value_importance:
+        # 高价值保留：访问>10 且 重要性>0.8 保留，不遗忘
+        if access_count >= self.high_value_access and importance >= self.high_value_importance:
+            return False
+        # 额外高价值：重要性>=0.8 单独保留
+        if importance >= 0.8:
             return False
         
-        # 4层遗忘曲线
+        # 4层遗忘曲线 - 主要规则
         curve_days = self.forgetting_curves.get(mem_type, self.threshold_days)
         
-        # 低访问+低重要性+超过曲线时间 → 遗忘
-        if access_count < self.threshold_access and importance < self.threshold_threshold_importance() and days_since_created > curve_days:
-            return True
+        # 超过曲线时间 → 遗忘（除非高价值已在上面保留）
+        # conversational 7天/episodic 30天/semantic 90天/procedural 180天
+        if days_since_created > curve_days:
+            # 低价值：访问<3 或 重要性<0.5 → 遗忘
+            if access_count < self.threshold_access or importance < 0.5:
+                return True
+            # 即使中等，超过曲线1.5倍也遗忘
+            if days_since_created > curve_days * 1.5 and importance < 0.6:
+                return True
         
-        # 通用阈值
+        # 低访问+低重要性+超过通用30天 → 遗忘
         if access_count < self.threshold_access and importance < self.threshold_importance and days_since_created > self.threshold_days:
             return True
         
@@ -71,7 +80,7 @@ class ForgettingCurveV0914:
             return True
         
         # 超过类型曲线2倍时间，即使中等重要性也遗忘
-        if days_since_created > curve_days * 2 and importance < 0.6:
+        if days_since_created > curve_days * 2 and importance < 0.7:
             return True
         
         return False
