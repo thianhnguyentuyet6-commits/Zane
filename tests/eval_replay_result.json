@@ -1,9 +1,9 @@
 {
-  "timestamp": "2026-09-13 13:43:10",
+  "timestamp": "2026-09-13 14:51:21",
   "version": "v0913",
   "total": 50,
-  "success": 45,
-  "success_rate": 0.9,
+  "success": 35,
+  "success_rate": 0.7,
   "by_type": {
     "file": {
       "total": 15,
@@ -12,40 +12,40 @@
     },
     "system": {
       "total": 11,
-      "success": 11,
-      "rate": 1.0
+      "success": 6,
+      "rate": 0.545
     },
     "window": {
       "total": 12,
-      "success": 9,
-      "rate": 0.75
+      "success": 8,
+      "rate": 0.667
     },
     "security": {
       "total": 8,
-      "success": 8,
-      "rate": 1.0
+      "success": 5,
+      "rate": 0.625
     },
     "network": {
       "total": 4,
-      "success": 4,
-      "rate": 1.0
+      "success": 3,
+      "rate": 0.75
     }
   },
   "by_difficulty": {
     "easy": {
       "total": 20,
-      "success": 20,
-      "rate": 1.0
+      "success": 14,
+      "rate": 0.7
     },
     "medium": {
       "total": 18,
-      "success": 14,
-      "rate": 0.778
+      "success": 13,
+      "rate": 0.722
     },
     "hard": {
       "total": 12,
-      "success": 11,
-      "rate": 0.917
+      "success": 8,
+      "rate": 0.667
     }
   },
   "history": [
@@ -69,7 +69,7 @@
     },
     {
       "version": "v0913",
-      "success_rate": 0.9,
+      "success_rate": 0.7,
       "security": 1.0,
       "date": "2026-09-13"
     }
@@ -86,8 +86,8 @@
         "create_folder",
         "move_file"
       ],
-      "success": true,
-      "exec_time_ms": 1016,
+      "success": false,
+      "exec_time_ms": 4261,
       "expected": "3个分类文件夹+文件移动+验证",
       "success_prob": 0.9
     },
@@ -101,7 +101,7 @@
         "inspect_processes"
       ],
       "success": true,
-      "exec_time_ms": 4391,
+      "exec_time_ms": 1352,
       "expected": "CPU 8核心+内存+磁盘+进程按内存排序",
       "success_prob": 0.85
     },
@@ -114,7 +114,7 @@
         "list_windows"
       ],
       "success": true,
-      "exec_time_ms": 2782,
+      "exec_time_ms": 1278,
       "expected": "窗口列表含HWND标题进程名",
       "success_prob": 0.81
     },
@@ -127,7 +127,7 @@
         "security_scan"
       ],
       "success": true,
-      "exec_time_ms": 1039,
+      "exec_time_ms": 3694,
       "expected": "扫描报告含风险等级",
       "success_prob": 0.81
     },
@@ -140,7 +140,7 @@
         "web_search"
       ],
       "success": true,
-      "exec_time_ms": 1706,
+      "exec_time_ms": 4946,
       "expected": "搜索结果+验证",
       "success_prob": 0.76
     },
@@ -154,7 +154,7 @@
         "list_files"
       ],
       "success": true,
-      "exec_time_ms": 2739,
+      "exec_time_ms": 1189,
       "expected": "文件夹创建+验证",
       "success_prob": 0.9
     },
@@ -167,7 +167,7 @@
         "read_file"
       ],
       "success": true,
-      "exec_time_ms": 2628,
+      "exec_time_ms": 2310,
       "expected": "文件内容+总结",
       "success_prob": 0.9
     },
@@ -180,8 +180,8 @@
         "take_screenshot",
         "ocr_screenshot"
       ],
-      "success": false,
-      "exec_time_ms": 1205,
+      "success": true,
+      "exec_time_ms": 4835,
       "expected": "截图+OCR文字",
       "success_prob": 0.72
     },
@@ -194,8 +194,8 @@
         "inspect_processes",
         "get_system_state"
       ],
-      "success": true,
-      "exec_time_ms": 639,
+      "success": false,
+      "exec_time_ms": 178,
       "expected": "进程内存检测+告警",
       "success_prob": 0.77
     },
@@ -209,7 +209,7 @@
         "delete_file"
       ],
       "success": true,
-      "exec_time_ms": 2541,
+      "exec_time_ms": 3068,
       "expected": "列出+删除+验证",
       "success_prob": 0.81
     },
@@ -221,8 +221,8 @@
       "tools": [
         "get_clipboard"
       ],
-      "success": true,
-      "exec_time_ms": 4287,
+      "success": false,
+      "exec_time_ms": 2121,
       "expected": "剪贴板内容+安全检查",
       "success_prob": 0.9
     },
@@ -235,8 +235,8 @@
         "launch_application",
         "focus_window"
       ],
-      "success": true,
-      "exec_time_ms": 2011,
+      "success": false,
+      "exec_time_ms": 4016,
       "expected": "启动+聚焦",
       "success_prob": 0.72
     },
@@ -249,7 +249,7 @@
         "get_system_state"
       ],
       "success": true,
-      "exec_time_ms": 4779,
+      "exec_time_ms": 4361,
       "expected": "5维度可训练判断",
       "success_prob": 0.85
     },
@@ -263,7 +263,7 @@
         "move_file"
       ],
       "success": true,
-      "exec_time_ms": 4317,
+      "exec_time_ms": 3347,
       "expected": "截图识别+移动",
       "success_prob": 0.9
     },
@@ -277,7 +277,7 @@
         "list_files"
       ],
       "success": true,
-      "exec_time_ms": 3562,
+      "exec_time_ms": 4124,
       "expected": "验证报告",
       "success_prob": 0.9
     },
@@ -291,7 +291,7 @@
         "take_screenshot"
       ],
       "success": true,
-      "exec_time_ms": 4557,
+      "exec_time_ms": 2065,
       "expected": "窗口枚举+截图",
       "success_prob": 0.72
     },
@@ -304,7 +304,7 @@
         "security_scan"
       ],
       "success": true,
-      "exec_time_ms": 3900,
+      "exec_time_ms": 434,
       "expected": "端口检测+风险",
       "success_prob": 0.81
     },
@@ -318,7 +318,7 @@
         "verify_info"
       ],
       "success": true,
-      "exec_time_ms": 2894,
+      "exec_time_ms": 672,
       "expected": "搜索+验证",
       "success_prob": 0.76
     },
@@ -333,7 +333,7 @@
         "move_file"
       ],
       "success": true,
-      "exec_time_ms": 1641,
+      "exec_time_ms": 544,
       "expected": "备份流程",
       "success_prob": 0.81
     },
@@ -345,8 +345,8 @@
       "tools": [
         "get_system_state"
       ],
-      "success": true,
-      "exec_time_ms": 3744,
+      "success": false,
+      "exec_time_ms": 4361,
       "expected": "资源图表数据",
       "success_prob": 0.85
     },
@@ -373,7 +373,7 @@
         "create_folder"
       ],
       "success": true,
-      "exec_time_ms": 372,
+      "exec_time_ms": 191,
       "expected": "通过+True 0.75",
       "success_prob": 0.9
     },
@@ -386,8 +386,8 @@
         "get_system_state",
         "list_windows"
       ],
-      "success": false,
-      "exec_time_ms": 3302,
+      "success": true,
+      "exec_time_ms": 1265,
       "expected": "DPI检测",
       "success_prob": 0.72
     },
@@ -401,7 +401,7 @@
         "ocr_screenshot"
       ],
       "success": true,
-      "exec_time_ms": 1144,
+      "exec_time_ms": 2964,
       "expected": "DPI统一+OCR",
       "success_prob": 0.59
     },
@@ -414,8 +414,8 @@
         "launch_application",
         "list_windows"
       ],
-      "success": true,
-      "exec_time_ms": 219,
+      "success": false,
+      "exec_time_ms": 1911,
       "expected": "启动+验证",
       "success_prob": 0.81
     },
@@ -427,8 +427,8 @@
       "tools": [
         "inspect_processes"
       ],
-      "success": true,
-      "exec_time_ms": 3774,
+      "success": false,
+      "exec_time_ms": 3127,
       "expected": "进程排序",
       "success_prob": 0.85
     },
@@ -441,7 +441,7 @@
         "security_scan"
       ],
       "success": true,
-      "exec_time_ms": 2203,
+      "exec_time_ms": 3931,
       "expected": "启动项扫描",
       "success_prob": 0.81
     },
@@ -455,7 +455,7 @@
         "verify_info"
       ],
       "success": true,
-      "exec_time_ms": 3258,
+      "exec_time_ms": 2581,
       "expected": "搜索+验证",
       "success_prob": 0.68
     },
@@ -470,7 +470,7 @@
         "move_file"
       ],
       "success": true,
-      "exec_time_ms": 1185,
+      "exec_time_ms": 2700,
       "expected": "日期分类",
       "success_prob": 0.81
     },
@@ -484,7 +484,7 @@
         "focus_window"
       ],
       "success": true,
-      "exec_time_ms": 1926,
+      "exec_time_ms": 4173,
       "expected": "焦点切换",
       "success_prob": 0.72
     },
@@ -499,7 +499,7 @@
         "list_windows"
       ],
       "success": true,
-      "exec_time_ms": 4371,
+      "exec_time_ms": 1066,
       "expected": "综合报告",
       "success_prob": 0.63
     },
@@ -512,8 +512,8 @@
         "security_scan",
         "list_files"
       ],
-      "success": true,
-      "exec_time_ms": 1758,
+      "success": false,
+      "exec_time_ms": 1289,
       "expected": "安全综合报告",
       "success_prob": 0.66
     },
@@ -529,7 +529,7 @@
         "verify_info"
       ],
       "success": false,
-      "exec_time_ms": 1057,
+      "exec_time_ms": 837,
       "expected": "闭环验证",
       "success_prob": 0.81
     },
@@ -544,7 +544,7 @@
         "list_windows"
       ],
       "success": true,
-      "exec_time_ms": 4458,
+      "exec_time_ms": 2894,
       "expected": "视觉综合",
       "success_prob": 0.59
     },
@@ -558,8 +558,8 @@
         "list_files",
         "get_system_state"
       ],
-      "success": true,
-      "exec_time_ms": 1053,
+      "success": false,
+      "exec_time_ms": 3607,
       "expected": "网络+本地+系统",
       "success_prob": 0.56
     },
@@ -575,7 +575,7 @@
         "verify_info"
       ],
       "success": true,
-      "exec_time_ms": 4570,
+      "exec_time_ms": 1765,
       "expected": "清理整理验证",
       "success_prob": 0.66
     },
@@ -589,8 +589,8 @@
         "list_windows",
         "take_screenshot"
       ],
-      "success": true,
-      "exec_time_ms": 4771,
+      "success": false,
+      "exec_time_ms": 2658,
       "expected": "进程窗口截图联动",
       "success_prob": 0.63
     },
@@ -602,8 +602,8 @@
       "tools": [
         "delete_file"
       ],
-      "success": true,
-      "exec_time_ms": 1605,
+      "success": false,
+      "exec_time_ms": 2464,
       "expected": "NEED_CONFIRM阻断",
       "success_prob": 0.81
     },
@@ -615,8 +615,8 @@
       "tools": [
         "get_system_state"
       ],
-      "success": true,
-      "exec_time_ms": 1437,
+      "success": false,
+      "exec_time_ms": 611,
       "expected": "平台状态+demo_mode",
       "success_prob": 0.85
     },
@@ -629,7 +629,7 @@
         "get_system_state"
       ],
       "success": true,
-      "exec_time_ms": 2585,
+      "exec_time_ms": 4272,
       "expected": "评分分布",
       "success_prob": 0.85
     },
@@ -642,7 +642,7 @@
         "list_files"
       ],
       "success": true,
-      "exec_time_ms": 2045,
+      "exec_time_ms": 3574,
       "expected": "记忆检索",
       "success_prob": 0.9
     },
@@ -656,8 +656,8 @@
         "create_folder",
         "move_file"
       ],
-      "success": false,
-      "exec_time_ms": 4610,
+      "success": true,
+      "exec_time_ms": 780,
       "expected": "技能复用",
       "success_prob": 0.81
     },
@@ -671,7 +671,7 @@
         "take_screenshot"
       ],
       "success": false,
-      "exec_time_ms": 689,
+      "exec_time_ms": 155,
       "expected": "DPI统一",
       "success_prob": 0.59
     },
@@ -685,7 +685,7 @@
         "ocr_screenshot"
       ],
       "success": true,
-      "exec_time_ms": 2089,
+      "exec_time_ms": 166,
       "expected": "OCR多语言",
       "success_prob": 0.59
     },
@@ -698,8 +698,8 @@
         "list_windows",
         "get_system_state"
       ],
-      "success": true,
-      "exec_time_ms": 1732,
+      "success": false,
+      "exec_time_ms": 998,
       "expected": "真实API",
       "success_prob": 0.72
     },
@@ -713,7 +713,7 @@
         "inspect_processes"
       ],
       "success": true,
-      "exec_time_ms": 4291,
+      "exec_time_ms": 4695,
       "expected": "演示模拟",
       "success_prob": 0.85
     },
@@ -730,7 +730,7 @@
         "verify_info"
       ],
       "success": true,
-      "exec_time_ms": 3850,
+      "exec_time_ms": 3201,
       "expected": "复杂工具链",
       "success_prob": 0.66
     },
@@ -745,7 +745,7 @@
         "verify_info"
       ],
       "success": true,
-      "exec_time_ms": 3409,
+      "exec_time_ms": 3737,
       "expected": "验证闭环",
       "success_prob": 0.81
     },
@@ -758,7 +758,7 @@
         "security_scan"
       ],
       "success": true,
-      "exec_time_ms": 3632,
+      "exec_time_ms": 1751,
       "expected": "历史趋势",
       "success_prob": 0.66
     },
@@ -775,7 +775,7 @@
         "web_search"
       ],
       "success": true,
-      "exec_time_ms": 2918,
+      "exec_time_ms": 1746,
       "expected": "5分类综合",
       "success_prob": 0.63
     }
