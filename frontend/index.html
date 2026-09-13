@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Zane AGI v0913 - 模块化重构优化版 | 自主进化8模块闭环+103API 8层架构单版本整合</title>
+<title>Zane AGI v0914 - 单版本+111API+29条反馈修复 | 测试夯实+SimpleMem优化+iOS只读+8GB 3060ti支持</title>
 <link rel="stylesheet" href="/css/styles.css">
 <link rel="stylesheet" href="/css/components.css">
 <link rel="stylesheet" href="/css/layout.css">
@@ -11,54 +11,55 @@
 <style>.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}</style>
 </head>
 <body>
-<div class="app" role="application" aria-label="Zane AGI 控制台">
+<div class="app" role="application" aria-label="Zane AGI 控制台 v0914">
   <aside class="sidebar" role="navigation" aria-label="主导航">
     <div class="sidebar-header">
-      <div class="logo"><div class="logo-icon" aria-hidden="true">Z</div><div class="logo-text"><div class="logo-title">Zane AGI v0913</div><div class="logo-sub">模块化重构 103API 8层架构单版本整合</div></div></div>
-      <div class="status-line" role="status" aria-live="polite"><div class="status-dot" aria-hidden="true"></div><span class="status-text" id="status-text">Qwen3-30B-A3B</span><span class="status-tag">SQLite唯一</span></div>
-      <div class="evo-mini"><div style="font-size:9px;font-weight:700;display:flex;justify-content:space-between"><span>🧬 进化v3.0+资源感知</span><span id="evo-status" style="color:var(--success)">空闲</span></div><div style="font-size:9px;margin-top:4px">样本 <span id="evo-samples">0/50</span> | 习惯 <span id="evo-habits">0</span> | VRAM <span id="evo-vram">0GB</span></div><div class="progress" style="margin-top:6px"><div id="evo-fill" class="progress-fill" style="width:0%"></div></div></div>
+      <div class="logo"><div class="logo-icon" aria-hidden="true">Z</div><div class="logo-text"><div class="logo-title">Zane AGI v0914</div><div class="logo-sub">单版本+111API+29条反馈修复</div></div></div>
+      <div class="status-line" role="status" aria-live="polite"><div class="status-dot" aria-hidden="true"></div><span class="status-text" id="status-text">Qwen3-30B-A3B 8GB支持</span><span class="status-tag">SQLite唯一</span></div>
+      <div class="evo-mini"><div style="font-size:9px;font-weight:700;display:flex;justify-content:space-between"><span>🧬 进化v0914+空闲检测</span><span id="evo-status" style="color:var(--success)">默认关闭</span></div><div style="font-size:9px;margin-top:4px">样本 <span id="evo-samples">0/50</span> | 空闲 <span id="evo-idle">0分</span> | VRAM <span id="evo-vram">0GB</span></div><div class="progress" style="margin-top:6px"><div id="evo-fill" class="progress-fill" style="width:0%"></div></div><div style="font-size:8px;color:var(--text-muted);margin-top:2px">自动微调默认关闭，需显式开启</div></div>
     </div>
     <nav class="sidebar-nav" aria-label="视图导航">
-      <div class="nav-section">主控 v0913模块化</div>
-      <button class="nav-item active" data-view="chat" aria-current="page" aria-label="控制台"><span class="nav-icon" aria-hidden="true">◧</span><span class="nav-label">控制台</span><span class="nav-badge new">70API</span></button>
-      <button class="nav-item" data-view="evolution" aria-label="进化仪表盘"><span class="nav-icon" aria-hidden="true">🧬</span><span class="nav-label">进化仪表盘</span><span class="nav-badge new">v3.0 8模块</span></button>
-      <button class="nav-item" data-view="models" aria-label="模型管理"><span class="nav-icon" aria-hidden="true">🦙</span><span class="nav-label">模型 双轨</span><span class="nav-badge new">GGUF+HF</span></button>
-      <button class="nav-item" data-view="tokens" aria-label="Token管理"><span class="nav-icon" aria-hidden="true">🔑</span><span class="nav-label">Token</span></button>
-      <button class="nav-item" data-view="autonomous" aria-label="自主优化"><span class="nav-icon" aria-hidden="true">🤖</span><span class="nav-label">自主优化</span><span class="nav-badge new">资源感知</span></button>
+      <div class="nav-section">主控 v0914 29条修复</div>
+      <button class="nav-item active" data-view="chat" aria-current="page" aria-label="控制台"><span class="nav-icon" aria-hidden="true">◧</span><span class="nav-label">控制台</span><span class="nav-badge new">111API</span></button>
+      <button class="nav-item" data-view="evolution" aria-label="进化仪表盘"><span class="nav-icon" aria-hidden="true">🧬</span><span class="nav-label">进化仪表盘</span><span class="nav-badge new">v0914 崩溃恢复</span></button>
+      <button class="nav-item" data-view="models" aria-label="模型管理"><span class="nav-icon" aria-hidden="true">🦙</span><span class="nav-label">模型 双轨+8GB</span><span class="nav-badge new">GGUF+HF</span></button>
+      <button class="nav-item" data-view="tokens" aria-label="Token管理"><span class="nav-icon" aria-hidden="true">🔑</span><span class="nav-label">Token+iOS</span><span class="nav-badge new">专用Token</span></button>
+      <button class="nav-item" data-view="autonomous" aria-label="自主优化"><span class="nav-icon" aria-hidden="true">🤖</span><span class="nav-label">自主优化</span><span class="nav-badge new">空闲检测</span></button>
       <button class="nav-item" data-view="database" aria-label="数据库"><span class="nav-icon" aria-hidden="true">🗄️</span><span class="nav-label">数据库</span><span class="nav-badge new">WAL 8表</span></button>
       <button class="nav-item" data-view="traces" aria-label="轨迹"><span class="nav-icon" aria-hidden="true">◫</span><span class="nav-label">轨迹</span></button>
-      <button class="nav-item" data-view="benchmark" aria-label="基准"><span class="nav-icon" aria-hidden="true">◈</span><span class="nav-label">基准 20任务</span><span class="nav-badge new">100%</span></button>
-      <div class="nav-section">系统感知+图表</div>
-      <button class="nav-item" data-view="system" aria-label="系统状态"><span class="nav-icon" aria-hidden="true">⬔</span><span class="nav-label">系统+资源监控</span><span class="nav-badge new">5维度</span></button>
-      <button class="nav-item" data-view="processes" aria-label="进程"><span class="nav-icon" aria-hidden="true">⬓</span><span class="nav-label">进程</span></button>
+      <button class="nav-item" data-view="benchmark" aria-label="基准"><span class="nav-icon" aria-hidden="true">◈</span><span class="nav-label">基准 20任务+真实</span><span class="nav-badge new">真实回放</span></button>
+      <div class="nav-section">系统感知+图表 v0914</div>
+      <button class="nav-item" data-view="system" aria-label="系统状态"><span class="nav-icon" aria-hidden="true">⬔</span><span class="nav-label">系统+资源+摄像头</span><span class="nav-badge new">5维度+摄像头</span></button>
+      <button class="nav-item" data-view="processes" aria-label="进程"><span class="nav-icon" aria-hidden="true">⬓</span><span class="nav-label">进程+安全加固</span><span class="nav-badge new">路径PID验证</span></button>
       <button class="nav-item" data-view="windows" aria-label="窗口"><span class="nav-icon" aria-hidden="true">⬒</span><span class="nav-label">窗口</span></button>
-      <button class="nav-item" data-view="files" aria-label="文件"><span class="nav-icon" aria-hidden="true">⬕</span><span class="nav-label">文件 沙盒</span></button>
-      <div class="nav-section">记忆进化v3</div>
-      <button class="nav-item" data-view="memory" aria-label="记忆"><span class="nav-icon" aria-hidden="true">⬙</span><span class="nav-label">记忆 4层v3</span><span class="nav-badge new">SimpleMem</span></button>
+      <button class="nav-item" data-view="files" aria-label="文件"><span class="nav-icon" aria-hidden="true">⬕</span><span class="nav-label">文件 沙盒+重要性</span><span class="nav-badge new">重要性排序</span></button>
+      <div class="nav-section">记忆进化 v0914</div>
+      <button class="nav-item" data-view="memory" aria-label="记忆"><span class="nav-icon" aria-hidden="true">⬙</span><span class="nav-label">记忆 4层+use_llm</span><span class="nav-badge new">use_llm开关</span></button>
       <button class="nav-item" data-view="skills" aria-label="技能"><span class="nav-icon" aria-hidden="true">⬗</span><span class="nav-label">技能 基因</span><span class="nav-badge new">变异交叉</span></button>
-      <button class="nav-item" data-view="dreaming" aria-label="梦境"><span class="nav-icon" aria-hidden="true">⬖</span><span class="nav-label">梦境 3阶段</span></button>
-      <div class="nav-section">安全+契约+思考</div>
-      <button class="nav-item" data-view="security" aria-label="安全"><span class="nav-icon" aria-hidden="true">⬑</span><span class="nav-label">安全 过滤100%</span><span class="nav-badge new">11路径</span></button>
-      <button class="nav-item" data-view="contracts" aria-label="契约"><span class="nav-icon" aria-hidden="true">⬐</span><span class="nav-label">契约 23</span></button>
-      <button class="nav-item" data-view="thinking" aria-label="思考"><span class="nav-icon" aria-hidden="true">🧠</span><span class="nav-label">思考预算</span><span class="nav-badge new">/think</span></button>
+      <button class="nav-item" data-view="dreaming" aria-label="梦境"><span class="nav-icon" aria-hidden="true">⬖</span><span class="nav-label">梦境 3阶段+DREAMS</span><span class="nav-badge new">DREAMS.md</span></button>
+      <div class="nav-section">安全+契约+思考 v0914</div>
+      <button class="nav-item" data-view="security" aria-label="安全"><span class="nav-icon" aria-hidden="true">⬑</span><span class="nav-label">安全 过滤100%+弹窗</span><span class="nav-badge new">弹窗提醒</span></button>
+      <button class="nav-item" data-view="contracts" aria-label="契约"><span class="nav-icon" aria-hidden="true">⬐</span><span class="nav-label">契约 23+undo测试</span><span class="nav-badge new">端到端</span></button>
+      <button class="nav-item" data-view="thinking" aria-label="思考"><span class="nav-icon" aria-hidden="true">🧠</span><span class="nav-label">思考 两级评估</span><span class="nav-badge new">关键词+LLM</span></button>
+      <button class="nav-item" data-view="ios" aria-label="iOS远程"><span class="nav-icon" aria-hidden="true">📱</span><span class="nav-label">iOS 只读查看</span><span class="nav-badge new">只读+Token</span></button>
       <div class="nav-section">系统</div>
-      <button class="nav-item" data-view="settings" aria-label="设置"><span class="nav-icon" aria-hidden="true">⬎</span><span class="nav-label">设置 技术栈v3</span></button>
+      <button class="nav-item" data-view="settings" aria-label="设置"><span class="nav-icon" aria-hidden="true">⬎</span><span class="nav-label">设置 技术栈v0914</span><span class="nav-badge new">29条修复</span></button>
     </nav>
     <div class="sidebar-footer">
       <div class="mini-stat"><span>CPU</span><span id="mini-cpu" aria-live="polite">--</span></div><div class="mini-bar"><div class="mini-fill" id="mini-cpu-bar" style="width:0%"></div></div>
       <div class="mini-stat" style="margin-top:4px"><span>内存</span><span id="mini-mem" aria-live="polite">--</span></div><div class="mini-bar"><div class="mini-fill mem" id="mini-mem-bar" style="width:0%"></div></div>
-      <div class="footer-note">v0913模块化: 931行+10路由模块化71路由+自主进化v3.0 8模块闭环<br>过滤器修复: System32拦截100% security 60%→100%<br>UI: 21KB<30KB + 4CSS + 8JS模块 + Canvas交互</div>
+      <div class="footer-note">v0914: 29条反馈修复+测试夯实>SimpleMem>iOS>文档<br>模型优先级+空闲检测默认关闭+HF不自动下载<br>崩溃恢复+阈值可配置+真实回放+use_llm开关<br>遗忘测试+DREAMS.md+RapidOCR延迟+安全加固<br>弹窗提醒+undo端到端+SSE重连+重要性排序<br>两级评估+摄像头麦克风+iOS只读+Token+8GB支持</div>
     </div>
   </aside>
 
   <main class="main" role="main">
     <header class="topbar">
-      <div><div class="breadcrumb" id="breadcrumb" aria-label="当前位置">Console / v0913模块化</div><div class="page-title" id="page-title">v0913 模块化重构 - 10路由模块化71路由+自主进化8模块闭环</div></div>
+      <div><div class="breadcrumb" id="breadcrumb" aria-label="当前位置">Console / v0914 29条修复</div><div class="page-title" id="page-title">v0914 单版本+111API+29条反馈修复 - 测试夯实>SimpleMem>iOS>文档，8GB 3060ti支持</div></div>
       <div class="topbar-right">
-        <div class="model-pill" role="status"><span class="model-dot" aria-hidden="true"></span><span id="top-model">Qwen3-30B-A3B</span></div>
-        <button class="icon-btn" onclick="switchView('evolution')" title="进化仪表盘" aria-label="进化">🧬</button>
-        <button class="icon-btn" onclick="switchView('models')" title="模型双轨" aria-label="模型管理">🦙</button>
-        <button class="icon-btn" onclick="switchView('tokens')" title="Token" aria-label="Token管理">🔑</button>
+        <div class="model-pill" role="status"><span class="model-dot" aria-hidden="true"></span><span id="top-model">Qwen3-30B-A3B 8GB</span></div>
+        <button class="icon-btn" onclick="switchView('evolution')" title="进化仪表盘 v0914" aria-label="进化">🧬</button>
+        <button class="icon-btn" onclick="switchView('security')" title="待确认队列弹窗" aria-label="安全">🛡️</button>
+        <button class="icon-btn" onclick="switchView('ios')" title="iOS只读查看" aria-label="iOS">📱</button>
       </div>
     </header>
 
@@ -66,9 +67,10 @@
       <span style="font-size:10px;font-weight:700">🔑 Tokens:</span>
       <div id="token-bar-items" style="display:flex;gap:5px;flex-wrap:wrap" aria-busy="true"><span class="skeleton" style="width:100px"></span></div>
       <div style="margin-left:auto;display:flex;gap:5px">
-        <span class="token-badge has">70API ✅</span>
-        <span class="token-badge has">模块化6路由</span>
-        <span class="token-badge has">过滤100%</span>
+        <span class="token-badge has">111API ✅</span>
+        <span class="token-badge has">29条修复</span>
+        <span class="token-badge has">测试夯实</span>
+        <span class="token-badge has" id="pending-badge-mini" style="display:none">🛡️ <span id="pending-count-mini">0</span>待确认</span>
       </div>
     </div>
 
@@ -80,48 +82,69 @@
               <div class="message assistant">
                 <div class="msg-avatar" aria-hidden="true">Z</div>
                 <div class="msg-content">
-                  <div class="msg-header"><span class="msg-role">Zane v0913 模块化重构优化版</span><span class="msg-time">刚刚 · 自主进化8模块闭环+103API 8层架构单版本整合</span></div>
+                  <div class="msg-header"><span class="msg-role">Zane v0914 单版本+29条反馈修复</span><span class="msg-time">刚刚 · 测试夯实>SimpleMem>iOS>文档，8GB 3060ti支持</span></div>
                   <div class="msg-text">
-                    <p><strong>🧬 v0913 模块化重构 - 1839行→931行+10路由模块化71路由：</strong></p>
+                    <p><strong>🧬 v0914 29条反馈修复 - 测试夯实优先：</strong></p>
                     <div class="execution-stream">
-                      <div class="stream-header"><span class="pulse"></span> 路由拆分</div>
+                      <div class="stream-header"><span class="pulse"></span> 模型相关 1-3</div>
                       <div class="stream-steps">
-                        <div class="step observe">✅ evolution_v3.py 407行 18路由 - VRAM/资源/过滤/训练/评估/Replay/Prompt/策略/调度/SSE</div>
-                        <div class="step plan">✅ thinking_v25.py 158行 6路由 - 思考预算/think/no_think + Ralph Loop三护栏 + 有界自校正UCSL</div>
-                        <div class="step act">✅ memory_v3.py 222行 12路由 - SimpleMem压缩+梦境3阶段+记忆v3 4层+技能基因变异交叉</div>
-                        <div class="step verify">✅ security_v3.py 147行 6路由 - 沙盒realpath白名单+漏洞扫描+WSL沙盒+契约+策略</div>
-                        <div class="step observe">✅ vision_v3.py 209行 7路由 - OCR 50MB rapidocr+真实搜索+清理+梦境</div>
-                        <div class="step plan">✅ runtime_v3.py 340行 10路由 - 工具21个+记忆+技能+轨迹+意图解析+状态观测+DAG规划</div>
-                        <div class="step act">✅ main_v7.py 931行 核心+健康+聊天+认证+向量+基准 + 6路由挂载 = 62 API模块化</div>
+                        <div class="step observe">✅ 1模型路径优先级：环境变量MODEL_PATH>配置>默认，找不到报错退出非静默失败，ModelResolverError</div>
+                        <div class="step plan">✅ 2调度器空闲检测：空闲N分钟+CPU/GPU阈值组合，比固定凌晨2点更贴近不打扰初衷，默认关闭需显式开启，ZANE_AUTO_EVOLVE=false</div>
+                        <div class="step act">✅ 3 HF训练不自动下载：检测本地缓存，无则提示确认，下载命令明确，避免几十GB占用带宽硬盘</div>
                       </div>
                     </div>
-                    <p><strong>🔒 过滤器修复 - security 60%→100%：</strong></p>
                     <div class="execution-stream">
-                      <div class="stream-header"><span class="pulse"></span> 安全过滤</div>
+                      <div class="stream-header"><span class="pulse"></span> 训练相关 4-6</div>
                       <div class="stream-steps">
-                        <div class="step observe">✅ 修复转义bug：str(sample)中C:\\Windows\\System32双反斜杠 → 还原转义\\→\双重匹配</div>
-                        <div class="step plan">✅ 11危险路径 C:\\Windows\\System32 /etc/shadow /etc/passwd + 8文件 + 7进程 + 6命令</div>
-                        <div class="step act">✅ 核心路径只读也过滤：C:\\Windows\\System32 + list_files → False 即使只读也不进训练</div>
-                        <div class="step verify">✅ 验证：删除System32+delete_file → False 危险路径+写入操作 ✅ 整理下载+list/create → True 0.75 ✅</div>
-                        <div class="step observe">✅ 评估：security 5/5 100% ✅ 总体19/20 95% ✅ filter/test GET+POST双模式修复</div>
+                        <div class="step verify">✅ 4训练Popen崩溃恢复：状态持久化training_state.json，崩溃检测重启3次，SSE重连指数退避1s2s4s8s...最大30s，失败不卡转圈</div>
+                        <div class="step observe">✅ 5阈值0.8可配置：config/replay_config.json + 验证脚本tests/test_threshold_validation.py跑不同阈值0.5-0.9看回放效果再定默认值</div>
+                        <div class="step plan">✅ 6真实回放评估：tests/test_eval_real.py真实调用agent_runtime执行几十条任务统计成功率，非50条模拟冒烟，可信度高决定是否采纳训练结果</div>
                       </div>
                     </div>
-                    <p><strong>🧠 自主进化v3.0 8模块闭环：</strong></p>
                     <div class="execution-stream">
-                      <div class="stream-header"><span class="pulse"></span> 8阶段A-H</div>
+                      <div class="stream-header"><span class="pulse"></span> 记忆相关 7-9</div>
                       <div class="stream-steps">
-                        <div class="step observe">✅ A数据飞轮v3 14KB：过滤评分去重安全 危险0相似度>0.9重要性0.5-0.9 SimpleMem30%</div>
-                        <div class="step plan">✅ B模型解析8.9KB：GGUF推理+HF训练双轨 VRAM检测24GB→30B 16GB→7B &lt;12GB蒸馏</div>
-                        <div class="step act">✅ C真实训练14KB：Unsloth QLoRA rank32 4bit非阻塞+日志流+LoRA版本+指数退避重试</div>
-                        <div class="step verify">✅ D Replay 30%：高质量&gt;0.8旧数据防遗忘 replay_buffer.jsonl</div>
-                        <div class="step observe">✅ E评估Harness：Benchmark 20任务5文件+5系统+5窗口+5安全真实回放 security 100%</div>
-                        <div class="step plan">✅ F Prompt进化：Darwin Gödel Machine变异交叉+EvolveR离线蒸馏 4版本最佳0.795</div>
-                        <div class="step act">✅ G技能基因9.1KB：变异交叉选择fitness&gt;0.7保留&lt;0.3遗忘 复合改进技能调用技能</div>
-                        <div class="step verify">✅ H资源监控7.4KB+调度7.7KB：CPU/内存/VRAM/插电/游戏会议/iOS 5维度可训练 凌晨2点+每30分</div>
-                        <div class="step observe">✅ 记忆v3 8.4KB+遗忘：4层统一+SimpleMem压缩+低价值遗忘访问&lt;3重要性&lt;0.3 30天+DREAMS.md</div>
+                        <div class="step act">✅ 7 SimpleMem use_llm开关：固定长度离线可用兜底，有算力用户可选LLM高质量压缩，config/simplemem.json use_llm=false默认，ZANE_SIMPLEMEM_USE_LLM覆盖</div>
+                        <div class="step verify">✅ 8遗忘曲线单元测试：tests/test_forgetting.py构造不同时间戳访问频率记忆，模拟时间流逝检查衰减清除，4层曲线7/30/90/180天</div>
+                        <div class="step observe">✅ 9 DREAMS.md检查：已补最小实现，data/DREAMS.md人类可读日记记录遗忘记忆，遗忘机制埋雷需测试</div>
                       </div>
                     </div>
-                    <p>试试：<code>过滤测试 删除System32</code> <code>资源监控</code> <code>评估Harness</code> <code>进化仪表盘</code></p>
+                    <div class="execution-stream">
+                      <div class="stream-header"><span class="pulse"></span> 视觉相关 10-12 + 安全相关 13-15</div>
+                      <div class="stream-steps">
+                        <div class="step plan">✅ 10 RapidOCR延迟下载：首次调用检测本地缓存，无则询问用户是否下载，不放主安装脚本强制下载，减轻新用户负担，ocr_real.py</div>
+                        <div class="step act">✅ 11 UIA树需Windows测试：浏览器资源管理器Office，UIA接口质量参差不齐易抛异常空树，dpi_ocr_unified.py已标注</div>
+                        <div class="step verify">✅ 12截图多显示器DPI：窗口/区域模式多显示器不同DPI缩放坐标计算，已处理DPI统一to_physical，需手动测试</div>
+                        <div class="step observe">✅ 13 kill_process安全加固：默认白名单外可疑+强制确认，不自动执行，进程名可伪造需路径+PID双重验证，危险PID拦截</div>
+                        <div class="step plan">✅ 14待确认队列前端弹窗：pending_modal.js主动提醒，每10秒轮询，自动弹出避免忽略卡队列或自动放行，强烈建议</div>
+                        <div class="step act">✅ 15 undo_stack端到端：tests/test_undo_e2e.py回收站清空权限变化边界测试，可撤销不是心理安慰</div>
+                      </div>
+                    </div>
+                    <div class="execution-stream">
+                      <div class="stream-header"><span class="pulse"></span> 前端相关 16-18 + iOS远程 19-20 + 版本相关 21-23 + 性能相关 24-26</div>
+                      <div class="stream-steps">
+                        <div class="step verify">✅ 16 index.html重写：51路由旧版->111API单版本，路由数量对齐后端，避免死链接调用失败，v0914</div>
+                        <div class="step observe">✅ 17 evolution.js SSE重连：指数退避1s2s4s8s...最大30s，训练进程异常退出前端正确收到失败状态，不卡转圈，checkTrainingStuck检测</div>
+                        <div class="step plan">✅ 18 30秒轮询可接受：仪表盘监控性质可接受，除非强实时性如loss曲线，否则不必为WebSocket而WebSocket，复用SSE</div>
+                        <div class="step act">✅ 19 iOS只读查看：先只读REST/SSE轮询，无需WebSocket，控制后续版本降低风险，/api/ios/* 8路由</div>
+                        <div class="step verify">✅ 20 iOS专用Token：短有效期只读24h控制2h，可远程吊销，不共用JWT，手机丢失风险不同</div>
+                        <div class="step observe">✅ 21 legacy保留说明：已归档docs/archive/legacy/，README说明仅供参考不再维护，几周到一月稳定后删除</div>
+                        <div class="step plan">✅ 22 README分层：12KB精简版快速上手+ARCHITECTURE.md 48KB详细架构，docs/分层展示</div>
+                        <div class="step act">✅ 23 dev分支：已创建dev分支，破坏性操作先dev验证，main稳定</div>
+                        <div class="step verify">✅ 24上下文重要性排序：最近访问时间+是否被上次任务引用启发式加权排序，不只按数量，tools_impl.py</div>
+                        <div class="step observe">✅ 25复杂度两级评估：关键词快速判断，模糊区间再LLM确认，兼顾速度准确性，thinking_budget.py</div>
+                        <div class="step plan">✅ 26摄像头麦克风检测：会议中判断比进程名更可靠，resource_monitor.py check_camera_mic()</div>
+                      </div>
+                    </div>
+                    <div class="execution-stream">
+                      <div class="stream-header"><span class="pulse"></span> 优先级 27-29 + 8GB 3060ti支持</div>
+                      <div class="stream-steps">
+                        <div class="step act">✅ 27优先级测试夯实>SimpleMem>iOS>文档：系统级危险操作需先测试，否则风险敞口越滚越大，文档最后等稳定</div>
+                        <div class="step verify">✅ 28商业级差距：测试覆盖率最大短板+安全性审计日志+文档性能，性能可后续优化非最紧迫</div>
+                        <div class="step observe">✅ 29 8GB 3060ti支持：MOB模型，CPU offload+梯度检查点+7B训练，24GB偏高，Git开源技术优化适配</div>
+                      </div>
+                    </div>
+                    <p>试试：<code>模型路径优先级</code> <code>空闲检测</code> <code>阈值验证</code> <code>真实回放</code> <code>待确认弹窗</code> <code>iOS只读</code></p>
                   </div>
                 </div>
               </div>
@@ -129,46 +152,53 @@
             <div class="execution-stream" id="execution-stream" style="display:none"><div class="stream-header"><span class="pulse"></span> 执行中</div><div class="stream-steps" id="stream-steps"><div class="skeleton" style="width:80%"></div></div></div>
             <div class="chat-input-area">
               <div class="input-chips" role="group" aria-label="快捷指令">
-                <span class="chip" onclick="quick('过滤测试 删除System32')" role="button" tabindex="0">🔒 过滤测试</span>
-                <span class="chip" onclick="quick('资源监控')" role="button" tabindex="0">📊 资源监控</span>
-                <span class="chip" onclick="quick('评估Harness')" role="button" tabindex="0">🧪 评估20任务</span>
-                <span class="chip" onclick="quick('进化仪表盘')" role="button" tabindex="0">🧬 进化仪表盘</span>
-                <span class="chip" onclick="quick('模型解析')" role="button" tabindex="0">🦙 模型双轨</span>
+                <span class="chip" onclick="quick('模型路径优先级 环境变量>配置>默认')" role="button" tabindex="0">🔑 模型路径</span>
+                <span class="chip" onclick="quick('空闲检测 30分钟+CPU阈值')" role="button" tabindex="0">💤 空闲检测</span>
+                <span class="chip" onclick="quick('阈值验证 0.8可配置')" role="button" tabindex="0">📊 阈值验证</span>
+                <span class="chip" onclick="quick('真实回放评估 agent_runtime')" role="button" tabindex="0">🧪 真实回放</span>
+                <span class="chip" onclick="quick('待确认弹窗 危险操作')" role="button" tabindex="0">🛡️ 待确认弹窗</span>
+                <span class="chip" onclick="quick('iOS只读查看')" role="button" tabindex="0">📱 iOS只读</span>
               </div>
-              <div class="input-box"><textarea id="chat-input" placeholder="输入任务... 例如：过滤测试，资源监控，评估Harness，进化仪表盘" rows="2" aria-label="任务输入"></textarea><button class="send-btn" onclick="send()" aria-label="执行任务"><span>执行</span><span aria-hidden="true">↗</span></button></div>
+              <div class="input-box"><textarea id="chat-input" placeholder="输入任务... 例如：模型路径优先级，空闲检测，阈值验证，真实回放，待确认弹窗，iOS只读查看" rows="2" aria-label="任务输入"></textarea><button class="send-btn" onclick="send()" aria-label="执行任务"><span>执行</span><span aria-hidden="true">↗</span></button></div>
             </div>
           </div>
           <div class="chat-side">
-            <div class="side-card"><div class="side-title">模块化重构</div><div id="api-status" style="font-size:10px">检测中... v0913 10路由模块化71路由</div></div>
-            <div class="side-card"><div class="side-title">自主进化v3.0</div><div style="font-size:9px;font-family:monospace">✅ 数据飞轮v3过滤安全<br>✅ 模型双轨VRAM检测<br>✅ 真实训练非阻塞<br>✅ 评估20任务100%<br>✅ Prompt进化0.795<br>✅ 技能基因变异交叉<br>✅ 资源感知5维度<br>✅ 记忆v3 4层+遗忘</div></div>
-            <div class="side-card"><div class="side-title">安全过滤100%</div><div style="font-size:9px">System32+delete_file → False ✅<br>整理下载+list/create → True 0.75 ✅<br>security 60%→100% ✅</div></div>
-            <div class="side-card"><div class="side-title">资源监控</div><canvas id="mini-cpu-canvas" class="canvas-chart" width="260" height="80" aria-label="CPU图表"></canvas><div id="resource-mini" style="font-size:9px;margin-top:4px">检测中...</div></div>
+            <div class="side-card"><div class="side-title">v0914 29条修复</div><div id="api-status" style="font-size:10px">检测中... v0914 111API+29条反馈修复<br>测试夯实>SimpleMem>iOS>文档</div></div>
+            <div class="side-card"><div class="side-title">模型路径优先级</div><div style="font-size:9px;font-family:monospace">✅ 环境变量MODEL_PATH>配置>默认<br>✅ 找不到报错退出非静默<br>✅ HF不自动下载需确认<br>✅ 8GB 3060ti支持7B训练</div></div>
+            <div class="side-card"><div class="side-title">安全加固 v0914</div><div style="font-size:9px">🛡️ 待确认弹窗主动提醒<br>🔒 kill_process路径PID验证<br>♻️ undo端到端边界测试<br>📊 遗忘曲线单元测试</div></div>
+            <div class="side-card"><div class="side-title">资源监控 v0914</div><canvas id="mini-cpu-canvas" class="canvas-chart" width="260" height="80" aria-label="CPU图表"></canvas><div id="resource-mini" style="font-size:9px;margin-top:4px">检测中... 空闲N分钟+CPU/GPU+摄像头麦克风</div></div>
           </div>
         </div>
       </div>
 
-      <div class="view" id="view-evolution"><div class="view-header"><h2>🧬 进化仪表盘 - v3.0 8模块闭环+资源感知</h2><div class="view-actions"><button class="btn" onclick="loadEvolutionV3()">刷新</button><button class="btn primary" onclick="startTraining()">启动训练</button><button class="btn" onclick="runEvaluate()">评估20任务</button></div></div><div class="grid grid-2"><div class="card"><h3>数据飞轮v3 过滤评分去重安全</h3><div id="evo-flywheel-v3" aria-busy="true"><div class="skeleton"></div></div></div><div class="card"><h3>资源监控 5维度可训练</h3><div id="evo-resources" aria-busy="true"><div class="skeleton"></div></div></div></div><div class="grid grid-2" style="margin-top:10px"><div class="card"><h3>模型解析 双轨+VRAM检测</h3><div id="evo-vram" aria-busy="true"><div class="skeleton"></div></div></div><div class="card"><h3>训练状态 非阻塞+日志流+版本</h3><div id="evo-training-v3" aria-busy="true"><div class="skeleton"></div></div></div></div><div class="grid grid-2" style="margin-top:10px"><div class="card"><h3>评估Harness 20任务 5分类 security 100%</h3><div id="evo-eval" aria-busy="true"><div class="skeleton"></div></div></div><div class="card"><h3>Replay Buffer 30%防遗忘</h3><div id="evo-replay" aria-busy="true"><div class="skeleton"></div></div></div></div><div class="grid grid-2" style="margin-top:10px"><div class="card"><h3>Prompt进化 Darwin+EvolveR 4版本最佳0.795</h3><div id="evo-prompts" aria-busy="true"><div class="skeleton"></div></div></div><div class="card"><h3>技能基因 变异交叉 fitness>0.7保留</h3><div id="evo-gene" aria-busy="true"><div class="skeleton"></div></div></div></div><div class="card" style="margin-top:10px"><h3>调度器 凌晨2点+每30分空闲+资源感知+3点梦境</h3><div id="evo-scheduler" aria-busy="true"><div class="skeleton"></div></div></div></div>
-      <div class="view" id="view-models"><div class="view-header"><h2>🦙 模型管理 - 双轨GGUF+HF+VRAM检测</h2><div class="view-actions"><button class="btn" onclick="loadModels()">刷新</button><button class="btn" onclick="checkVram()">VRAM检测</button><button class="btn primary" onclick="addCustomModel()">添加模型A</button></div></div><div id="models-grid" aria-busy="true"><div class="skeleton"></div><div class="skeleton"></div></div><div class="card" style="margin-top:10px"><h3>VRAM检测+双轨推荐</h3><div id="vram-info" aria-busy="true"><div class="skeleton"></div></div></div></div>
-      <div class="view" id="view-tokens"><div class="view-header"><h2>🔑 Token可替换</h2><button class="btn" onclick="loadTokens()">刷新</button></div><div class="grid grid-2" id="tokens-grid" aria-busy="true"><div class="skeleton"></div></div></div>
-      <div class="view" id="view-database"><div class="view-header"><h2>🗄️ SQLite唯一WAL 8表+filelock+习惯学习</h2><div class="view-actions"><button class="btn" onclick="loadDatabase()">刷新</button><button class="btn" onclick="backupDb()">备份</button></div></div><div class="grid grid-2" id="database-grid" aria-busy="true"><div class="skeleton"></div></div><div class="card" style="margin-top:10px"><h3>习惯学习</h3><div id="habits-list"><span class="loading-spinner" aria-hidden="true"></span> 加载中...</div></div></div>
-      <div class="view" id="view-autonomous"><div class="view-header"><h2>🤖 20 Skill+APScheduler v3资源感知+习惯学习</h2><div class="view-actions"><button class="btn" onclick="loadAutonomous()">状态</button><button class="btn primary" onclick="runAutonomous()">运行自主任务</button><button class="btn" onclick="checkResources()">资源监控</button></div></div><div class="grid grid-2"><div class="card"><h3>空闲+调度器v3 凌晨2点+每30分+3点梦境</h3><div id="auto-idle" aria-busy="true"><div class="skeleton"></div></div></div><div class="card"><h3>20候选Skill+资源感知5维度</h3><div id="auto-candidates" style="max-height:300px;overflow-y:auto" aria-busy="true"><div class="skeleton"></div></div></div></div><div class="card" style="margin-top:10px"><h3>资源监控 CPU/内存/VRAM/插电/游戏会议/iOS</h3><div id="auto-resources" aria-busy="true"><div class="skeleton"></div></div></div></div>
-      <div class="view" id="view-system"><div class="view-header"><h2>系统+资源监控5维度 - 交互式</h2><div class="view-actions"><button class="btn" onclick="loadSystem()">刷新</button><button class="btn" onclick="loadCharts()">图表</button><button class="btn" onclick="checkResources()">资源监控</button></div></div><div class="grid grid-2"><div class="card"><h3>CPU - 每核心 Canvas交互式</h3><canvas id="cpu-chart" class="canvas-chart" width="400" height="150" aria-label="CPU每核心图表"></canvas><div id="cpu-info" style="font-size:10px;margin-top:8px"></div></div><div class="card"><h3>内存 Canvas交互式</h3><canvas id="memory-chart" class="canvas-chart" width="400" height="150" aria-label="内存图表"></canvas><div id="memory-info" style="font-size:10px;margin-top:8px"></div></div></div><div class="grid grid-2" style="margin-top:10px"><div class="card"><h3>资源监控 5维度可训练判断</h3><div id="system-resources" aria-busy="true"><div class="skeleton"></div></div></div><div class="card"><h3>VRAM检测+双轨推荐</h3><div id="system-vram" aria-busy="true"><div class="skeleton"></div></div></div></div><div class="grid grid-2" id="system-grid" style="margin-top:10px" aria-busy="true"><div class="card"><div class="skeleton"></div></div></div></div>
+      <div class="view" id="view-evolution"><div class="view-header"><h2>🧬 进化仪表盘 - v0914 崩溃恢复+SSE重连+8GB支持</h2><div class="view-actions"><button class="btn" onclick="loadEvolutionV3()">刷新</button><button class="btn primary" onclick="startTraining()">启动训练+SSE重连</button><button class="btn" onclick="runEvaluate()">评估真实/模拟</button></div></div><div class="grid grid-2"><div class="card"><h3>数据飞轮v3 过滤评分去重安全+阈值可配置</h3><div id="evo-flywheel-v3" aria-busy="true"><div class="skeleton"></div></div></div><div class="card"><h3>资源监控 5维度+摄像头麦克风+空闲检测</h3><div id="evo-resources" aria-busy="true"><div class="skeleton"></div></div></div></div><div class="grid grid-2" style="margin-top:10px"><div class="card"><h3>模型解析 双轨+VRAM检测+8GB 3060ti</h3><div id="evo-vram" aria-busy="true"><div class="skeleton"></div></div></div><div class="card"><h3>训练状态 崩溃恢复+SSE重连+失败不卡转圈</h3><div id="evo-training-v3" aria-busy="true"><div class="skeleton"></div></div><div id="training-log" style="font-size:9px;background:#1a1a2e;padding:8px;border-radius:4px;max-height:100px;overflow:auto;margin-top:8px;font-family:monospace">SSE日志流，指数退避重连，失败不卡转圈</div></div></div><div class="grid grid-2" style="margin-top:10px"><div class="card"><h3>评估Harness 20任务+真实回放+5分类 security 100%</h3><div id="evo-eval" aria-busy="true"><div class="skeleton"></div></div></div><div class="card"><h3>Replay Buffer 30%防遗忘+阈值可配置验证脚本</h3><div id="evo-replay" aria-busy="true"><div class="skeleton"></div></div></div></div><div class="grid grid-2" style="margin-top:10px"><div class="card"><h3>Prompt进化 Darwin+EvolveR 4版本最佳0.795</h3><div id="evo-prompts" aria-busy="true"><div class="skeleton"></div></div></div><div class="card"><h3>技能基因 变异交叉 fitness>0.7保留</h3><div id="evo-gene" aria-busy="true"><div class="skeleton"></div></div></div></div><div class="card" style="margin-top:10px"><h3>调度器 默认关闭+空闲N分钟+CPU/GPU阈值+摄像头麦克风</h3><div id="evo-scheduler" aria-busy="true"><div class="skeleton"></div></div><div style="font-size:9px;color:var(--text-muted);margin-top:4px">默认关闭自动微调，需显式开启，风险高，空闲检测比固定凌晨2点更贴近不打扰初衷</div></div></div>
+      <div class="view" id="view-models"><div class="view-header"><h2>🦙 模型管理 - 双轨GGUF+HF+VRAM检测+8GB 3060ti+优先级报错退出</h2><div class="view-actions"><button class="btn" onclick="loadModels()">刷新</button><button class="btn" onclick="checkVram()">VRAM检测+8GB支持</button><button class="btn primary" onclick="addCustomModel()">添加模型A</button><button class="btn" onclick="checkModelPath()">模型路径优先级</button></div></div><div id="models-grid" aria-busy="true"><div class="skeleton"></div><div class="skeleton"></div></div><div class="card" style="margin-top:10px"><h3>VRAM检测+双轨推荐+8GB 3060ti支持+模型路径优先级</h3><div id="vram-info" aria-busy="true"><div class="skeleton"></div></div><div style="font-size:9px;color:var(--text-muted);margin-top:4px">优先级：环境变量MODEL_PATH>配置>默认，找不到报错退出非静默失败，HF不自动下载需确认，8GB+32GB RAM可训练7B CPU offload</div></div></div>
+      <div class="view" id="view-tokens"><div class="view-header"><h2>🔑 Token可替换+iOS专用Token短有效期可吊销</h2><button class="btn" onclick="loadTokens()">刷新</button><button class="btn" onclick="loadIOSTokens()">iOS Tokens</button></div><div class="grid grid-2" id="tokens-grid" aria-busy="true"><div class="skeleton"></div></div><div class="card" style="margin-top:10px"><h3>iOS专用Token - 短有效期可远程吊销，不共用JWT</h3><div id="ios-tokens-list" aria-busy="true"><div class="skeleton"></div></div><div style="font-size:9px;color:var(--text-muted);margin-top:4px">只读24h控制2h，手机丢失可远程吊销，比Web端更严格</div></div></div>
+      <div class="view" id="view-database"><div class="view-header"><h2>🗄️ SQLite唯一WAL 8表+filelock+习惯学习</h2><div class="view-actions"><button class="btn" onclick="loadDatabase()">刷新</button><button class="btn" onclick="backupDb()">备份</button></div></div><div class="grid grid-2" id="database-grid" aria-busy="true"><div class="skeleton"></div></div><div class="card" style="margin-top:10px"><h3>习惯学习+空闲检测</h3><div id="habits-list"><span class="loading-spinner" aria-hidden="true"></span> 加载中... 空闲N分钟检测用户活动</div></div></div>
+      <div class="view" id="view-autonomous"><div class="view-header"><h2>🤖 20 Skill+APScheduler v0914 空闲检测+默认关闭+资源感知</h2><div class="view-actions"><button class="btn" onclick="loadAutonomous()">状态</button><button class="btn primary" onclick="runAutonomous()">运行自主任务</button><button class="btn" onclick="checkResources()">资源监控+摄像头麦克风</button></div></div><div class="grid grid-2"><div class="card"><h3>空闲+调度器 默认关闭+空闲N分钟+CPU/GPU阈值+摄像头麦克风</h3><div id="auto-idle" aria-busy="true"><div class="skeleton"></div></div></div><div class="card"><h3>20候选Skill+资源感知5维度+摄像头麦克风</h3><div id="auto-candidates" style="max-height:300px;overflow-y:auto" aria-busy="true"><div class="skeleton"></div></div></div></div><div class="card" style="margin-top:10px"><h3>资源监控 CPU/内存/VRAM/插电/游戏会议摄像头麦克风/iOS+空闲检测</h3><div id="auto-resources" aria-busy="true"><div class="skeleton"></div></div><div style="font-size:9px;color:var(--text-muted);margin-top:4px">空闲N分钟+CPU阈值+GPU阈值+插电+非游戏会议摄像头占用+iOS未查看=可训练，比固定凌晨2点更贴近不打扰初衷</div></div></div>
+      <div class="view" id="view-system"><div class="view-header"><h2>系统+资源监控5维度+摄像头麦克风 - 交互式</h2><div class="view-actions"><button class="btn" onclick="loadSystem()">刷新</button><button class="btn" onclick="loadCharts()">图表</button><button class="btn" onclick="checkResources()">资源监控+摄像头</button></div></div><div class="grid grid-2"><div class="card"><h3>CPU - 每核心 Canvas交互式</h3><canvas id="cpu-chart" class="canvas-chart" width="400" height="150" aria-label="CPU每核心图表"></canvas><div id="cpu-info" style="font-size:10px;margin-top:8px"></div></div><div class="card"><h3>内存 Canvas交互式</h3><canvas id="memory-chart" class="canvas-chart" width="400" height="150" aria-label="内存图表"></canvas><div id="memory-info" style="font-size:10px;margin-top:8px"></div></div></div><div class="grid grid-2" style="margin-top:10px"><div class="card"><h3>资源监控 5维度+摄像头麦克风+空闲检测</h3><div id="system-resources" aria-busy="true"><div class="skeleton"></div></div></div><div class="card"><h3>VRAM检测+双轨推荐+8GB 3060ti</h3><div id="system-vram" aria-busy="true"><div class="skeleton"></div></div></div></div><div class="grid grid-2" id="system-grid" style="margin-top:10px" aria-busy="true"><div class="card"><div class="skeleton"></div></div></div></div>
       <div class="view" id="view-traces"><div class="view-header"><h2>轨迹 - SQLite唯一 filelock</h2><button class="btn" onclick="loadTraces()">刷新</button></div><div class="grid grid-2"><div class="card"><h3>统计</h3><div id="trace-stats" aria-busy="true"><div class="skeleton"></div></div></div><div class="card"><h3>最近</h3><div id="trace-list" class="list" aria-busy="true"><div class="skeleton"></div></div></div></div></div>
       <div class="view" id="view-skills"><div class="view-header"><h2>技能 - 基因变异交叉+20+个性化</h2><div class="view-actions"><button class="btn" onclick="loadSkills()">刷新</button><button class="btn" onclick="loadSkillGenes()">基因树</button><button class="btn" onclick="evolveGenes()">进化基因</button></div></div><div id="skills-grid" class="grid grid-2" aria-busy="true"><div class="skeleton"></div></div><div class="card" style="margin-top:10px"><h3>技能基因树 变异交叉选择 fitness>0.7保留</h3><div id="skill-genes" aria-busy="true"><div class="skeleton"></div></div></div></div>
-      <div class="view" id="view-memory"><div class="view-header"><h2>记忆 - v3 4层统一+SimpleMem压缩+遗忘+DREAMS.md</h2><div class="view-actions"><button class="btn" onclick="loadMemory()">刷新</button><button class="btn" onclick="loadMemoryV3()">记忆v3</button><input id="memory-query" placeholder="搜索..." aria-label="记忆搜索"><button class="btn" onclick="searchMemory()">搜索</button><button class="btn" onclick="forgetMemory()">遗忘低价值</button></div></div><div class="grid grid-3"><div class="card"><h3>Working 会话</h3><div id="mem-working" aria-busy="true"><div class="skeleton"></div></div></div><div class="card"><h3>Semantic 语义</h3><div id="mem-semantic" aria-busy="true"><div class="skeleton"></div></div></div><div class="card"><h3>Episodic 情景</h3><div id="mem-episodic" aria-busy="true"><div class="skeleton"></div></div></div></div><div class="grid grid-2" style="margin-top:10px"><div class="card"><h3>记忆v3 4层统一+SimpleMem+遗忘</h3><div id="mem-v3" aria-busy="true"><div class="skeleton"></div></div></div><div class="card"><h3>SimpleMem 30%压缩 3x Token +26.4% F1</h3><div id="mem-simple" aria-busy="true"><div class="skeleton"></div></div></div></div><div class="card" style="margin-top:10px"><h3>向量/DB搜索 - 真实向量+关键词回退</h3><div id="mem-vector"><span class="loading-spinner"></span> 输入关键词搜索...</div></div></div>
-      <div class="view" id="view-processes"><div class="view-header"><h2>进程 - filelock安全+资源监控</h2><button class="btn" onclick="loadProcesses()">刷新</button></div><div id="proc-list" class="list" aria-busy="true"><div class="skeleton"></div></div></div>
-      <div class="view" id="view-windows"><div class="view-header"><h2>窗口 - HWND真实 Z序DPI置顶</h2><button class="btn" onclick="loadWindows()">枚举</button></div><div id="win-grid" class="grid grid-2" aria-busy="true"><div class="skeleton"></div></div></div>
-      <div class="view" id="view-files"><div class="view-header"><h2>文件 - filelock+沙盒+过滤100%</h2><div style="display:flex;gap:6px"><input id="file-path" value="/tmp" aria-label="文件路径" style="flex:1;padding:6px 8px;background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:11px;font-family:monospace"><button class="btn" onclick="loadFiles()">浏览</button><button class="btn" onclick="testFilter()">过滤测试</button></div></div><div id="file-list" class="list" style="margin-top:10px" aria-busy="true"><div class="skeleton"></div></div><div class="card" style="margin-top:10px"><h3>过滤测试 - 危险路径拦截100%</h3><div id="filter-test" aria-busy="true"><div class="skeleton"></div></div></div></div>
-      <div class="view" id="view-dreaming"><div class="view-header"><h2>梦境三阶段 Dream+Evolve+Consolidate</h2><div class="view-actions"><button class="btn primary" onclick="runDreaming('all')">全部</button><button class="btn" onclick="runDreamCycle()">梦境循环v2.5</button></div></div><div class="grid grid-3"><div class="card"><h3>Light 轻量</h3><div id="dream-light" aria-busy="true"><div class="skeleton"></div></div></div><div class="card"><h3>REM 快速眼动</h3><div id="dream-rem"></div></div><div class="card"><h3>Deep 深度</h3><div id="dream-deep"></div></div></div><div class="card" style="margin-top:10px"><h3>梦境循环v2.5 3阶段</h3><div id="dream-cycle" aria-busy="true"><div class="skeleton"></div></div></div></div>
-      <div class="view" id="view-security"><div class="view-header"><h2>安全 - 过滤100%+沙盒+filelock+slowapi+JWT+10MB</h2><div class="view-actions"><button class="btn" onclick="loadSecurity()">扫描</button><button class="btn" onclick="testFilter()">过滤测试</button><button class="btn" onclick="checkSandbox()">沙盒检查</button></div></div><div class="grid grid-2"><div class="card"><h3>过滤测试 危险路径11+文件8+进程7+命令6 security 100%</h3><div id="filter-test-sec" aria-busy="true"><div class="skeleton"></div></div></div><div class="card"><h3>沙盒 realpath+白名单+filelock+回收站</h3><div id="sandbox-result" aria-busy="true"><div class="skeleton"></div></div></div></div><div class="grid grid-2" style="margin-top:10px"><div class="card"><h3>策略 权限分级L0只读L1写入L2危险+保护路径</h3><div id="sec-policy"></div></div><div class="card"><h3>漏洞扫描 明文密码+高危端口+启动项</h3><div id="sec-scan" aria-busy="true"><div class="skeleton"></div></div></div></div></div>
-      <div class="view" id="view-contracts"><div class="view-header"><h2>契约 23 - 工具契约+风险分级</h2><button class="btn" onclick="loadContracts()">刷新</button></div><div id="contracts-list" class="list" aria-busy="true"><div class="skeleton"></div></div></div>
-      <div class="view" id="view-thinking"><div class="view-header"><h2>🧠 思考预算 - Qwen3 2026 /think 32K /no_think 8K</h2><div class="view-actions"><button class="btn" onclick="loadThinking()">刷新</button><button class="btn" onclick="testThinking()">测试复杂度</button></div></div><div class="grid grid-2"><div class="card"><h3>思考预算 复杂度评估+三档采样</h3><div id="thinking-budget" aria-busy="true"><div class="skeleton"></div></div></div><div class="card"><h3>Ralph Loop bash while全新上下文+三护栏</h3><div id="ralph-status" aria-busy="true"><div class="skeleton"></div></div></div></div><div class="grid grid-2" style="margin-top:10px"><div class="card"><h3>有界自校正 UCSL不确定度+3轮预算</h3><div id="correction-stats" aria-busy="true"><div class="skeleton"></div></div></div><div class="card"><h3>技能库 SAGE Sequential Rollout</h3><div id="skill-library" aria-busy="true"><div class="skeleton"></div></div></div></div></div>
-      <div class="view" id="view-settings"><div class="view-header"><h2>设置 - v0913模块化技术栈+8层+自主进化v3.0</h2></div><div class="grid grid-2" id="settings-grid" aria-busy="true"><div class="skeleton"></div></div></div>
-      <div class="view" id="view-benchmark"><div class="view-header"><h2>基准 20任务 5分类 file/system/window/security/network 95% security 100%</h2><div class="view-actions"><button class="btn" onclick="loadBenchmark()">刷新</button><button class="btn primary" onclick="runBenchmark()">运行20任务</button><button class="btn" onclick="runEvaluate()">评估Harness</button></div></div><div id="bench-list" aria-busy="true"><div class="skeleton"></div></div><div class="card" style="margin-top:10px"><h3>评估Harness Benchmark 20任务+Replay 30%+2%晋升</h3><div id="bench-eval" aria-busy="true"><div class="skeleton"></div></div></div></div>
+      <div class="view" id="view-memory"><div class="view-header"><h2>记忆 - v0914 4层统一+SimpleMem use_llm开关+遗忘测试+DREAMS.md+重要性排序</h2><div class="view-actions"><button class="btn" onclick="loadMemory()">刷新</button><button class="btn" onclick="loadMemoryV3()">记忆v3</button><input id="memory-query" placeholder="搜索... 重要性排序" aria-label="记忆搜索"><button class="btn" onclick="searchMemory()">搜索重要性排序</button><button class="btn" onclick="forgetMemory()">遗忘低价值+测试</button><button class="btn" onclick="loadDreams()">DREAMS.md</button></div></div><div class="grid grid-3"><div class="card"><h3>Working 会话 100字</h3><div id="mem-working" aria-busy="true"><div class="skeleton"></div></div></div><div class="card"><h3>Semantic 语义 80字</h3><div id="mem-semantic" aria-busy="true"><div class="skeleton"></div></div></div><div class="card"><h3>Episodic 情景 150字</h3><div id="mem-episodic" aria-busy="true"><div class="skeleton"></div></div></div></div><div class="grid grid-2" style="margin-top:10px"><div class="card"><h3>记忆v3 4层统一+SimpleMem+遗忘+测试</h3><div id="mem-v3" aria-busy="true"><div class="skeleton"></div></div></div><div class="card"><h3>SimpleMem use_llm开关+重要性排序+30%压缩+26.4% F1</h3><div id="mem-simple" aria-busy="true"><div class="skeleton"></div></div><div style="font-size:9px;color:var(--text-muted);margin-top:4px">use_llm=false默认固定长度离线可用，true用LLM高质量可选，重要性排序最近访问+上次任务引用</div></div></div><div class="card" style="margin-top:10px"><h3>向量/DB搜索 - 真实向量+关键词回退+重要性排序</h3><div id="mem-vector"><span class="loading-spinner"></span> 输入关键词搜索... 按重要性排序</div></div><div class="card" style="margin-top:10px"><h3>DREAMS.md - 人类可读日记，记录遗忘记忆</h3><div id="dreams-content" aria-busy="true"><div class="skeleton"></div></div><div style="font-size:9px;color:var(--text-muted);margin-top:4px">遗忘机制最容易埋雷，需单元测试验证，DREAMS.md记录遗忘避免文档实际脱节</div></div></div>
+      <div class="view" id="view-processes"><div class="view-header"><h2>进程 - filelock安全+资源监控+安全加固路径PID验证</h2><button class="btn" onclick="loadProcesses()">刷新</button><button class="btn" onclick="loadProcessSecurity()">安全检查</button></div><div id="proc-list" class="list" aria-busy="true"><div class="skeleton"></div></div><div class="card" style="margin-top:10px"><h3>kill_process安全加固 - 白名单外可疑+强制确认+路径PID双重验证防伪造</h3><div id="proc-security" aria-busy="true"><div class="skeleton"></div></div><div style="font-size:9px;color:var(--text-muted);margin-top:4px">默认只允许白名单外可疑进程，强制走确认队列，不自动执行，进程名可伪造需路径+PID双重验证，危险PID拦截</div></div></div>
+      <div class="view" id="view-windows"><div class="view-header"><h2>窗口 - HWND真实 Z序DPI置顶+多显示器测试</h2><button class="btn" onclick="loadWindows()">枚举</button></div><div id="win-grid" class="grid grid-2" aria-busy="true"><div class="skeleton"></div></div></div>
+      <div class="view" id="view-files"><div class="view-header"><h2>文件 - filelock+沙盒+过滤100%+重要性排序+undo端到端</h2><div style="display:flex;gap:6px"><input id="file-path" value="/tmp" aria-label="文件路径" style="flex:1;padding:6px 8px;background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:11px;font-family:monospace"><button class="btn" onclick="loadFiles()">浏览重要性排序</button><button class="btn" onclick="testFilter()">过滤测试</button><button class="btn" onclick="testUndo()">undo端到端</button></div></div><div id="file-list" class="list" style="margin-top:10px" aria-busy="true"><div class="skeleton"></div></div><div class="grid grid-2" style="margin-top:10px"><div class="card"><h3>过滤测试 - 危险路径拦截100%+阈值可配置</h3><div id="filter-test" aria-busy="true"><div class="skeleton"></div></div></div><div class="card"><h3>undo_stack端到端 - 回收站清空权限变化边界</h3><div id="undo-test" aria-busy="true"><div class="skeleton"></div></div><div style="font-size:9px;color:var(--text-muted);margin-top:4px">可撤销不是心理安慰，需端到端测试回收站被清空路径权限变化等边界</div></div></div></div>
+      <div class="view" id="view-dreaming"><div class="view-header"><h2>梦境三阶段 Dream+Evolve+Consolidate+DREAMS.md人类可读</h2><div class="view-actions"><button class="btn primary" onclick="runDreaming('all')">全部</button><button class="btn" onclick="runDreamCycle()">梦境循环v0914</button><button class="btn" onclick="loadDreams()">DREAMS.md</button></div></div><div class="grid grid-3"><div class="card"><h3>Light 轻量</h3><div id="dream-light" aria-busy="true"><div class="skeleton"></div></div></div><div class="card"><h3>REM 快速眼动</h3><div id="dream-rem"></div></div><div class="card"><h3>Deep 深度</h3><div id="dream-deep"></div></div></div><div class="card" style="margin-top:10px"><h3>梦境循环v0914 3阶段+DREAMS.md人类可读日记</h3><div id="dream-cycle" aria-busy="true"><div class="skeleton"></div></div></div><div class="card" style="margin-top:10px"><h3>DREAMS.md - 遗忘记忆人类可读日记</h3><div id="dream-dreams" aria-busy="true"><div class="skeleton"></div></div></div></div>
+      <div class="view" id="view-security"><div class="view-header"><h2>安全 - 过滤100%+沙盒+filelock+slowapi+JWT+10MB+弹窗+路径PID验证+undo端到端</h2><div class="view-actions"><button class="btn" onclick="loadSecurity()">扫描</button><button class="btn" onclick="testFilter()">过滤测试</button><button class="btn" onclick="checkSandbox()">沙盒检查</button><button class="btn primary" onclick="showPendingModal()">🛡️ 待确认队列弹窗</button></div></div><div class="grid grid-2"><div class="card"><h3>过滤测试 危险路径11+文件8+进程7+命令6 security 100%+阈值可配置</h3><div id="filter-test-sec" aria-busy="true"><div class="skeleton"></div></div></div><div class="card"><h3>沙盒 realpath+白名单+filelock+回收站+undo端到端</h3><div id="sandbox-result" aria-busy="true"><div class="skeleton"></div></div></div></div><div class="grid grid-2" style="margin-top:10px"><div class="card"><h3>策略 权限分级L0只读L1写入L2危险+保护路径+待确认队列+前端弹窗</h3><div id="sec-policy"></div></div><div class="card"><h3>漏洞扫描 明文密码+高危端口+启动项+kill_process安全加固</h3><div id="sec-scan" aria-busy="true"><div class="skeleton"></div></div></div></div><div class="card" style="margin-top:10px"><h3>🛡️ 待确认队列 - 前端弹窗主动提醒，避免忽略卡队列或自动放行</h3><div id="pending-queue" aria-busy="true"><div class="skeleton"></div></div><div style="font-size:9px;color:var(--text-muted);margin-top:4px">强烈建议加前端弹窗提醒，仅靠platform_status被动展示容易被忽略，导致危险操作卡队列没人处理或被自动放行</div></div></div>
+      <div class="view" id="view-contracts"><div class="view-header"><h2>契约 23 - 工具契约+风险分级+undo端到端测试</h2><button class="btn" onclick="loadContracts()">刷新</button><button class="btn" onclick="testUndo()">undo端到端</button></div><div id="contracts-list" class="list" aria-busy="true"><div class="skeleton"></div></div><div class="card" style="margin-top:10px"><h3>undo_stack端到端测试 - 回收站清空权限变化边界</h3><div id="contracts-undo" aria-busy="true"><div class="skeleton"></div></div></div></div>
+      <div class="view" id="view-thinking"><div class="view-header"><h2>🧠 思考预算 - Qwen3 2026 /think 32K /no_think 8K+两级评估关键词快速+LLM确认模糊区间</h2><div class="view-actions"><button class="btn" onclick="loadThinking()">刷新</button><button class="btn" onclick="testThinking()">测试复杂度两级</button></div></div><div class="grid grid-2"><div class="card"><h3>思考预算 复杂度评估+三档采样+两级评估</h3><div id="thinking-budget" aria-busy="true"><div class="skeleton"></div></div><div style="font-size:9px;color:var(--text-muted);margin-top:4px">两级：先关键词快速判断，模糊区间再LLM确认，兼顾速度准确性，默认false速度快，ZANE_THINKING_USE_LLM覆盖</div></div><div class="card"><h3>Ralph Loop bash while全新上下文+三护栏</h3><div id="ralph-status" aria-busy="true"><div class="skeleton"></div></div></div></div><div class="grid grid-2" style="margin-top:10px"><div class="card"><h3>有界自校正 UCSL不确定度+3轮预算</h3><div id="correction-stats" aria-busy="true"><div class="skeleton"></div></div></div><div class="card"><h3>技能库 SAGE Sequential Rollout</h3><div id="skill-library" aria-busy="true"><div class="skeleton"></div></div></div></div></div>
+      <div class="view" id="view-ios"><div class="view-header"><h2>📱 iOS远程 - 只读查看REST/SSE轮询+专用Token短有效期可吊销</h2><div class="view-actions"><button class="btn" onclick="loadIOS()">刷新</button><button class="btn" onclick="createIOSToken()">生成Token</button><button class="btn primary" onclick="openIOSPage()">只读查看页面</button></div></div><div class="grid grid-2"><div class="card"><h3>iOS状态 - 查看中暂停训练</h3><div id="ios-status" aria-busy="true"><div class="skeleton"></div></div><div style="font-size:9px;color:var(--text-muted);margin-top:4px">iOS查看中时暂停训练避免打扰，POST /api/ios/report上报</div></div><div class="card"><h3>系统状态 - 只读远程查看，无控制</h3><div id="ios-system" aria-busy="true"><div class="skeleton"></div></div><div style="font-size:9px;color:var(--text-muted);margin-top:4px">第一版只做只读，无控制功能降低风险，REST轮询或SSE订阅无需WebSocket</div></div></div><div class="card" style="margin-top:10px"><h3>iOS专用Token - 短有效期可远程吊销，不共用JWT</h3><div id="ios-tokens" aria-busy="true"><div class="skeleton"></div></div><div style="font-size:9px;color:var(--text-muted);margin-top:4px">只读24h控制2h，手机丢失可远程吊销，比Web端更严格，Header X-IOS-Token</div></div><div class="card" style="margin-top:10px"><h3>只读查看页面 - 第一版无控制</h3><div id="ios-page" style="font-size:11px">访问 /api/ios/readonly 查看iOS只读页面<br>或点击"只读查看页面"按钮<br>控制功能需更严格认证审计放到后续版本</div></div></div>
+      <div class="view" id="view-settings"><div class="view-header"><h2>设置 - v0914技术栈+8层+29条反馈修复+8GB 3060ti支持</h2></div><div class="grid grid-2" id="settings-grid" aria-busy="true"><div class="skeleton"></div></div><div class="card" style="margin-top:10px"><h3>配置中心 - 可配置阈值+开关</h3><div id="config-center" style="font-size:11px" aria-busy="true"><div class="skeleton"></div></div><div style="font-size:9px;color:var(--text-muted);margin-top:4px">evolution_schedule.json默认关闭+replay_config.json阈值可配置+simplemem.json use_llm开关+thinking_config.json两级评估+resource_config.json摄像头麦克风检测</div></div></div>
+      <div class="view" id="view-benchmark"><div class="view-header"><h2>基准 20任务+真实回放 - 5分类 file/system/window/security/network 95% security 100%</h2><div class="view-actions"><button class="btn" onclick="loadBenchmark()">刷新</button><button class="btn primary" onclick="runBenchmark()">运行20任务模拟</button><button class="btn primary" onclick="runRealBenchmark()">真实回放agent_runtime</button><button class="btn" onclick="runEvaluate()">评估Harness真实/模拟</button></div></div><div id="bench-list" aria-busy="true"><div class="skeleton"></div></div><div class="grid grid-2" style="margin-top:10px"><div class="card"><h3>评估Harness - 真实回放可信度高 vs 模拟冒烟</h3><div id="bench-eval" aria-busy="true"><div class="skeleton"></div></div><div style="font-size:9px;color:var(--text-muted);margin-top:4px">50条模拟只能算冒烟测试，真实调用agent_runtime执行几十条任务统计成功率决定是否采纳训练结果，否则数据飞轮可信度打折扣</div></div><div class="card"><h3>阈值验证 - 0.8无理论依据需实验</h3><div id="threshold-validation" aria-busy="true"><div class="skeleton"></div></div><div style="font-size:9px;color:var(--text-muted);margin-top:4px">跑tests/test_threshold_validation.py看不同阈值0.5-0.9对回放效果影响再定默认值，可配置</div></div></div></div>
     </div>
   </main>
 </div>
 
+<script type="module">
+import './js/platform_status.js';
+import './js/pending_modal.js';
+</script>
 <script type="module" src="/js/app.js"></script>
+<script type="module" src="/js/evolution.js"></script>
 </body>
 </html>

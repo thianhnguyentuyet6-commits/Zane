@@ -1,14 +1,20 @@
 {
-  "enabled": true,
-  "train_time": "02:00",
-  "check_interval_minutes": 30,
+  "enabled": false,
+  "auto_evolve": false,
+  "idle_minutes": 30,
   "cpu_threshold": 20,
   "memory_threshold": 70,
   "vram_threshold_gb": 18,
-  "idle_minutes": 30,
-  "require_plugged": false,
-  "pause_on_game": true,
-  "pause_on_meeting_fullscreen": true,
+  "gpu_util_threshold": 30,
+  "check_interval_minutes": 15,
   "min_samples": 50,
-  "auto_trigger": true
+  "require_plugged": true,
+  "pause_on_game": true,
+  "pause_on_meeting": true,
+  "pause_on_ios_viewing": true,
+  "allow_nightly": false,
+  "nightly_time": "02:00",
+  "max_train_per_day": 1,
+  "cooldown_hours": 6,
+  "note": "v0914 默认关闭自动微调，需用户在config/evolution_schedule.json中设置enabled=true显式开启，或设置环境变量ZANE_AUTO_EVOLVE=true，风险较高。触发条件：用户空闲N分钟+CPU/GPU利用率低于阈值组合，比固定时间窗口更贴近不打扰用户初衷"
 }

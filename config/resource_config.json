@@ -1,0 +1,12 @@
+{
+  "cpu_threshold": 20,
+  "memory_threshold": 70,
+  "vram_threshold_gb": 18,
+  "gpu_util_threshold": 30,
+  "idle_minutes": 30,
+  "check_camera_mic": true,
+  "game_detection": true,
+  "meeting_detection": true,
+  "fullscreen_detection": true,
+  "note": "v0914 资源监控5维度+摄像头/麦克风检测会议中，比进程名更可靠，空闲N分钟+CPU/GPU阈值组合"
+}
