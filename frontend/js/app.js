@@ -1,6 +1,7 @@
 import { apiGet, apiPost, tokenApi, databaseApi, autonomousApi, systemApi } from './api.js';
 import { modelsApi, renderModelsView } from './models.js';
 import { drawInteractiveCpuChart, drawInteractiveMemoryChart } from './charts.js';
+import './platform_status.js'; // v0913 平台状态条 真实/演示区分
 window.drawInteractiveCpuChart = drawInteractiveCpuChart;
 window.drawInteractiveMemoryChart = drawInteractiveMemoryChart;
 
