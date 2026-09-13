@@ -79,16 +79,16 @@ def test_undo_basic():
             pass
         
         print("✅ 基本撤销测试通过")
-        return True
+        assert True
         
     except ImportError as e:
         print(f"❌ 导入失败: {e}")
-        return False
+        assert False, '测试失败'
     except Exception as e:
         print(f"❌ 测试失败: {e}")
         import traceback
         traceback.print_exc()
-        return False
+        assert False, '测试失败'
 
 
 def test_undo_edge_cases():
@@ -168,13 +168,13 @@ def test_undo_edge_cases():
             pass
         
         print("✅ 边界情况测试完成")
-        return True
+        assert True
         
     except Exception as e:
         print(f"❌ 边界测试失败: {e}")
         import traceback
         traceback.print_exc()
-        return False
+        assert False, '测试失败'
 
 
 def test_undo_stack_persistence():
@@ -218,13 +218,13 @@ def test_undo_stack_persistence():
             pass
         
         print("✅ 撤销栈持久化测试通过")
-        return True
+        assert True
         
     except Exception as e:
         print(f"❌ 持久化测试失败: {e}")
         import traceback
         traceback.print_exc()
-        return False
+        assert False, '测试失败'
 
 
 if __name__ == "__main__":
